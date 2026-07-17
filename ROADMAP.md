@@ -9,12 +9,12 @@ The roadmap describes public-alpha direction and does not promise dates.
 - Resumable install summaries after interrupted provider or model downloads.
 - Contract tests against released Oída and GERM installer surfaces.
 - Screen-reader and low-vision terminal audits.
-- Explicit update previews showing source commits before checkout.
+- Compatibility-set migration previews with release notes before changing pins.
 
 ## Toward Beta
 
 - Stable installer-state migrations.
-- Version-channel selection for application tags and tested compatibility sets.
+- Opt-in version-channel selection beyond the default tested compatibility set.
 - Reproducible provider-lock metadata and model revision pinning.
 - Optional signed desktop launchers built from the same assistant core.
 - End-to-end smoke fixtures that start both model-free gateways and complete one

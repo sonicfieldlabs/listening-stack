@@ -6,6 +6,11 @@
 zip application and its SHA-256 checksum. It refuses to execute the download
 when verification fails or no SHA-256 utility is available.
 
+The bootstrap accepts only one 64-character digest naming exactly
+`listening-stack.pyz`; it never passes a downloaded checksum filename to the
+checksum utility. The verified executable is written to a temporary file in
+the destination directory and atomically replaces the prior executable.
+
 A curl pipe is concise but difficult to inspect. For shared, privileged, or
 long-lived machines, download the bootstrap first, read it, pin
 `LISTENING_STACK_VERSION`, and then execute it.
@@ -16,15 +21,16 @@ installation was not disabled.
 
 ## Git Safety
 
-The install root contains dedicated checkouts, not development worktrees. For
-an existing checkout the assistant:
+The install root contains dedicated checkouts, not development worktrees. The
+assistant refuses roots inside an existing Git repository and refuses symlinked
+managed directories. For an existing checkout it:
 
 1. requires a `.git` directory;
 2. checks the exact GitHub origin;
 3. refuses a dirty worktree;
-4. fetches the configured public-alpha branch;
-5. checks out the fetched commit detached;
-6. records the commit in local state.
+4. fetches an immutable commit from the release compatibility set;
+5. checks out the fetched commit detached and verifies the resulting SHA;
+6. records the release label, origin, and commit in local state.
 
 It does not reset, clean, stash, force-push, or rewrite history.
 
@@ -38,6 +44,11 @@ Tailscale addresses, personal network names, or model credentials.
 Hugging Face authentication remains in the Hugging Face CLI's own credential
 store. Network-provider credentials are outside this installer and must remain
 in operator-managed environment or secret stores.
+
+The installer writes `state.json` only after application imports and selected
+host integrations succeed, so the state file remains a completed-installation
+marker rather than an optimistic plan. Its JSON input size and structure are
+bounded before lifecycle commands use it.
 
 ## Local Data
 
@@ -57,11 +68,20 @@ The local gateways bind to `127.0.0.1` by default. Exposing them to a LAN,
 overlay network, reverse proxy, or public host is a separate operator decision
 and is not automated here.
 
+The generated environment explicitly binds Oída and GERM to loopback, gives
+both applications one install-root `AKOUSMATA_PATH`, bounds GERM's accepted
+input roots to GERM output, Oída handoff audio, and the shared store, bounds
+model roots to install-managed paths, and keeps cloud image analysis off.
+Lifecycle commands reject edited state that would make them bind or probe a
+non-loopback host.
+
 ## Process Control
 
 Oída manages its own recorded gateway process. The assistant records GERM's PID
-and checks its command before sending a signal. It refuses to stop a PID that
-does not look like the recorded Uvicorn GERM process.
+and process-start token and checks both with its command before sending a
+signal. It refuses to stop a reused PID or a process that does not look like
+the recorded Uvicorn GERM server. A health endpoint is reused only when its
+service identity matches the expected application.
 
 ## Reporting
 

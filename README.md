@@ -16,7 +16,7 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer release: `0.1.0`.
+Current installer release: `0.1.2`.
 
 ## Quick Start
 
@@ -62,7 +62,21 @@ chmod +x listening-stack.pyz
 
 Sources are cloned into a dedicated installation directory. The installer
 verifies every existing origin and refuses to update a dirty or unexpected
-checkout. It records the exact commits it installed in local state.
+checkout. Release `0.1.2` installs one immutable compatibility set and records
+the exact commits it installed in local state:
+
+| Component | Tested release |
+| --- | --- |
+| Oída | 0.6.5 |
+| GERM | 0.2.5 |
+| AKOÚŌ | 0.7.0 |
+| Earworm | 0.4.0 |
+| Akousmata | 0.4.0 |
+
+The official MOSS-Audio source is pinned to the revision tested with Oída
+0.6.5. Stable Audio 3 source is pinned to the same revision locked by GERM
+0.2.5. Rerunning this installer therefore reproduces the compatibility set;
+it does not silently advance a checkout to a newer moving branch.
 
 ## Model Choices
 
@@ -97,6 +111,11 @@ MOSS-Audio code and released model checkpoints are Apache-2.0. Oída is develope
 and tested first against the 4B Instruct and Thinking checkpoints while
 remaining model-agnostic at its gateway boundary.
 
+Oída 0.6.5 requires Safetensors for its embedded model loader and pins its
+compatible Torch, TorchAudio, TorchCodec, and Transformers releases. The
+installer downloads MOSS checkpoints by immutable Hugging Face commit and the
+doctor verifies both model configuration and Safetensors weights.
+
 Stable Audio 3's repository code is MIT. Its downloadable weights are a
 separate matter: the listed checkpoints are gated and currently identify the
 Stability AI Community License plus additional component terms. They should
@@ -118,6 +137,11 @@ runtime paths, and attribution guidance.
   Homebrew, apt, or dnf when available.
 - Xcode command-line tools for native Apple Silicon build steps.
 - A Hugging Face account only for gated Stable Audio 3 weights.
+
+When `uv` is absent, the assistant downloads the checksum-pinned official
+installer for tested `uv` 0.11.29 without modifying shell startup files. A
+pinned Hugging Face CLI is installed inside the selected Listening Stack root,
+not into the host's global tool directory.
 
 The Stable Audio 3 Small models have an upstream CPU path. GERM can prepare its
 MLX route on Apple Silicon. Stable Audio 3 Medium expects CUDA in the upstream
@@ -173,6 +197,12 @@ non-secret settings only. Hugging Face credentials stay in the Hugging Face
 CLI's own local credential store and are never copied into this repository or
 the installer state.
 
+Oída and GERM share one explicit `AKOUSMATA_PATH` under the installation root.
+GERM's allowed hosts, input roots, and model roots are bounded to the generated
+loopback and install-root paths. The bounded input set includes GERM output,
+Oída's handoff audio, and the shared Akousmata store; cloud image analysis
+remains disabled unless an operator enables it separately.
+
 ## Agent Integrations
 
 Oída exposes the agentic listening gateway. The assistant can install its
@@ -194,6 +224,7 @@ the stack's local services.
 ## Safety and Data Boundaries
 
 - The bootstrap verifies the release checksum before execution.
+- Component and model-runtime source checkouts use immutable revisions.
 - No model, token, recording, generated sound, log, machine path, or installer
   state is committed to this repository.
 - Model terms are displayed before gated downloads.
@@ -214,6 +245,9 @@ a shared machine.
   certify model output quality or legal fitness for a particular use.
 - Stable Audio 3's optimized paths differ across CPU, CUDA, and Apple Silicon.
 - Oída and GERM interfaces remain under active development before 1.0.
+- Stable Audio 3's Python loader resolves gated model revisions through its
+  upstream Hugging Face contract; the exact resolved cache revision is recorded
+  in installer state when available.
 
 ## Development
 
@@ -233,8 +267,8 @@ Use a dry run to inspect installation commands without changing the machine:
   --accept-model-terms --yes --dry-run
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), [ROADMAP.md](ROADMAP.md), and
-[CITATION.cff](CITATION.cff).
+See [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md),
+[ROADMAP.md](ROADMAP.md), and [CITATION.cff](CITATION.cff).
 
 ## License
 

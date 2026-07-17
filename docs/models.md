@@ -26,6 +26,13 @@ serves direct and transcription routes; the Thinking model serves deeper,
 music, and targeted re-listening routes. Oída consumes a final model response
 as bounded evidence and does not expose private reasoning traces.
 
+Listening Stack 0.1.2 downloads each MOSS checkpoint by the immutable commit
+audited for this release. Oída 0.6.5's embedded loader requires Safetensors and
+uses its locked Torch 2.10, TorchAudio 2.10, TorchCodec 0.10, and Transformers
+5.14 runtime. The installer also prepares Oída's optional Music ID dependency;
+identification remains opt-in per listen and may contact the service used by
+ShazamIO when an operator enables it.
+
 Oída's current planning guidance is 16 GB minimum and 24 GB suggested for 4B,
 or 24 GB minimum and 48 GB suggested for 8B. Apple Silicon and CUDA are the
 practical accelerated routes. CPU execution is possible but can be slow.
@@ -81,6 +88,10 @@ For a publication or release, record:
 
 The CLI queries the official Hugging Face API's current `usedStorage` field.
 Its static values are fallbacks for offline planning.
+
+Live size requests run concurrently with bounded response sizes, so one slow
+model endpoint does not serialize the entire planning pass. The resulting size
+is advisory; model identity and source revision remain separate provenance.
 
 Disk estimates include all selected checkpoint bytes, a 15% margin for download
 and extraction behavior, and a fixed reserve for source and Python environments.
