@@ -13,8 +13,8 @@ review and accept its terms, then authenticate in the same terminal:
 
 ```bash
 export HF_HOME="$HOME/SonicField/ListeningStack/models/huggingface"
-hf auth login
-hf auth whoami
+"$HOME/SonicField/ListeningStack/.listening-stack/bin/hf" auth login
+"$HOME/SonicField/ListeningStack/.listening-stack/bin/hf" auth whoami
 ```
 
 Rerun the installer with the same model selection. Existing complete downloads
@@ -34,16 +34,25 @@ belong there, then rerun the assistant.
 
 ## Oída starts in stub mode
 
-Check that the selected MOSS checkpoint directories contain `config.json`, and
-inspect the generated environment:
+Check that the selected MOSS checkpoint directories contain `config.json` and
+one or more `*.safetensors` files, then inspect the generated environment:
 
 ```bash
 grep '^OIDA_' "$HOME/SonicField/ListeningStack/.listening-stack/stack.env"
 listening-stack doctor
 ```
 
-The installer sets explicit local MOSS paths. It does not silently enable Hub
-lookup. Rerun model download if a checkpoint is incomplete.
+The installer sets explicit local MOSS paths, disables silent Hub lookup, and
+downloads the immutable revisions tested with Oída 0.6.5. Rerun model download
+if a checkpoint is incomplete.
+
+## A repository is clean but reported as outdated
+
+Listening Stack releases use an immutable compatibility set. A checkout can
+match an older recorded installation and still differ from the current
+installer's pin. Review the versions and revisions in the install plan, then
+rerun the same install command. The assistant fetches only the expected commit
+and never resets local work.
 
 ## GERM reports its provider unavailable
 

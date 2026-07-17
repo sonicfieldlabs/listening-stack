@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import hashlib
+import hmac
 import json
 import os
 from pathlib import Path
@@ -12,15 +14,16 @@ import shlex
 import sys
 from typing import Dict, List, Mapping, Sequence, Tuple
 
+from . import __version__
 from .catalog import (
-    GERM_SOURCE_KEYS,
+    ALL_REPOSITORIES,
     MODELS,
     MOSS_AUDIO_REPOSITORY,
-    OIDA_SOURCE_KEYS,
     REPOSITORIES,
     STABLE_AUDIO_REPOSITORY,
     Model,
     Repository,
+    source_keys,
 )
 from .system import Runner, executable, is_apple_silicon
 
@@ -28,6 +31,10 @@ from .system import Runner, executable, is_apple_silicon
 STATE_DIRECTORY = ".listening-stack"
 STATE_FILENAME = "state.json"
 ENV_FILENAME = "stack.env"
+MAX_STATE_BYTES = 2 * 1024 * 1024
+UV_VERSION = "0.11.29"
+UV_INSTALLER_SHA256 = "504a79fd2ed0dcd47e7f04f0792cfd0871f62e24a7fe40fa8ae0f563a369f2bd"
+HF_CLI_VERSION = "1.23.0"
 ALLOWED_INTEGRATIONS = ("hermes", "codex", "claude", "openclaw", "opencode")
 
 
@@ -53,14 +60,24 @@ def environment_path(root: Path) -> Path:
 
 def load_state(root: Path) -> Dict[str, object]:
     path = state_path(root)
+    if path.is_symlink():
+        raise ValueError("Refusing symlinked Listening Stack state at %s" % path)
     if not path.is_file():
         raise FileNotFoundError(
             "No Listening Stack installation state exists at %s" % path
         )
+    if path.stat().st_size > MAX_STATE_BYTES:
+        raise ValueError("Listening Stack state is unexpectedly large at %s" % path)
     with path.open("r", encoding="utf-8") as handle:
         value = json.load(handle)
     if not isinstance(value, dict) or value.get("schema_version") != 1:
         raise ValueError("Unsupported or invalid Listening Stack state at %s" % path)
+    if value.get("component") not in {"oida", "germ", "full"}:
+        raise ValueError("Listening Stack state has an invalid component at %s" % path)
+    if not isinstance(value.get("environment"), dict):
+        raise ValueError("Listening Stack state has no valid environment at %s" % path)
+    if not isinstance(value.get("commits"), dict):
+        raise ValueError("Listening Stack state has no valid commit map at %s" % path)
     return value
 
 
@@ -74,8 +91,9 @@ class Installer:
         self.models_root = self.root / "models"
         self.hf_home = self.models_root / "huggingface"
         self.commits: Dict[str, str] = {}
+        self.model_revisions: Dict[str, str] = {}
         self.uv = executable("uv") or "uv"
-        self.hf = executable("hf") or "hf"
+        self.hf = str(self.root / STATE_DIRECTORY / "bin" / "hf")
 
     @property
     def models(self) -> List[Model]:
@@ -118,17 +136,19 @@ class Installer:
         environment = self._environment()
         self._heading("Writing local configuration")
         self._write_environment(environment)
-        state = self._write_state(environment)
+
+        self._heading("Verifying application imports")
+        self._verify_installation(environment)
 
         if self.selection.integrations:
             self._heading("Installing selected agent integrations")
             self._install_integrations(environment)
 
-        self._heading("Verifying application imports")
-        self._verify_installation(environment)
-        return state
+        self._heading("Recording completed installation state")
+        return self._write_state(environment)
 
     def _validate_selection(self) -> None:
+        self._validate_root()
         if self.selection.component not in {"oida", "germ", "full"}:
             raise ValueError("component must be oida, germ, or full")
         if self.selection.provider not in {"auto", "mlx", "python", "mock"}:
@@ -136,6 +156,8 @@ class Installer:
         unknown = [key for key in self.selection.model_keys if key not in MODELS]
         if unknown:
             raise ValueError("Unknown models: " + ", ".join(unknown))
+        if len(set(self.selection.model_keys)) != len(self.selection.model_keys):
+            raise ValueError("Model selections must not contain duplicates")
         allowed_apps = (
             {"oida", "germ"}
             if self.selection.component == "full"
@@ -155,6 +177,8 @@ class Installer:
         ]
         if invalid_integrations:
             raise ValueError("Unknown integrations: " + ", ".join(invalid_integrations))
+        if len(set(self.selection.integrations)) != len(self.selection.integrations):
+            raise ValueError("Integration selections must not contain duplicates")
         if self.selection.integrations and self.selection.component == "germ":
             raise ValueError(
                 "Agent integrations are supplied by Oída; install Oída or the full stack first"
@@ -183,18 +207,57 @@ class Installer:
                 "Select the MLX or Python provider when downloading Stable Audio 3 models"
             )
 
+    def _validate_root(self) -> None:
+        anchor = Path(self.root.anchor)
+        if self.root == anchor:
+            raise ValueError("Refusing to use the filesystem root as an install root")
+        try:
+            home = Path.home().expanduser().resolve()
+        except OSError:
+            home = None
+        if home is not None and self.root == home:
+            raise ValueError("Refusing to use the home directory as an install root")
+        enclosing_repository = next(
+            (
+                path
+                for path in (self.root, *self.root.parents)
+                if (path / ".git").exists()
+            ),
+            None,
+        )
+        if enclosing_repository is not None:
+            raise ValueError(
+                "Refusing to install inside an existing Git repository: %s"
+                % enclosing_repository
+            )
+        if "," in str(self.root):
+            raise ValueError(
+                "The install root cannot contain a comma because GERM path allowlists are comma-separated"
+            )
+
     def _make_directories(self) -> None:
-        for path in (
+        paths = (
             self.src_root,
             self.vendor_root,
             self.models_root,
             self.hf_home,
+            self.models_root / "moss-audio",
+            self.root / "data",
             self.root / "data" / "oida",
+            self.root / "data" / "audio",
             self.root / "data" / "germ",
+            self.root / "data" / "akousmata",
             self.root / "logs",
             self.root / "run",
             self.root / STATE_DIRECTORY,
-        ):
+            self.root / STATE_DIRECTORY / "bin",
+            self.root / STATE_DIRECTORY / "tools",
+        )
+        for path in paths:
+            if path.is_symlink():
+                raise RuntimeError(
+                    "Refusing to use a symlinked managed directory: %s" % path
+                )
             self.runner.note("  create %s" % path)
             if not self.runner.dry_run:
                 path.mkdir(parents=True, exist_ok=True)
@@ -231,7 +294,8 @@ class Installer:
                 "uv is required. Install it from https://docs.astral.sh/uv/ and rerun."
             )
         self.runner.note(
-            "  uv is missing; installing it with Astral's official installer."
+            "  uv is missing; installing tested uv %s with Astral's official installer."
+            % UV_VERSION
         )
         script = self.root / STATE_DIRECTORY / "uv-install.sh"
         self.runner.run(
@@ -241,20 +305,30 @@ class Installer:
                 "=https",
                 "--tlsv1.2",
                 "-LsSf",
-                "https://astral.sh/uv/install.sh",
+                "https://astral.sh/uv/%s/install.sh" % UV_VERSION,
                 "-o",
                 str(script),
             ]
         )
-        self.runner.run(["sh", str(script)])
-        if not self.runner.dry_run:
-            script.unlink(missing_ok=True)
-            found = executable("uv")
-            if not found:
+        install_environment = {"UV_NO_MODIFY_PATH": "1"}
+        if self.runner.dry_run:
+            self.runner.run(["sh", str(script)], env=install_environment)
+            return
+        try:
+            digest = hashlib.sha256(script.read_bytes()).hexdigest()
+            if not hmac.compare_digest(digest, UV_INSTALLER_SHA256):
                 raise RuntimeError(
-                    "uv installation completed but the executable could not be found"
+                    "Refusing to run the uv installer because its SHA-256 checksum changed"
                 )
-            self.uv = found
+            self.runner.run(["sh", str(script)], env=install_environment)
+        finally:
+            script.unlink(missing_ok=True)
+        found = executable("uv")
+        if not found:
+            raise RuntimeError(
+                "uv installation completed but the executable could not be found"
+            )
+        self.uv = found
 
     def _ensure_python(self) -> None:
         self.runner.run([self.uv, "python", "install", "3.12"])
@@ -286,11 +360,7 @@ class Installer:
         self.runner.note("    Install ffmpeg before using model-backed audio decoding.")
 
     def _source_keys(self) -> Tuple[str, ...]:
-        if self.selection.component == "oida":
-            return OIDA_SOURCE_KEYS
-        if self.selection.component == "germ":
-            return GERM_SOURCE_KEYS
-        return OIDA_SOURCE_KEYS + GERM_SOURCE_KEYS
+        return source_keys(self.selection.component)
 
     def _install_sources(self) -> None:
         for key in self._source_keys():
@@ -301,15 +371,39 @@ class Installer:
         self.commits[spec.key] = self._install_repository(spec, destination)
 
     def _install_repository(self, spec: Repository, destination: Path) -> str:
+        if destination.is_symlink():
+            raise RuntimeError(
+                "Refusing to use a symlinked repository destination: %s" % destination
+            )
         if destination.exists() and not (destination / ".git").is_dir():
             raise RuntimeError(
                 "Refusing to replace non-Git directory: %s" % destination
             )
-        if (destination / ".git").is_dir():
+        existing = (destination / ".git").is_dir()
+        if existing:
             origin = self.runner.capture(
-                ["git", "remote", "get-url", "origin"], cwd=destination
+                ["git", "remote", "get-url", "origin"],
+                cwd=destination,
+                check=False,
             )
-            if _normalise_git_url(origin) != _normalise_git_url(spec.url):
+            if not origin:
+                head = self.runner.capture(
+                    ["git", "rev-parse", "--verify", "HEAD"],
+                    cwd=destination,
+                    check=False,
+                )
+                entries = [
+                    path for path in destination.iterdir() if path.name != ".git"
+                ]
+                if head or entries:
+                    raise RuntimeError(
+                        "%s has no origin and is not an empty interrupted checkout"
+                        % destination
+                    )
+                self.runner.run(
+                    ["git", "remote", "add", "origin", spec.url], cwd=destination
+                )
+            elif _normalise_git_url(origin) != _normalise_git_url(spec.url):
                 raise RuntimeError(
                     "%s has unexpected origin %s; expected %s"
                     % (destination, origin, spec.url)
@@ -321,35 +415,42 @@ class Installer:
                 raise RuntimeError(
                     "Refusing to update dirty installation checkout: %s" % destination
                 )
-            self.runner.run(
-                ["git", "fetch", "--depth", "1", "origin", spec.branch], cwd=destination
-            )
-            self.runner.run(
-                ["git", "checkout", "--detach", "FETCH_HEAD"], cwd=destination
-            )
         else:
+            self.runner.run(["git", "init", "--quiet", str(destination)])
             self.runner.run(
-                [
-                    "git",
-                    "clone",
-                    "--depth",
-                    "1",
-                    "--branch",
-                    spec.branch,
-                    spec.url,
-                    str(destination),
-                ]
+                ["git", "remote", "add", "origin", spec.url], cwd=destination
             )
+        target = spec.revision or spec.ref
+        self.runner.run(
+            ["git", "fetch", "--depth", "1", "--no-tags", "origin", target],
+            cwd=destination,
+        )
+        self.runner.run(["git", "checkout", "--detach", "FETCH_HEAD"], cwd=destination)
         commit = self.runner.capture(["git", "rev-parse", "HEAD"], cwd=destination)
+        if spec.revision and commit and commit.lower() != spec.revision.lower():
+            raise RuntimeError(
+                "%s resolved to %s instead of pinned revision %s"
+                % (spec.name, commit, spec.revision)
+            )
+        release = " v%s" % spec.version if spec.version else ""
         self.runner.note(
-            "  ✓ %s %s" % (spec.name, commit[:12] if commit else "planned")
+            "  ✓ %s%s at %s"
+            % (spec.name, release, commit[:12] if commit else target[:12])
         )
         return commit or "planned"
 
     def _sync_applications(self) -> None:
         model_apps = {model.application for model in self.models}
         if self.selection.component in {"oida", "full"}:
-            command = [self.uv, "sync", "--locked", "--python", "3.12"]
+            command = [
+                self.uv,
+                "sync",
+                "--locked",
+                "--python",
+                "3.12",
+                "--extra",
+                "songid",
+            ]
             if "oida" in model_apps:
                 command.extend(["--extra", "moss"])
             self.runner.run(command, cwd=self.src_root / "oida")
@@ -381,19 +482,52 @@ class Installer:
                 )
 
     def _ensure_hf(self) -> None:
-        found = executable("hf")
-        if found:
-            self.hf = found
-            self.runner.note("  ✓ Hugging Face CLI at %s" % found)
-            return
-        self.runner.run([self.uv, "tool", "install", "huggingface_hub"])
-        if not self.runner.dry_run:
-            found = executable("hf")
-            if not found:
-                raise RuntimeError(
-                    "Hugging Face CLI installation completed but `hf` could not be found"
+        binary = Path(self.hf)
+        if binary.is_symlink():
+            raise RuntimeError(
+                "Refusing to use a symlinked Hugging Face CLI: %s" % binary
+            )
+        if binary.is_file() and os.access(binary, os.X_OK):
+            version = self.runner.capture([str(binary), "--version"], check=False)
+            if _reported_version(version) == HF_CLI_VERSION:
+                self.runner.note(
+                    "  ✓ dedicated Hugging Face CLI %s at %s" % (HF_CLI_VERSION, binary)
                 )
-            self.hf = found
+                return
+            self.runner.note(
+                "  Replacing the dedicated Hugging Face CLI with tested version %s."
+                % HF_CLI_VERSION
+            )
+        tool_environment = {
+            "UV_TOOL_BIN_DIR": str(binary.parent),
+            "UV_TOOL_DIR": str(self.root / STATE_DIRECTORY / "tools"),
+        }
+        self.runner.run(
+            [
+                self.uv,
+                "tool",
+                "install",
+                "--force",
+                "--python",
+                "3.12",
+                "huggingface_hub==%s" % HF_CLI_VERSION,
+            ],
+            env=tool_environment,
+        )
+        if not self.runner.dry_run and not (
+            binary.is_file() and os.access(binary, os.X_OK)
+        ):
+            raise RuntimeError(
+                "Hugging Face CLI installation completed but %s was not created"
+                % binary
+            )
+        if not self.runner.dry_run:
+            version = self.runner.capture([str(binary), "--version"], check=False)
+            if _reported_version(version) != HF_CLI_VERSION:
+                raise RuntimeError(
+                    "Hugging Face CLI reports %s instead of pinned version %s"
+                    % (version or "no version", HF_CLI_VERSION)
+                )
 
     def _download_models(self) -> None:
         environment = {"HF_HOME": str(self.hf_home)}
@@ -412,8 +546,33 @@ class Installer:
         for model in self.models:
             command = [self.hf, "download", model.model_id]
             if model.application == "oida":
-                command.extend(["--local-dir", str(self._moss_model_path(model))])
+                destination = self._moss_model_path(model)
+                if destination.is_symlink():
+                    raise RuntimeError(
+                        "Refusing to use a symlinked model destination: %s"
+                        % destination
+                    )
+                if model.download_revision:
+                    command.extend(["--revision", model.download_revision])
+                command.extend(["--local-dir", str(destination)])
             self.runner.run(command, env=environment)
+            if model.download_revision:
+                self.model_revisions[model.key] = model.download_revision
+            elif self.runner.dry_run:
+                self.model_revisions[model.key] = "main"
+            else:
+                resolved = self._cached_hf_revision(model)
+                if resolved:
+                    self.model_revisions[model.key] = resolved
+
+    def _cached_hf_revision(self, model: Model) -> str:
+        repository = "models--" + model.model_id.replace("/", "--")
+        reference = self.hf_home / "hub" / repository / "refs" / "main"
+        try:
+            revision = reference.read_text(encoding="utf-8").strip().lower()
+        except OSError:
+            return ""
+        return revision if _is_commit_revision(revision) else ""
 
     def _moss_model_path(self, model: Model) -> Path:
         return self.models_root / "moss-audio" / model.model_id.rsplit("/", 1)[-1]
@@ -426,18 +585,34 @@ class Installer:
         return "mlx" if is_apple_silicon() else "python"
 
     def _environment(self) -> Dict[str, str]:
+        akousmata_path = self.root / "data" / "akousmata"
+        oida_audio = self.root / "data" / "audio"
+        germ_output = self.root / "data" / "germ"
+        stable_repo = self.vendor_root / "stable-audio-3"
         environment: Dict[str, str] = {
             "HF_HOME": str(self.hf_home),
+            "AKOUSMATA_PATH": str(akousmata_path),
             "OIDA_DATA_DIR": str(self.root / "data" / "oida"),
-            "OIDA_AUDIO_DIR": str(self.root / "data" / "audio"),
+            "OIDA_AUDIO_DIR": str(oida_audio),
             "OIDA_HOST": "127.0.0.1",
             "OIDA_PORT": "8765",
+            "OIDA_SERVER_URL": "http://127.0.0.1:8765",
+            "OIDA_GERM_URL": "http://127.0.0.1:5178",
+            "OIDA_ALLOW_HF_HUB": "0",
             "GERM_HOST": "127.0.0.1",
             "GERM_PORT": "5178",
-            "GERM_OUTPUT_DIR": str(self.root / "data" / "germ"),
+            "GERM_ALLOWED_HOSTS": "localhost,127.0.0.1",
+            "GERM_OUTPUT_DIR": str(germ_output),
+            "GERM_ALLOWED_INPUT_ROOTS": ",".join(
+                (str(germ_output), str(oida_audio), str(akousmata_path))
+            ),
+            "GERM_ALLOWED_MODEL_ROOTS": ",".join(
+                (str(stable_repo), str(self.models_root), str(germ_output))
+            ),
+            "GERM_ENABLE_CLOUD_VISION": "0",
             "GERM_OIDA_URL": "http://127.0.0.1:8765",
-            "GERM_OFFICIAL_REPO_DIR": str(self.vendor_root / "stable-audio-3"),
-            "GERM_MLX_REPO_DIR": str(self.vendor_root / "stable-audio-3"),
+            "GERM_OFFICIAL_REPO_DIR": str(stable_repo),
+            "GERM_MLX_REPO_DIR": str(stable_repo),
         }
         moss = [model for model in self.models if model.application == "oida"]
         if moss:
@@ -451,6 +626,7 @@ class Installer:
                     "OIDA_MOSS_THINKING_MODEL": str(self._moss_model_path(thinking)),
                     "OIDA_REQUIRE_MODEL": "1",
                     "OIDA_MOSS_PREWARM": "0",
+                    "OIDA_MOSS_RESIDENT": "single",
                 }
             )
         else:
@@ -479,16 +655,29 @@ class Installer:
             _atomic_write(path, "\n".join(lines) + "\n", mode=0o600)
 
     def _write_state(self, environment: Mapping[str, str]) -> Dict[str, object]:
+        repositories = {
+            key: {
+                "name": ALL_REPOSITORIES[key].name,
+                "url": ALL_REPOSITORIES[key].url,
+                "ref": ALL_REPOSITORIES[key].ref,
+                "version": ALL_REPOSITORIES[key].version,
+                "revision": commit,
+            }
+            for key, commit in sorted(self.commits.items())
+            if key in ALL_REPOSITORIES
+        }
         state: Dict[str, object] = {
             "schema_version": 1,
-            "installer_version": "0.1.0",
+            "installer_version": __version__,
             "installed_at": datetime.now(timezone.utc).isoformat(),
             "root": str(self.root),
             "component": self.selection.component,
             "models": list(self.selection.model_keys),
+            "model_revisions": dict(sorted(self.model_revisions.items())),
             "provider": self._resolved_provider(),
             "integrations": list(self.selection.integrations),
             "commits": dict(self.commits),
+            "repositories": repositories,
             "environment": dict(environment),
         }
         path = state_path(self.root)
@@ -522,17 +711,34 @@ class Installer:
                 env=environment,
             )
         if self.selection.component in {"germ", "full"}:
+            germ_models = any(model.application == "germ" for model in self.models)
+            provider = self._resolved_provider()
+            import_check = "from server.main import app"
+            if germ_models and provider == "python":
+                import_check = "import stable_audio_3; " + import_check
             self.runner.run(
                 [
                     self.uv,
                     "run",
                     "python",
                     "-c",
-                    "from server.main import app; print('GERM import: ' + app.title)",
+                    import_check + "; print('GERM import: ' + app.title)",
                 ],
                 cwd=self.src_root / "germ",
                 env=environment,
             )
+            if germ_models and provider == "mlx":
+                binary = (
+                    self.vendor_root / "stable-audio-3" / "optimized" / "mlx" / "sa3"
+                )
+                self.runner.note("  verify MLX executable at %s" % binary)
+                if not self.runner.dry_run and not (
+                    binary.is_file() and os.access(binary, os.X_OK)
+                ):
+                    raise RuntimeError(
+                        "Stable Audio 3 MLX installation did not create an executable at %s"
+                        % binary
+                    )
 
     def _heading(self, title: str) -> None:
         print("\n%s" % title)
@@ -560,6 +766,17 @@ def _normalise_git_url(value: str) -> str:
     if cleaned.startswith("git@github.com:"):
         cleaned = "https://github.com/" + cleaned.split(":", 1)[1]
     return cleaned.lower()
+
+
+def _is_commit_revision(value: str) -> bool:
+    return len(value) == 40 and all(
+        character in "0123456789abcdef" for character in value
+    )
+
+
+def _reported_version(value: str) -> str:
+    parts = value.strip().split()
+    return parts[-1] if parts else ""
 
 
 def _atomic_write(path: Path, content: str, mode: int) -> None:

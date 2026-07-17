@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,6 +38,45 @@ class CliTests(unittest.TestCase):
                     ]
                 )
             self.assertIn("Dry run complete", output.getvalue())
+            self.assertIn("Oída v0.6.5", output.getvalue())
+            self.assertIn("GERM v0.2.5", output.getvalue())
+
+    def test_models_and_no_models_are_mutually_exclusive(self):
+        with self.assertRaises(SystemExit) as raised:
+            main(["install", "--models", "none", "--no-models"])
+        self.assertEqual(raised.exception.code, 2)
+
+    def test_status_target_is_forwarded(self):
+        output = StringIO()
+        with (
+            patch(
+                "listening_stack.cli.runtime_status",
+                return_value={"component": "full", "oida": {"running": False}},
+            ) as mocked,
+            redirect_stdout(output),
+        ):
+            main(["status", "oida", "--root", "/tmp/listening-stack-test"])
+        mocked.assert_called_once_with(
+            Path("/tmp/listening-stack-test").resolve(), "oida"
+        )
+        self.assertIn("component: full", output.getvalue())
+
+    def test_json_doctor_failure_has_nonzero_exit(self):
+        result = {
+            "ok": False,
+            "summary": {"pass": 0, "info": 0, "warn": 0, "fail": 1},
+            "checks": [],
+            "runtime": {},
+        }
+        output = StringIO()
+        with (
+            patch("listening_stack.cli.run_doctor", return_value=result),
+            redirect_stdout(output),
+            self.assertRaises(SystemExit) as raised,
+        ):
+            main(["doctor", "--json"])
+        self.assertEqual(raised.exception.code, 1)
+        self.assertIn('"ok": false', output.getvalue())
 
 
 if __name__ == "__main__":

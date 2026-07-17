@@ -7,12 +7,13 @@ import json
 from pathlib import Path
 import shutil
 import sys
-from typing import Iterable, List, Optional, Sequence, Tuple
+from typing import Iterable, List, Mapping, Optional, Sequence, Tuple
 
 from . import __version__
 from .catalog import (
     MODELS,
     MODEL_PRESETS,
+    REPOSITORIES,
     Model,
     format_gb,
     memory_guidance,
@@ -20,6 +21,7 @@ from .catalog import (
     preset_models,
     refresh_model_sizes,
     selected_models,
+    source_keys,
 )
 from .doctor import run_doctor
 from .installer import ALLOWED_INTEGRATIONS, Installer, Selection, load_state
@@ -42,11 +44,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     install = subparsers.add_parser("install", help="Run the installation assistant.")
     install.add_argument("--component", choices=["full", "oida", "germ"])
-    install.add_argument(
+    model_selection = install.add_mutually_exclusive_group()
+    model_selection.add_argument(
         "--models",
         help="Preset name or comma-separated model keys. Use `listening-stack models` to inspect choices.",
     )
-    install.add_argument(
+    model_selection.add_argument(
         "--no-models",
         action="store_true",
         help="Install model-free stub/mock paths only.",
@@ -141,13 +144,15 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                 stop_runtime(args.root.expanduser().resolve(), args.target), args.json
             )
         elif command == "status":
-            _emit(runtime_status(args.root.expanduser().resolve()), args.json)
+            _emit(
+                runtime_status(args.root.expanduser().resolve(), args.target), args.json
+            )
         elif command == "integrate":
             _integrate(args)
         else:
             parser.print_help()
     except (CommandError, FileNotFoundError, RuntimeError, ValueError, OSError) as exc:
-        print("\nInstallation assistant stopped: %s" % exc, file=sys.stderr)
+        print("\nListening Stack command stopped: %s" % exc, file=sys.stderr)
         raise SystemExit(1)
 
 
@@ -226,7 +231,14 @@ def _install(args: argparse.Namespace) -> None:
     refreshed, warnings = (
         refresh_model_sizes(models) if models and not args.dry_run else (models, [])
     )
-    _print_plan(component, refreshed, integrations, provider, root)
+    _print_plan(
+        component,
+        refreshed,
+        integrations,
+        provider,
+        root,
+        install_system_dependencies=not args.skip_system_dependencies,
+    )
     for warning in warnings:
         print("  ! %s" % warning)
 
@@ -274,8 +286,10 @@ def _install(args: argparse.Namespace) -> None:
         started = start_runtime(root)
         print(json.dumps(started, indent=2, ensure_ascii=False))
     print("\nListening Stack installation complete.")
-    print("  Oída: http://127.0.0.1:8765")
-    print("  GERM: http://127.0.0.1:5178/dashboard")
+    if component in {"oida", "full"}:
+        print("  Oída: http://127.0.0.1:8765")
+    if component in {"germ", "full"}:
+        print("  GERM: http://127.0.0.1:5178/dashboard")
     print("\nNext steps:")
     print("  listening-stack doctor --root %s" % _shell_path(root))
     if not selection.start_after_install:
@@ -346,7 +360,9 @@ def _parse_models(component: str, raw: str) -> List[str]:
     value = raw.strip().lower()
     if value in MODEL_PRESETS[component]:
         return list(preset_models(component, value))
-    keys = [part.strip() for part in raw.split(",") if part.strip()]
+    keys = list(
+        dict.fromkeys(part.strip().lower() for part in raw.split(",") if part.strip())
+    )
     selected_models(keys)
     return keys
 
@@ -357,6 +373,7 @@ def _print_plan(
     integrations: Sequence[str],
     provider: str,
     root: Path,
+    install_system_dependencies: bool,
 ) -> None:
     print("\nInstall plan")
     print(
@@ -364,6 +381,11 @@ def _print_plan(
         % {"full": "Oída + GERM", "oida": "Oída", "germ": "GERM"}[component]
     )
     print("  Directory:    %s" % root)
+    print("  Sources:")
+    for key in source_keys(component):
+        repository = REPOSITORIES[key]
+        release = "v%s" % repository.version if repository.version else repository.ref
+        print("    - %s %s (%s)" % (repository.name, release, repository.revision[:12]))
     if models:
         print("  Models:")
         for model in models:
@@ -377,6 +399,14 @@ def _print_plan(
             resolved = "mlx" if is_apple_silicon() else "python"
         print("  GERM runtime: %s" % resolved)
     print("  Integrations: %s" % (", ".join(integrations) if integrations else "none"))
+    print(
+        "  System tools: %s"
+        % (
+            "install missing uv/ffmpeg when supported"
+            if install_system_dependencies
+            else "must already be provisioned"
+        )
+    )
     print(
         "  Disk plan:    about %.1f GB including model-download headroom and environments"
         % planned_disk_gb(component, models)
@@ -431,6 +461,7 @@ def _models(args: argparse.Namespace) -> None:
                 "license": model.license_label,
                 "gated": model.gated,
                 "url": model.url,
+                "download_revision": model.download_revision or None,
             }
             for model in models
         ]
@@ -460,6 +491,8 @@ def _doctor(args: argparse.Namespace) -> None:
     result = run_doctor(args.root.expanduser().resolve())
     if args.json:
         print(json.dumps(result, indent=2, ensure_ascii=False))
+        if not result["ok"]:
+            raise SystemExit(1)
         return
     symbols = {"pass": "✓", "info": "·", "warn": "!", "fail": "×"}
     for check in result["checks"]:
@@ -539,10 +572,15 @@ def _choose_many(prompt: str, options: Sequence[Tuple[str, str]]) -> List[str]:
 
 def _confirm(prompt: str, default: bool) -> bool:
     suffix = "Y/n" if default else "y/N"
-    raw = input("%s [%s]: " % (prompt, suffix)).strip().lower()
-    if not raw:
-        return default
-    return raw in {"y", "yes"}
+    while True:
+        raw = input("%s [%s]: " % (prompt, suffix)).strip().lower()
+        if not raw:
+            return default
+        if raw in {"y", "yes"}:
+            return True
+        if raw in {"n", "no"}:
+            return False
+        print("Enter yes or no.")
 
 
 def _flatten(values: Iterable[str]) -> List[str]:
@@ -555,8 +593,15 @@ def _flatten(values: Iterable[str]) -> List[str]:
 def _emit(value: object, as_json: bool) -> None:
     if as_json:
         print(json.dumps(value, indent=2, ensure_ascii=False))
-    else:
-        print(json.dumps(value, indent=2, ensure_ascii=False))
+        return
+    if not isinstance(value, Mapping):
+        print(value)
+        return
+    for key, item in value.items():
+        if isinstance(item, (dict, list)):
+            print("%s: %s" % (key, json.dumps(item, ensure_ascii=False)))
+        else:
+            print("%s: %s" % (key, item))
 
 
 def _banner() -> None:

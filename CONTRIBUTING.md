@@ -22,6 +22,9 @@ testable without downloading model weights.
 ```bash
 python3 -m unittest discover -s tests -v
 python3 scripts/build_release.py
+first="$(shasum -a 256 dist/listening-stack.pyz | cut -d' ' -f1)"
+python3 scripts/build_release.py
+test "$first" = "$(shasum -a 256 dist/listening-stack.pyz | cut -d' ' -f1)"
 ./dist/listening-stack.pyz models --json
 bash -n install.sh listening-stack
 ```
@@ -34,6 +37,8 @@ changes, model downloads, and service startup.
 - State the operating system and Python version used for tests.
 - Include a dry-run transcript for changed install flows.
 - Cite official upstream documentation for model, license, or hardware claims.
+- Update `CHANGELOG.md`, package version, citation version, and release artifact
+  together when preparing a release.
 - Do not include recordings, credentials, weights, generated outputs, local
   state, home-directory paths, private hostnames, or network addresses.
 - Do not silently broaden a system mutation. New package-manager, config, or

@@ -9,7 +9,7 @@ import shlex
 import shutil
 import subprocess
 import sys
-from typing import Dict, Iterable, Mapping, Optional, Sequence
+from typing import Mapping, Optional, Sequence
 
 
 class CommandError(RuntimeError):
@@ -32,15 +32,16 @@ class Runner:
         env: Optional[Mapping[str, str]] = None,
         check: bool = True,
     ) -> subprocess.CompletedProcess:
+        normalized = [str(item) for item in command]
         location = " (in %s)" % cwd if cwd else ""
-        self.note("  $ %s%s" % (shlex.join([str(item) for item in command]), location))
+        self.note("  $ %s%s" % (shlex.join(normalized), location))
         if self.dry_run:
-            return subprocess.CompletedProcess(command, 0, "", "")
+            return subprocess.CompletedProcess(normalized, 0, "", "")
         merged = os.environ.copy()
         if env:
             merged.update({str(key): str(value) for key, value in env.items()})
         result = subprocess.run(
-            [str(item) for item in command],
+            normalized,
             cwd=str(cwd) if cwd else None,
             env=merged,
             text=True,
@@ -49,7 +50,7 @@ class Runner:
         if check and result.returncode != 0:
             raise CommandError(
                 "Command failed with exit status %d: %s"
-                % (result.returncode, shlex.join(command))
+                % (result.returncode, shlex.join(normalized))
             )
         return result
 
@@ -60,14 +61,16 @@ class Runner:
         env: Optional[Mapping[str, str]] = None,
         check: bool = True,
     ) -> str:
+        normalized = [str(item) for item in command]
+        location = " (in %s)" % cwd if cwd else ""
         if self.dry_run:
-            self.note("  $ %s" % shlex.join([str(item) for item in command]))
+            self.note("  $ %s%s" % (shlex.join(normalized), location))
             return ""
         merged = os.environ.copy()
         if env:
             merged.update({str(key): str(value) for key, value in env.items()})
         result = subprocess.run(
-            [str(item) for item in command],
+            normalized,
             cwd=str(cwd) if cwd else None,
             env=merged,
             text=True,
@@ -77,7 +80,9 @@ class Runner:
         )
         if check and result.returncode != 0:
             detail = result.stderr.strip() or result.stdout.strip()
-            raise CommandError("Command failed: %s\n%s" % (shlex.join(command), detail))
+            raise CommandError(
+                "Command failed: %s\n%s" % (shlex.join(normalized), detail)
+            )
         return result.stdout.strip()
 
 
@@ -85,10 +90,13 @@ def executable(name: str) -> Optional[str]:
     found = shutil.which(name)
     if found:
         return found
-    for candidate in (
-        Path.home() / ".local" / "bin" / name,
-        Path.home() / ".cargo" / "bin" / name,
-    ):
+    directories = [Path.home() / ".local" / "bin", Path.home() / ".cargo" / "bin"]
+    for variable in ("UV_INSTALL_DIR", "UV_TOOL_BIN_DIR", "XDG_BIN_HOME"):
+        configured = os.environ.get(variable)
+        if configured:
+            directories.append(Path(configured).expanduser())
+    for directory in dict.fromkeys(directories):
+        candidate = directory / name
         if candidate.is_file() and os.access(candidate, os.X_OK):
             return str(candidate)
     return None
@@ -111,11 +119,3 @@ def total_ram_gb() -> Optional[float]:
     except (OSError, subprocess.SubprocessError, ValueError, IndexError):
         pass
     return None
-
-
-def command_environment(path_entries: Iterable[Path]) -> Dict[str, str]:
-    values = [str(path) for path in path_entries]
-    current = os.environ.get("PATH", "")
-    if current:
-        values.append(current)
-    return {"PATH": os.pathsep.join(values)}

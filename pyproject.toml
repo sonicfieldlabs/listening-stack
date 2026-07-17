@@ -1,11 +1,26 @@
 [project]
 name = "sonicfield-listening-stack"
-version = "0.1.0"
+version = "0.1.2"
 description = "Interactive installer and local runtime assistant for Oída and GERM."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [{ name = "Sonic Field Labs" }]
+keywords = ["audio", "installer", "listening", "local-first", "machine-listening"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Multimedia :: Sound/Audio",
+]
 
 [project.urls]
 Homepage = "https://sonicfield.org/stack"
