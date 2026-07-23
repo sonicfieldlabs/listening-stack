@@ -26,8 +26,8 @@ serves direct and transcription routes; the Thinking model serves deeper,
 music, and targeted re-listening routes. Oída consumes a final model response
 as bounded evidence and does not expose private reasoning traces.
 
-Listening Stack 0.1.2 downloads each MOSS checkpoint by the immutable commit
-audited for this release. Oída 0.6.5's embedded loader requires Safetensors and
+Listening Stack 0.2.0 downloads each MOSS checkpoint by the immutable commit
+audited for this release. Oída 0.8.0's embedded loader requires Safetensors and
 uses its locked Torch 2.10, TorchAudio 2.10, TorchCodec 0.10, and Transformers
 5.14 runtime. The installer also prepares Oída's optional Music ID dependency;
 identification remains opt-in per listen and may contact the service used by
@@ -106,4 +106,6 @@ listening-stack doctor
 ```
 
 The doctor reports installed RAM, free disk, provider compatibility, model
-presence, repository origins, and local gateway health.
+presence, repository origins, local gateway health, and Oída's live accountable-
+listening contracts. It verifies structure and compatibility, not the truth or
+quality of a model's sonic interpretation.

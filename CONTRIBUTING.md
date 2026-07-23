@@ -15,7 +15,8 @@ testable without downloading model weights.
 4. **Interrupted-download recovery:** add deterministic fixtures for partial
    Hugging Face cache and network failure states.
 5. **Integration contracts:** test Oída adapter installation against temporary
-   Hermes, Codex, Claude, OpenClaw, and OpenCode configuration homes.
+   Hermes, Codex, Claude, OpenClaw, and OpenCode configuration homes, and keep
+   live gateway/schema checks aligned with the pinned contract matrix.
 
 ## Development
 
@@ -43,5 +44,8 @@ changes, model downloads, and service startup.
   state, home-directory paths, private hostnames, or network addresses.
 - Do not silently broaden a system mutation. New package-manager, config, or
   network actions need an explicit prompt and documentation.
+- Keep one semantic owner per listening concept. Installer checks may verify a
+  component contract, but must not redefine AKOÚŌ claims, Earworm provenance,
+  or Oída runtime authority.
 
 By contributing, you agree that your contribution is licensed under Apache-2.0.

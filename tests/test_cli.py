@@ -38,8 +38,10 @@ class CliTests(unittest.TestCase):
                     ]
                 )
             self.assertIn("Dry run complete", output.getvalue())
-            self.assertIn("Oída v0.6.5", output.getvalue())
+            self.assertIn("Oída v0.8.0", output.getvalue())
             self.assertIn("GERM v0.2.5", output.getvalue())
+            self.assertIn("oida/gateway/v0.4", output.getvalue())
+            self.assertIn("earworm/auditum/v1", output.getvalue())
 
     def test_models_and_no_models_are_mutually_exclusive(self):
         with self.assertRaises(SystemExit) as raised:

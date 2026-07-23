@@ -41,7 +41,12 @@ class InstallerTests(unittest.TestCase):
                 self.selection(root), Runner(dry_run=True, quiet=True)
             ).install()
             self.assertEqual(state["component"], "full")
-            self.assertEqual(state["installer_version"], "0.1.2")
+            self.assertEqual(state["installer_version"], "0.2.0")
+            self.assertEqual(state["contracts"]["gateway"], "oida/gateway/v0.4")
+            self.assertEqual(
+                state["contracts"]["listening_context"],
+                "akouo/listening-context/v1",
+            )
             self.assertEqual(
                 state["environment"]["AKOUSMATA_PATH"],
                 str(Path(state["root"]) / "data" / "akousmata"),

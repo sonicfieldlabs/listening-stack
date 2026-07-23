@@ -43,8 +43,25 @@ listening-stack doctor
 ```
 
 The installer sets explicit local MOSS paths, disables silent Hub lookup, and
-downloads the immutable revisions tested with Oída 0.6.5. Rerun model download
+downloads the immutable revisions tested with Oída 0.8.0. Rerun model download
 if a checkpoint is incomplete.
+
+## Oída is healthy but a contract or schema check fails
+
+The doctor checks more than `/health`. It reads `/gateway` and the three public
+accountable-listening schemas from the same loopback process. A failure usually
+means the running daemon predates the pinned source checkout or was started by a
+different environment.
+
+```bash
+listening-stack stop oida
+listening-stack install --component oida --models none --yes
+listening-stack start oida
+listening-stack doctor
+```
+
+Do not edit the recorded contract matrix to silence the check. The component
+contracts and live schemas must agree at the actual integration boundary.
 
 ## A repository is clean but reported as outdated
 

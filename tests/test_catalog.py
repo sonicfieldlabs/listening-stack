@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from listening_stack.catalog import (  # noqa: E402
+    ACCOUNTABLE_LISTENING_CONTRACTS,
     MODELS,
     REPOSITORIES,
     memory_guidance,
@@ -41,11 +42,29 @@ class CatalogTests(unittest.TestCase):
             selected_models(["not-a-model"])
 
     def test_release_compatibility_set_is_immutable(self):
-        self.assertEqual(REPOSITORIES["oida"].version, "0.6.5")
+        self.assertEqual(REPOSITORIES["oida"].version, "0.8.0")
         self.assertEqual(REPOSITORIES["germ"].version, "0.2.5")
+        self.assertEqual(REPOSITORIES["akouo"].version, "0.8.0")
+        self.assertEqual(REPOSITORIES["earworm"].version, "0.5.0")
+        self.assertEqual(REPOSITORIES["akousmata"].version, "0.5.0")
         for repository in REPOSITORIES.values():
             self.assertEqual(len(repository.revision), 40)
             int(repository.revision, 16)
+
+    def test_accountable_listening_contracts_have_one_recorded_owner(self):
+        self.assertEqual(
+            ACCOUNTABLE_LISTENING_CONTRACTS,
+            {
+                "gateway": "oida/gateway/v0.4",
+                "host_perception": "oida/host-perception/v0.3",
+                "listening_event": "oida/listening-event/v0.2",
+                "listening_context": "akouo/listening-context/v1",
+                "akouo": "akouo/v0.8",
+                "earworm": "earworm/v0.5",
+                "auditum": "earworm/auditum/v1",
+                "akousmata": "akousmata/v0.5",
+            },
+        )
 
     def test_source_keys_are_component_specific(self):
         self.assertEqual(source_keys("germ"), ("germ",))

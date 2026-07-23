@@ -7,9 +7,12 @@ The roadmap describes public-alpha direction and does not promise dates.
 - Signed release artifacts in addition to SHA-256 checksums.
 - More precise CUDA, Apple unified-memory, CPU, and free-disk preflight.
 - Resumable install summaries after interrupted provider or model downloads.
-- Contract tests against released Oída and GERM installer surfaces.
+- Released-artifact smoke tests that exercise Oída's accountable-listening
+  gateway and one model-free Oída-to-GERM handoff.
 - Screen-reader and low-vision terminal audits.
 - Compatibility-set migration previews with release notes before changing pins.
+- Contract-diff previews that distinguish additive schema changes from semantic
+  ownership or authority changes.
 
 ## Toward Beta
 

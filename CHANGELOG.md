@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.0 — 2026-07-22
+
+- Pin Oída 0.8.0, AKOÚŌ 0.8.0, Earworm 0.5.0, and Akousmata 0.5.0 by immutable
+  source revision while retaining the tested GERM 0.2.5 and model-runtime set.
+- Record the accountable-listening compatibility matrix in completed installer
+  state: Oída gateway, host-perception and listening-event contracts; AKOÚŌ
+  listening context and claims; Earworm auditums; and Akousmata navigation.
+- Extend the read-only doctor from process health to the actual integration
+  boundary. It verifies Oída's live manifest and three public schemas using
+  bounded, non-redirecting loopback requests.
+- Document single semantic ownership, situated listening context, capability
+  versus authority, honest absence, preserved disagreement, append-only
+  revision, and the nonfinancial meaning of a tokenized auditum.
+- Show the listening contracts in every Oída/full install plan and update the
+  standalone deterministic release artifact and tests for the 0.2 compatibility
+  set.
+
 ## 0.1.2 — 2026-07-16
 
 - Pin the tested compatibility set to Oída 0.6.5, GERM 0.2.5, AKOÚŌ 0.7.0,

@@ -11,6 +11,7 @@ from typing import Iterable, List, Mapping, Optional, Sequence, Tuple
 
 from . import __version__
 from .catalog import (
+    ACCOUNTABLE_LISTENING_CONTRACTS,
     MODELS,
     MODEL_PRESETS,
     REPOSITORIES,
@@ -37,7 +38,7 @@ DEFAULT_ROOT = Path.home() / "SonicField" / "ListeningStack"
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="listening-stack",
-        description="Install and operate Oída, GERM, and their local model runtimes.",
+        description="Install and operate the accountable local listening stack and GERM.",
     )
     parser.add_argument("--version", action="version", version=__version__)
     subparsers = parser.add_subparsers(dest="command")
@@ -386,6 +387,16 @@ def _print_plan(
         repository = REPOSITORIES[key]
         release = "v%s" % repository.version if repository.version else repository.ref
         print("    - %s %s (%s)" % (repository.name, release, repository.revision[:12]))
+    if component in {"oida", "full"}:
+        print("  Listening contracts:")
+        for key in (
+            "gateway",
+            "host_perception",
+            "listening_event",
+            "listening_context",
+            "auditum",
+        ):
+            print("    - %s" % ACCOUNTABLE_LISTENING_CONTRACTS[key])
     if models:
         print("  Models:")
         for model in models:
@@ -607,7 +618,8 @@ def _emit(value: object, as_json: bool) -> None:
 def _banner() -> None:
     print("The Listening Stack")
     print(
-        "Oída hears. GERM cultivates. Akousmata remembers. AKOÚŌ structures. Earworm routes."
+        "Oída listens. AKOÚŌ structures claims. Earworm addresses auditums. "
+        "Akousmata renders and audits memory. GERM cultivates."
     )
     print(
         "\nThis assistant installs local public-alpha software. It will show every model, license boundary, and host change before proceeding."

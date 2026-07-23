@@ -8,15 +8,15 @@ the models an operator explicitly selects. It checks the host, explains disk
 and memory requirements, keeps weights outside Git, and leaves both local
 gateways ready to start.
 
-**Oída hears. GERM cultivates. Akousmata remembers. AKOÚŌ structures. Earworm
-routes.**
+**Oída listens. AKOÚŌ structures claims. Earworm addresses auditums. Akousmata
+renders and audits memory. GERM cultivates.**
 
 This repository is an installer and operator assistant. Oída, GERM, AKOÚŌ,
 Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer release: `0.1.2`.
+Current installer release: `0.2.0`.
 
 ## Quick Start
 
@@ -62,21 +62,47 @@ chmod +x listening-stack.pyz
 
 Sources are cloned into a dedicated installation directory. The installer
 verifies every existing origin and refuses to update a dirty or unexpected
-checkout. Release `0.1.2` installs one immutable compatibility set and records
+checkout. Release `0.2.0` installs one immutable compatibility set and records
 the exact commits it installed in local state:
 
 | Component | Tested release |
 | --- | --- |
-| Oída | 0.6.5 |
+| Oída | 0.8.0 |
 | GERM | 0.2.5 |
-| AKOÚŌ | 0.7.0 |
-| Earworm | 0.4.0 |
-| Akousmata | 0.4.0 |
+| AKOÚŌ | 0.8.0 |
+| Earworm | 0.5.0 |
+| Akousmata | 0.5.0 |
 
 The official MOSS-Audio source is pinned to the revision tested with Oída
-0.6.5. Stable Audio 3 source is pinned to the same revision locked by GERM
+0.8.0. Stable Audio 3 source is pinned to the same revision locked by GERM
 0.2.5. Rerunning this installer therefore reproduces the compatibility set;
 it does not silently advance a checkout to a newer moving branch.
+
+## Accountable Listening Contract
+
+Release 0.2.0 installs listening as an explicit, inspectable chain:
+
+1. Oída owns runtime perception and emits `oida/listening-event/v0.2` through
+   `oida/gateway/v0.4`.
+2. AKOÚŌ owns listening modes, claim discipline, and the situated
+   `akouo/listening-context/v1`: position, actual evidence apertures, auditory
+   scales, sources of listening, participants, authority, and honest absence.
+3. Earworm owns addressable, append-only `earworm/auditum/v1` lineage,
+   disagreement, action receipts, revision, and forgetting. “Tokenized” here
+   means structured, addressable, and versioned—never a financial token.
+4. Akousmata renders and structurally audits those records without becoming a
+   second owner of claims or provenance.
+
+Capability and authority stay separate. A host may declare what its apparatus
+can perceive, but Oída recomputes the effective context and defaults operational
+authority to observe-only. Unsupported measurements remain absent rather than
+being inferred from model prose. Distinct routes remain distinct listenings;
+disagreement is preserved instead of averaged away.
+
+The installer records this semantic compatibility matrix in `state.json`.
+When Oída is running, `listening-stack doctor` reads the live gateway manifest
+and all three public schemas to verify the contract at the actual integration
+boundary. See [Accountable listening architecture](docs/accountable-listening.md).
 
 ## Model Choices
 
@@ -111,7 +137,7 @@ MOSS-Audio code and released model checkpoints are Apache-2.0. Oída is develope
 and tested first against the 4B Instruct and Thinking checkpoints while
 remaining model-agnostic at its gateway boundary.
 
-Oída 0.6.5 requires Safetensors for its embedded model loader and pins its
+Oída 0.8.0 requires Safetensors for its embedded model loader and pins its
 compatible Torch, TorchAudio, TorchCodec, and Transformers releases. The
 installer downloads MOSS checkpoints by immutable Hugging Face commit and the
 doctor verifies both model configuration and Safetensors weights.
@@ -203,6 +229,12 @@ loopback and install-root paths. The bounded input set includes GERM output,
 Oída's handoff audio, and the shared Akousmata store; cloud image analysis
 remains disabled unless an operator enables it separately.
 
+Oída's public schema boundary is available at:
+
+- `http://127.0.0.1:8765/gateway/schema/host-perception`
+- `http://127.0.0.1:8765/gateway/schema/listening-event`
+- `http://127.0.0.1:8765/gateway/schema/listening-context`
+
 ## Agent Integrations
 
 Oída exposes the agentic listening gateway. The assistant can install its
@@ -225,6 +257,8 @@ the stack's local services.
 
 - The bootstrap verifies the release checksum before execution.
 - Component and model-runtime source checkouts use immutable revisions.
+- The recorded semantic contracts are verified against Oída's live manifest and
+  schemas rather than inferred from package versions alone.
 - No model, token, recording, generated sound, log, machine path, or installer
   state is committed to this repository.
 - Model terms are displayed before gated downloads.
@@ -241,7 +275,8 @@ a shared machine.
 
 - Downloads are large and can be interrupted by network or access restrictions.
 - Model availability, upstream terms, and hardware compatibility can change.
-- The doctor can confirm files, imports, origins, and gateway health; it cannot
+- The doctor can confirm files, imports, origins, gateway health, and listening
+  contracts; it cannot
   certify model output quality or legal fitness for a particular use.
 - Stable Audio 3's optimized paths differ across CPU, CUDA, and Apple Silicon.
 - Oída and GERM interfaces remain under active development before 1.0.

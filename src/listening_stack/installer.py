@@ -16,6 +16,7 @@ from typing import Dict, List, Mapping, Sequence, Tuple
 
 from . import __version__
 from .catalog import (
+    ACCOUNTABLE_LISTENING_CONTRACTS,
     ALL_REPOSITORIES,
     MODELS,
     MOSS_AUDIO_REPOSITORY,
@@ -677,6 +678,7 @@ class Installer:
             "provider": self._resolved_provider(),
             "integrations": list(self.selection.integrations),
             "commits": dict(self.commits),
+            "contracts": dict(ACCOUNTABLE_LISTENING_CONTRACTS),
             "repositories": repositories,
             "environment": dict(environment),
         }

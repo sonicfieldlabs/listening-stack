@@ -71,7 +71,7 @@ remain under Hugging Face's credential handling and are not written to stack
 state or environment files.
 
 MOSS-Audio checkpoints are downloaded at the immutable revisions tested by
-Oída 0.6.5. Stable Audio 3 currently resolves the selected gated model through
+Oída 0.8.0. Stable Audio 3 currently resolves the selected gated model through
 its upstream loader; when the Hugging Face cache exposes the resolved `main`
 revision, the installer records it in `state.json`.
 
@@ -103,7 +103,7 @@ Pin the executable release used by the curl bootstrap:
 ```bash
 curl -fsSL \
   https://raw.githubusercontent.com/sonicfieldlabs/listening-stack/main/install.sh \
-  | LISTENING_STACK_VERSION=v0.1.2 bash
+  | LISTENING_STACK_VERSION=v0.2.0 bash
 ```
 
 Override the executable destination:
@@ -121,12 +121,18 @@ clean installation checkout before fetching the immutable revisions in the
 installer's compatibility set. It records the exact commits and refuses a
 checkout that resolves to anything else. It never resets a dirty tree.
 
-Listening Stack 0.1.2 pins Oída 0.6.5, GERM 0.2.5, AKOÚŌ 0.7.0, Earworm
-0.4.0, and Akousmata 0.4.0. A later installer release may publish a newer
-tested set; an existing 0.1.2 executable continues to reproduce this one.
+Listening Stack 0.2.0 pins Oída 0.8.0, GERM 0.2.5, AKOÚŌ 0.8.0, Earworm
+0.5.0, and Akousmata 0.5.0. It also records the exact accountable-listening
+contracts in state. A later installer release may publish a newer tested set;
+an existing 0.2.0 executable continues to reproduce this one.
 
 Application version numbers remain owned by their repositories. Updating an
 installer checkout does not rewrite an Oída or GERM version.
+
+After starting Oída, run `listening-stack doctor`. In addition to source and
+model checks, it verifies the live gateway manifest plus host-perception,
+listening-event, and listening-context schemas. This detects a process that is
+healthy at `/health` but semantically incompatible at the integration boundary.
 
 ## Removing an Installation
 

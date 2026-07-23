@@ -50,6 +50,12 @@ host integrations succeed, so the state file remains a completed-installation
 marker rather than an optimistic plan. Its JSON input size and structure are
 bounded before lifecycle commands use it.
 
+The state also records the semantic compatibility set for accountable
+listening. When Oída is running, the doctor reads only fixed gateway/schema
+paths on the configured loopback origin, bounds response sizes, rejects
+redirects and non-loopback URLs, and compares the live contracts with that set.
+It does not submit recordings or listening content during this check.
+
 ## Local Data
 
 The install root can contain:

@@ -59,9 +59,9 @@ REPOSITORIES: Mapping[str, Repository] = {
         key="oida",
         name="Oída",
         url="https://github.com/sonicfieldlabs/oida.git",
-        ref="v0.6.5",
-        version="0.6.5",
-        revision="4cd403d48dc3b4e571b05868ed668efa50631074",
+        ref="v0.8.0",
+        version="0.8.0",
+        revision="841a1a74474980410297f23eeae06d70ed2fd56a",
     ),
     "germ": Repository(
         key="germ",
@@ -75,26 +75,39 @@ REPOSITORIES: Mapping[str, Repository] = {
         key="akouo",
         name="AKOÚŌ",
         url="https://github.com/sonicfieldlabs/akouo.git",
-        ref="v0.7.0",
-        version="0.7.0",
-        revision="1b3ae90ec37f712af4bf8be97f5ace8330d1329e",
+        ref="v0.8.0",
+        version="0.8.0",
+        revision="39c7c272b61e928849377b4fef679b0463a339f4",
     ),
     "earworm": Repository(
         key="earworm",
         name="Earworm",
         url="https://github.com/sonicfieldlabs/earworm.git",
-        ref="v0.4.0",
-        version="0.4.0",
-        revision="b3a76c1e9b5b6fbd08cf69302f4bfb6a6c29bd37",
+        ref="v0.5.0",
+        version="0.5.0",
+        revision="295387b89aae0781072c56f0aa84c308ca2ed2c8",
     ),
     "akousmata": Repository(
         key="akousmata",
         name="Akousmata",
         url="https://github.com/sonicfieldlabs/akousmata.git",
-        ref="v0.4.0",
-        version="0.4.0",
-        revision="295d6534be437ade9ea0ba3216384cb50839705a",
+        ref="v0.5.0",
+        version="0.5.0",
+        revision="b9646760444d36bcd9207007650ca6599f304c71",
     ),
+}
+
+# One semantic owner per contract. The installer records this matrix in local
+# state and the doctor verifies it at Oída's live gateway/schema boundary.
+ACCOUNTABLE_LISTENING_CONTRACTS: Mapping[str, str] = {
+    "gateway": "oida/gateway/v0.4",
+    "host_perception": "oida/host-perception/v0.3",
+    "listening_event": "oida/listening-event/v0.2",
+    "listening_context": "akouo/listening-context/v1",
+    "akouo": "akouo/v0.8",
+    "earworm": "earworm/v0.5",
+    "auditum": "earworm/auditum/v1",
+    "akousmata": "akousmata/v0.5",
 }
 
 OIDA_SOURCE_KEYS: Tuple[str, ...] = ("earworm", "akouo", "akousmata", "oida")

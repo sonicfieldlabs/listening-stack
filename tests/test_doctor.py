@@ -9,12 +9,18 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from listening_stack.catalog import MODELS, REPOSITORIES  # noqa: E402
+from listening_stack.catalog import (  # noqa: E402
+    ACCOUNTABLE_LISTENING_CONTRACTS,
+    MODELS,
+    REPOSITORIES,
+)
 from listening_stack.doctor import (  # noqa: E402
     _check_germ_boundary,
     _check_model,
+    _check_oida_accountability_contracts,
     _check_private_file,
     _check_repository,
+    _fetch_local_json,
 )
 
 
@@ -101,7 +107,74 @@ class DoctorTests(unittest.TestCase):
             (Path(temporary) / ".git").mkdir()
             check = _check_repository(Path(temporary), "oida", spec.revision)
         self.assertEqual(check.status, "pass")
-        self.assertIn("v0.6.5", check.detail)
+        self.assertIn("v0.8.0", check.detail)
+
+    def test_oida_live_contracts_verify_manifest_and_three_schemas(self):
+        manifest = {
+            "version": "0.8.0",
+            "contract": "oida/gateway/v0.4",
+            "components": {
+                "akouo": {"contract": "akouo/v0.8"},
+                "earworm": {"contract": "earworm/v0.5"},
+                "akousmata": {"contract": "akousmata/v0.5"},
+            },
+            "schemas": {
+                "host_perception": "/gateway/schema/host-perception",
+                "listening_event": "/gateway/schema/listening-event",
+                "listening_context": "/gateway/schema/listening-context",
+            },
+        }
+        schemas = [
+            {"properties": {"contract": {"const": contract}}}
+            for contract in (
+                ACCOUNTABLE_LISTENING_CONTRACTS["host_perception"],
+                ACCOUNTABLE_LISTENING_CONTRACTS["listening_event"],
+                ACCOUNTABLE_LISTENING_CONTRACTS["listening_context"],
+            )
+        ]
+        with patch(
+            "listening_stack.doctor._fetch_local_json",
+            side_effect=[manifest, *schemas],
+        ) as fetch:
+            checks = _check_oida_accountability_contracts("http://127.0.0.1:8765")
+        self.assertEqual(fetch.call_count, 4)
+        self.assertEqual(len(checks), 4)
+        self.assertTrue(all(check.status == "pass" for check in checks))
+
+    def test_oida_live_contracts_fail_closed_on_semantic_drift(self):
+        manifest = {
+            "version": "0.8.0",
+            "contract": "oida/gateway/v0.4",
+            "components": {
+                "akouo": {"contract": "akouo/v0.8"},
+                "earworm": {"contract": "earworm/v0.4"},
+                "akousmata": {"contract": "akousmata/v0.5"},
+            },
+            "schemas": {
+                "host_perception": "/gateway/schema/host-perception",
+                "listening_event": "/gateway/schema/listening-event",
+                "listening_context": "/gateway/schema/listening-context",
+            },
+        }
+        schemas = [
+            {"properties": {"contract": {"const": contract}}}
+            for contract in (
+                ACCOUNTABLE_LISTENING_CONTRACTS["host_perception"],
+                "oida/listening-event/v0.1",
+                ACCOUNTABLE_LISTENING_CONTRACTS["listening_context"],
+            )
+        ]
+        with patch(
+            "listening_stack.doctor._fetch_local_json",
+            side_effect=[manifest, *schemas],
+        ):
+            checks = _check_oida_accountability_contracts("http://localhost:8765")
+        self.assertEqual(checks[0].status, "fail")
+        self.assertEqual(checks[2].status, "fail")
+
+    def test_gateway_contract_fetch_rejects_non_loopback_urls(self):
+        with self.assertRaisesRegex(ValueError, "loopback"):
+            _fetch_local_json("https://example.com", "/gateway")
 
 
 if __name__ == "__main__":

@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use the Listening Stack Installer in research, cite this software and the installed applications and models separately."
 title: "The Listening Stack Installer"
 type: software
-version: 0.1.2
-date-released: 2026-07-16
+version: 0.2.0
+date-released: 2026-07-22
 authors:
   - family-names: "Isaza"
     given-names: "Eme"
