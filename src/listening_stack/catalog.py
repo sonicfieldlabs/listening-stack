@@ -61,7 +61,7 @@ REPOSITORIES: Mapping[str, Repository] = {
         url="https://github.com/sonicfieldlabs/oida.git",
         ref="v0.8.0",
         version="0.8.0",
-        revision="841a1a74474980410297f23eeae06d70ed2fd56a",
+        revision="f29c0144d135fd1c63b744308e13ccd044dea992",
     ),
     "germ": Repository(
         key="germ",
@@ -93,7 +93,7 @@ REPOSITORIES: Mapping[str, Repository] = {
         url="https://github.com/sonicfieldlabs/akousmata.git",
         ref="v0.5.0",
         version="0.5.0",
-        revision="b9646760444d36bcd9207007650ca6599f304c71",
+        revision="f3e796a7c0fe5b5ab4851973ebcdfd27d8357e11",
     ),
 }
 
