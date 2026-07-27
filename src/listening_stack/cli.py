@@ -18,7 +18,9 @@ from .catalog import (
     Model,
     format_gb,
     memory_guidance,
+    normalize_profile,
     planned_disk_gb,
+    profile_includes,
     preset_models,
     refresh_model_sizes,
     selected_models,
@@ -38,13 +40,17 @@ DEFAULT_ROOT = Path.home() / "SonicField" / "ListeningStack"
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="listening-stack",
-        description="Install and operate the accountable local listening stack and GERM.",
+        description="Install and operate the accountable listening core, with GERM as an option.",
     )
     parser.add_argument("--version", action="version", version=__version__)
     subparsers = parser.add_subparsers(dest="command")
 
     install = subparsers.add_parser("install", help="Run the installation assistant.")
-    install.add_argument("--component", choices=["full", "oida", "germ"])
+    install.add_argument(
+        "--component",
+        choices=["core", "full", "germ", "oida"],
+        help="Install profile. `oida` is retained as an alias for `core`.",
+    )
     model_selection = install.add_mutually_exclusive_group()
     model_selection.add_argument(
         "--models",
@@ -161,19 +167,21 @@ def _install(args: argparse.Namespace) -> None:
     _banner()
     interactive = not args.yes and sys.stdin.isatty()
     if args.component:
-        component = args.component
+        component = normalize_profile(args.component)
+        if args.component == "oida":
+            print("Using the `core` profile (`oida` is a compatibility alias).")
     elif interactive:
         component = _choose_one(
             "What would you like to install?",
             [
-                ("full", "Oída + GERM (recommended)"),
-                ("oida", "Oída only"),
+                ("core", "Listening core: AKOÚŌ + Earworm + Akousmata + Oída (recommended)"),
+                ("full", "Listening core + optional GERM"),
                 ("germ", "GERM only"),
             ],
             default=1,
         )
     else:
-        component = "full"
+        component = "core"
 
     if args.no_models:
         model_keys: List[str] = []
@@ -206,7 +214,7 @@ def _install(args: argparse.Namespace) -> None:
     integrations = _flatten(args.integration)
     if "all" in integrations:
         integrations = list(ALLOWED_INTEGRATIONS)
-    if component in {"oida", "full"} and not integrations and interactive:
+    if profile_includes(component, "oida") and not integrations and interactive:
         integrations = _choose_many(
             "Optional Oída agent integrations (press Enter for none)",
             [
@@ -287,9 +295,9 @@ def _install(args: argparse.Namespace) -> None:
         started = start_runtime(root)
         print(json.dumps(started, indent=2, ensure_ascii=False))
     print("\nListening Stack installation complete.")
-    if component in {"oida", "full"}:
+    if profile_includes(component, "oida"):
         print("  Oída: http://127.0.0.1:8765")
-    if component in {"germ", "full"}:
+    if profile_includes(component, "germ"):
         print("  GERM: http://127.0.0.1:5178/dashboard")
     print("\nNext steps:")
     print("  listening-stack doctor --root %s" % _shell_path(root))
@@ -303,7 +311,7 @@ def _install(args: argparse.Namespace) -> None:
 
 
 def _interactive_models(component: str) -> List[str]:
-    if component == "oida":
+    if component == "core":
         selection = _choose_one(
             "Which Oída models should be downloaded?",
             [
@@ -346,7 +354,7 @@ def _interactive_models(component: str) -> List[str]:
     allowed = [
         model
         for model in MODELS.values()
-        if component == "full" or model.application == component
+        if profile_includes(component, model.application)
     ]
     return _choose_many(
         "Choose checkpoints",
@@ -379,7 +387,11 @@ def _print_plan(
     print("\nInstall plan")
     print(
         "  Applications: %s"
-        % {"full": "Oída + GERM", "oida": "Oída", "germ": "GERM"}[component]
+        % {
+            "core": "Listening core (AKOÚŌ + Earworm + Akousmata + Oída)",
+            "full": "Listening core + optional GERM",
+            "germ": "GERM only",
+        }[component]
     )
     print("  Directory:    %s" % root)
     print("  Sources:")
@@ -387,12 +399,13 @@ def _print_plan(
         repository = REPOSITORIES[key]
         release = "v%s" % repository.version if repository.version else repository.ref
         print("    - %s %s (%s)" % (repository.name, release, repository.revision[:12]))
-    if component in {"oida", "full"}:
+    if profile_includes(component, "oida"):
         print("  Listening contracts:")
         for key in (
             "gateway",
             "host_perception",
             "listening_event",
+            "route_outcome",
             "listening_context",
             "auditum",
         ):
@@ -525,7 +538,8 @@ def _doctor(args: argparse.Namespace) -> None:
 def _integrate(args: argparse.Namespace) -> None:
     root = args.root.expanduser().resolve()
     state = load_state(root)
-    if state.get("component") == "germ":
+    profile = normalize_profile(str(state.get("profile") or state.get("component")))
+    if not profile_includes(profile, "oida"):
         raise ValueError("This installation does not include Oída")
     targets = (
         list(ALLOWED_INTEGRATIONS)
@@ -619,7 +633,7 @@ def _banner() -> None:
     print("The Listening Stack")
     print(
         "Oída listens. AKOÚŌ structures claims. Earworm addresses auditums. "
-        "Akousmata renders and audits memory. GERM cultivates."
+        "Akousmata renders and audits memory. GERM is an optional cultivation layer."
     )
     print(
         "\nThis assistant installs local public-alpha software. It will show every model, license boundary, and host change before proceeding."

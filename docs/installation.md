@@ -2,9 +2,9 @@
 
 ## Interactive Install
 
-The normal entry point asks five bounded questions:
+The normal entry point asks bounded questions:
 
-1. Install Oída, GERM, or both.
+1. Keep the default listening core, add optional GERM, or install GERM alone.
 2. Choose a recommended, complete, empty, or custom model set.
 3. Choose the Stable Audio 3 provider when GERM weights are selected.
 4. Optionally select Oída host integrations.
@@ -18,10 +18,10 @@ The default destination is `~/SonicField/ListeningStack`:
 
 ```text
 ListeningStack/
-├── src/                 Oída, GERM, and required sibling repositories
+├── src/                 selected first-party repositories
 ├── vendor/              official MOSS-Audio and Stable Audio 3 source
 ├── models/              local weights and Hugging Face cache
-├── data/                Oída/GERM data and the shared Akousmata store
+├── data/                selected service data and the Akousmata store
 ├── logs/                managed service logs
 └── .listening-stack/    local tools, non-secret environment, and completed state
 ```
@@ -30,7 +30,7 @@ Every one of these paths stays outside the installer repository.
 
 ## Model Presets
 
-For `--component oida`:
+For the default `--component core`:
 
 - `recommended` or `4b`: MOSS-Audio 4B Instruct and Thinking.
 - `8b`: MOSS-Audio 8B Instruct and Thinking.
@@ -44,14 +44,17 @@ For `--component germ`:
 - `all`: both Small checkpoints and Medium.
 - `none`: mock provider only.
 
-For `--component full`, use `recommended`, `all`, or `none`.
+For `--component full`, use `recommended`, `all`, or `none`. This is the
+explicit core-plus-GERM profile. The earlier `--component oida` spelling remains
+accepted as a compatibility alias for `core`, but new automation should use the
+profile name.
 
 Individual keys can be comma-separated:
 
 ```bash
 listening-stack install \
-  --component full \
-  --models moss-4b-instruct,moss-4b-thinking,stable-small-sfx
+  --component core \
+  --models moss-4b-instruct,moss-4b-thinking
 ```
 
 Inspect valid keys with `listening-stack models`.
@@ -71,13 +74,26 @@ remain under Hugging Face's credential handling and are not written to stack
 state or environment files.
 
 MOSS-Audio checkpoints are downloaded at the immutable revisions tested by
-Oída 0.8.0. Stable Audio 3 currently resolves the selected gated model through
+Oída 0.9.0. Stable Audio 3 currently resolves the selected gated model through
 its upstream loader; when the Hugging Face cache exposes the resolved `main`
 revision, the installer records it in `state.json`.
 
 ## Non-Interactive Install
 
-Automation must make the component, model, and gated-terms choices explicit:
+Automation gets the core profile when no component is supplied. Declare the
+profile anyway when reproducibility matters. A core-only install needs no GERM
+provider or gated-model acknowledgement:
+
+```bash
+listening-stack install \
+  --component core \
+  --models recommended \
+  --root /opt/sonicfield/listening-stack \
+  --yes
+```
+
+Automation that selects GERM must make the model and gated-terms choices
+explicit:
 
 ```bash
 listening-stack install \
@@ -103,7 +119,7 @@ Pin the executable release used by the curl bootstrap:
 ```bash
 curl -fsSL \
   https://raw.githubusercontent.com/sonicfieldlabs/listening-stack/main/install.sh \
-  | LISTENING_STACK_VERSION=v0.2.0 bash
+  | LISTENING_STACK_VERSION=v0.3.0 bash
 ```
 
 Override the executable destination:
@@ -121,18 +137,25 @@ clean installation checkout before fetching the immutable revisions in the
 installer's compatibility set. It records the exact commits and refuses a
 checkout that resolves to anything else. It never resets a dirty tree.
 
-Listening Stack 0.2.0 pins Oída 0.8.0, GERM 0.2.5, AKOÚŌ 0.8.0, Earworm
-0.5.0, and Akousmata 0.5.0. It also records the exact accountable-listening
-contracts in state. A later installer release may publish a newer tested set;
-an existing 0.2.0 executable continues to reproduce this one.
+Listening Stack 0.3.0 pins Oída 0.9.0, GERM 0.2.5, AKOÚŌ 0.9.0, Earworm
+0.6.0, and Akousmata 0.6.0. It also records the exact accountable-listening
+contracts in `listening-stack/state/v2`. The state names the canonical profile,
+the exact component set, the four core components, and optional components. A
+later installer release may publish a newer tested set; an existing 0.3.0
+executable continues to reproduce this one.
 
 Application version numbers remain owned by their repositories. Updating an
 installer checkout does not rewrite an Oída or GERM version.
 
+Version 0.3 can read version 1 state for lifecycle compatibility. Rerunning the
+installer writes version 2 state; it does not infer that an old `oida` selection
+included GERM.
+
 After starting Oída, run `listening-stack doctor`. In addition to source and
 model checks, it verifies the live gateway manifest plus host-perception,
-listening-event, and listening-context schemas. This detects a process that is
-healthy at `/health` but semantically incompatible at the integration boundary.
+listening-event, listening-context, and route-outcome schemas. This detects a
+process that is healthy at `/health` but semantically incompatible at the
+integration boundary.
 
 ## Removing an Installation
 

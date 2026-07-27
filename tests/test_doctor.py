@@ -44,6 +44,7 @@ class DoctorTests(unittest.TestCase):
                 )
             ),
             "GERM_ENABLE_CLOUD_VISION": "0",
+            "GERM_OIDA_URL": "http://127.0.0.1:8765",
         }
         self.assertEqual(_check_germ_boundary(root, environment).status, "pass")
         environment["GERM_ALLOWED_INPUT_ROOTS"] += ",/tmp"
@@ -107,21 +108,22 @@ class DoctorTests(unittest.TestCase):
             (Path(temporary) / ".git").mkdir()
             check = _check_repository(Path(temporary), "oida", spec.revision)
         self.assertEqual(check.status, "pass")
-        self.assertIn("v0.8.0", check.detail)
+        self.assertIn("v0.9.0", check.detail)
 
-    def test_oida_live_contracts_verify_manifest_and_three_schemas(self):
+    def test_oida_live_contracts_verify_manifest_and_four_schemas(self):
         manifest = {
-            "version": "0.8.0",
-            "contract": "oida/gateway/v0.4",
+            "version": "0.9.0",
+            "contract": "oida/gateway/v0.5",
             "components": {
-                "akouo": {"contract": "akouo/v0.8"},
-                "earworm": {"contract": "earworm/v0.5"},
-                "akousmata": {"contract": "akousmata/v0.5"},
+                "akouo": {"contract": "akouo/v0.9"},
+                "earworm": {"contract": "earworm/v0.6"},
+                "akousmata": {"contract": "akousmata/v0.6"},
             },
             "schemas": {
                 "host_perception": "/gateway/schema/host-perception",
                 "listening_event": "/gateway/schema/listening-event",
                 "listening_context": "/gateway/schema/listening-context",
+                "route_outcome": "/gateway/schema/route-outcome",
             },
         }
         schemas = [
@@ -130,6 +132,7 @@ class DoctorTests(unittest.TestCase):
                 ACCOUNTABLE_LISTENING_CONTRACTS["host_perception"],
                 ACCOUNTABLE_LISTENING_CONTRACTS["listening_event"],
                 ACCOUNTABLE_LISTENING_CONTRACTS["listening_context"],
+                ACCOUNTABLE_LISTENING_CONTRACTS["route_outcome"],
             )
         ]
         with patch(
@@ -137,23 +140,24 @@ class DoctorTests(unittest.TestCase):
             side_effect=[manifest, *schemas],
         ) as fetch:
             checks = _check_oida_accountability_contracts("http://127.0.0.1:8765")
-        self.assertEqual(fetch.call_count, 4)
-        self.assertEqual(len(checks), 4)
+        self.assertEqual(fetch.call_count, 5)
+        self.assertEqual(len(checks), 5)
         self.assertTrue(all(check.status == "pass" for check in checks))
 
     def test_oida_live_contracts_fail_closed_on_semantic_drift(self):
         manifest = {
-            "version": "0.8.0",
-            "contract": "oida/gateway/v0.4",
+            "version": "0.9.0",
+            "contract": "oida/gateway/v0.5",
             "components": {
-                "akouo": {"contract": "akouo/v0.8"},
-                "earworm": {"contract": "earworm/v0.4"},
-                "akousmata": {"contract": "akousmata/v0.5"},
+                "akouo": {"contract": "akouo/v0.9"},
+                "earworm": {"contract": "earworm/v0.5"},
+                "akousmata": {"contract": "akousmata/v0.6"},
             },
             "schemas": {
                 "host_perception": "/gateway/schema/host-perception",
                 "listening_event": "/gateway/schema/listening-event",
                 "listening_context": "/gateway/schema/listening-context",
+                "route_outcome": "/gateway/schema/route-outcome",
             },
         }
         schemas = [
@@ -162,6 +166,7 @@ class DoctorTests(unittest.TestCase):
                 ACCOUNTABLE_LISTENING_CONTRACTS["host_perception"],
                 "oida/listening-event/v0.1",
                 ACCOUNTABLE_LISTENING_CONTRACTS["listening_context"],
+                ACCOUNTABLE_LISTENING_CONTRACTS["route_outcome"],
             )
         ]
         with patch(

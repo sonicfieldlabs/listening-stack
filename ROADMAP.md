@@ -16,7 +16,8 @@ The roadmap describes public-alpha direction and does not promise dates.
 
 ## Toward Beta
 
-- Stable installer-state migrations.
+- Migration previews and explicit upgrade commands for future installer-state
+  contracts beyond the backward-readable version 2 format.
 - Opt-in version-channel selection beyond the default tested compatibility set.
 - Reproducible provider-lock metadata and model revision pinning.
 - Optional signed desktop launchers built from the same assistant core.

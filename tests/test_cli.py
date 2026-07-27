@@ -38,10 +38,29 @@ class CliTests(unittest.TestCase):
                     ]
                 )
             self.assertIn("Dry run complete", output.getvalue())
-            self.assertIn("Oída v0.8.0", output.getvalue())
+            self.assertIn("Oída v0.9.0", output.getvalue())
             self.assertIn("GERM v0.2.5", output.getvalue())
-            self.assertIn("oida/gateway/v0.4", output.getvalue())
-            self.assertIn("earworm/auditum/v1", output.getvalue())
+            self.assertIn("oida/gateway/v0.5", output.getvalue())
+            self.assertIn("earworm/auditum/v2", output.getvalue())
+
+    def test_noninteractive_default_is_core_without_germ(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = StringIO()
+            with redirect_stdout(output):
+                main(
+                    [
+                        "install",
+                        "--no-models",
+                        "--root",
+                        str(Path(temporary) / "stack"),
+                        "--yes",
+                        "--dry-run",
+                    ]
+                )
+            plan = output.getvalue()
+            self.assertIn("Listening core", plan)
+            self.assertIn("Oída v0.9.0", plan)
+            self.assertNotIn("GERM v0.2.5", plan)
 
     def test_models_and_no_models_are_mutually_exclusive(self):
         with self.assertRaises(SystemExit) as raised:

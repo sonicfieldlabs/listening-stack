@@ -1,8 +1,8 @@
 # Models, Access, and Hardware
 
-The Listening Stack is model-agnostic at its contracts. This installer begins
-with two concrete local model families because they currently provide the most
-direct tested paths for Oída and GERM.
+The Listening Stack is model-agnostic at its contracts. The default core offers
+one concrete local model family for Oída. A second family is available only when
+the optional GERM component is selected.
 
 ## MOSS-Audio for Oída
 
@@ -26,8 +26,8 @@ serves direct and transcription routes; the Thinking model serves deeper,
 music, and targeted re-listening routes. Oída consumes a final model response
 as bounded evidence and does not expose private reasoning traces.
 
-Listening Stack 0.2.0 downloads each MOSS checkpoint by the immutable commit
-audited for this release. Oída 0.8.0's embedded loader requires Safetensors and
+Listening Stack 0.3.0 downloads each MOSS checkpoint by the immutable commit
+audited for this release. Oída 0.9.0's embedded loader requires Safetensors and
 uses its locked Torch 2.10, TorchAudio 2.10, TorchCodec 0.10, and Transformers
 5.14 runtime. The installer also prepares Oída's optional Music ID dependency;
 identification remains opt-in per listen and may contact the service used by
@@ -37,7 +37,7 @@ Oída's current planning guidance is 16 GB minimum and 24 GB suggested for 4B,
 or 24 GB minimum and 48 GB suggested for 8B. Apple Silicon and CUDA are the
 practical accelerated routes. CPU execution is possible but can be slow.
 
-## Stable Audio 3 for GERM
+## Stable Audio 3 for Optional GERM
 
 GERM's cultivation graph is provider-agnostic, and its mock route works without
 a model. Its first real-model implementation is specifically designed around
@@ -95,8 +95,9 @@ is advisory; model identity and source revision remain separate provenance.
 
 Disk estimates include all selected checkpoint bytes, a 15% margin for download
 and extraction behavior, and a fixed reserve for source and Python environments.
-RAM guidance uses the largest model expected to be resident. It sums the
-largest selected Oída and GERM models only for the concurrent-app estimate.
+RAM guidance uses the largest model expected to be resident. Only the explicit
+full profile sums the largest selected Oída and GERM models for the
+concurrent-app estimate.
 
 Use:
 

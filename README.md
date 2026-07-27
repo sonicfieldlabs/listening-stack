@@ -2,21 +2,24 @@
 
 > **Public alpha · Open research release · Local-first · Open-source · Under active development**
 
-The Listening Stack Installer prepares [Oída](https://github.com/sonicfieldlabs/oida)
-and [GERM](https://github.com/sonicfieldlabs/germ), their local runtimes, and
-the models an operator explicitly selects. It checks the host, explains disk
-and memory requirements, keeps weights outside Git, and leaves both local
-gateways ready to start.
+The Listening Stack Installer prepares the accountable listening core:
+[AKOÚŌ](https://github.com/sonicfieldlabs/akouo),
+[Earworm](https://github.com/sonicfieldlabs/earworm),
+[Akousmata](https://github.com/sonicfieldlabs/akousmata), and
+[Oída](https://github.com/sonicfieldlabs/oida). [GERM](https://github.com/sonicfieldlabs/germ)
+is available as an explicit optional installation. The assistant checks the
+host, explains disk and memory requirements, keeps weights outside Git, and
+prepares only the services and models an operator selected.
 
 **Oída listens. AKOÚŌ structures claims. Earworm addresses auditums. Akousmata
-renders and audits memory. GERM cultivates.**
+renders and audits memory. GERM optionally cultivates.**
 
 This repository is an installer and operator assistant. Oída, GERM, AKOÚŌ,
 Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer release: `0.2.0`.
+Current installer release: `0.3.0`.
 
 ## Quick Start
 
@@ -50,58 +53,66 @@ chmod +x listening-stack.pyz
 
 ## What the Assistant Can Install
 
-- **Full stack:** Oída, GERM, the supporting Oída libraries, selected models,
-  and one local Stable Audio 3 provider.
-- **Oída only:** Oída and the AKOÚŌ, Earworm, and Akousmata source dependencies
-  required by its current `uv` workspace.
+- **Core profile (default):** AKOÚŌ, Earworm, Akousmata, Oída, and any selected
+  MOSS-Audio models. It neither installs nor configures GERM.
+- **Full profile:** the core plus an explicitly selected GERM installation and,
+  when requested, one local Stable Audio 3 provider.
 - **GERM only:** GERM with its mock path or a selected Stable Audio 3 runtime.
-- **Model-free paths:** Oída's deterministic/stub route and GERM's mock route,
-  with no weights or hosted account.
+- **Model-free paths:** the core's deterministic/stub route and, only in a
+  GERM-containing profile, GERM's mock route, with no weights or hosted account.
 - **Optional agent adapters:** Hermes, Codex, Claude, OpenClaw, and OpenCode,
   installed through Oída only after they are selected.
 
 Sources are cloned into a dedicated installation directory. The installer
 verifies every existing origin and refuses to update a dirty or unexpected
-checkout. Release `0.2.0` installs one immutable compatibility set and records
+checkout. Release `0.3.0` installs one immutable compatibility set and records
 the exact commits it installed in local state:
 
 | Component | Tested release |
 | --- | --- |
-| Oída | 0.8.0 |
+| Oída | 0.9.0 |
 | GERM | 0.2.5 |
-| AKOÚŌ | 0.8.0 |
-| Earworm | 0.5.0 |
-| Akousmata | 0.5.0 |
+| AKOÚŌ | 0.9.0 |
+| Earworm | 0.6.0 |
+| Akousmata | 0.6.0 |
 
 The official MOSS-Audio source is pinned to the revision tested with Oída
-0.8.0. Stable Audio 3 source is pinned to the same revision locked by GERM
+0.9.0. Stable Audio 3 source is pinned to the same revision locked by GERM
 0.2.5. Rerunning this installer therefore reproduces the compatibility set;
 it does not silently advance a checkout to a newer moving branch.
 
 ## Accountable Listening Contract
 
-Release 0.2.0 installs listening as an explicit, inspectable chain:
+Release 0.3.0 installs listening as an explicit, inspectable chain:
 
-1. Oída owns runtime perception and emits `oida/listening-event/v0.2` through
-   `oida/gateway/v0.4`.
-2. AKOÚŌ owns listening modes, claim discipline, and the situated
-   `akouo/listening-context/v1`: position, actual evidence apertures, auditory
-   scales, sources of listening, participants, authority, and honest absence.
-3. Earworm owns addressable, append-only `earworm/auditum/v1` lineage,
-   disagreement, action receipts, revision, and forgetting. “Tokenized” here
-   means structured, addressable, and versioned—never a financial token.
-4. Akousmata renders and structurally audits those records without becoming a
-   second owner of claims or provenance.
+1. AKOÚŌ owns routing and claim discipline under `akouo/v0.9`, including
+   situated `akouo/listening-context/v2`, attributable listening passes,
+   provenance and cuts, explicit route decisions, and declared ensembles.
+2. Oída owns runtime perception and the decision-first gateway. A successful
+   hearing emits `oida/listening-event/v0.3` through `oida/gateway/v0.5`; a
+   refusal before perception emits `oida/route-outcome/v0.1` instead of
+   fabricating an empty hearing.
+3. Earworm owns addressable, append-only `earworm/auditum/v2` lineage,
+   disagreement, decision-only records, action receipts, revision, and
+   forgetting receipts. “Tokenized” here means structured, addressable, and
+   versioned—never a financial token.
+4. Akousmata renders, queries, and structurally audits those records without
+   becoming a second owner of claims or provenance.
 
 Capability and authority stay separate. A host may declare what its apparatus
 can perceive, but Oída recomputes the effective context and defaults operational
-authority to observe-only. Unsupported measurements remain absent rather than
-being inferred from model prose. Distinct routes remain distinct listenings;
-disagreement is preserved instead of averaged away.
+authority to observe-only. Prompts, transcripts, and contextual descriptions
+remain attributed text rather than being relabeled as heard evidence.
+Unsupported measurements remain absent rather than being inferred from model
+prose. A pause, refusal, withholding, or forgetting decision is recorded as a
+decision, not confused with honest absence or an undetermined claim. Distinct
+routes remain distinct listenings; multiple listeners become an ear swarm only
+when they remain attributable and demonstrably redirect one another.
 
-The installer records this semantic compatibility matrix in `state.json`.
+The installer records this semantic compatibility matrix, the selected profile,
+and its exact component set in `listening-stack/state/v2` state.
 When Oída is running, `listening-stack doctor` reads the live gateway manifest
-and all three public schemas to verify the contract at the actual integration
+and all four public schemas to verify the contract at the actual integration
 boundary. See [Accountable listening architecture](docs/accountable-listening.md).
 
 ## Model Choices
@@ -137,7 +148,7 @@ MOSS-Audio code and released model checkpoints are Apache-2.0. Oída is develope
 and tested first against the 4B Instruct and Thinking checkpoints while
 remaining model-agnostic at its gateway boundary.
 
-Oída 0.8.0 requires Safetensors for its embedded model loader and pins its
+Oída 0.9.0 requires Safetensors for its embedded model loader and pins its
 compatible Torch, TorchAudio, TorchCodec, and Transformers releases. The
 installer downloads MOSS checkpoints by immutable Hugging Face commit and the
 doctor verifies both model configuration and Safetensors weights.
@@ -197,11 +208,21 @@ Run a reproducible non-interactive install:
 
 ```bash
 listening-stack install \
+  --component core \
+  --models recommended \
+  --integration codex \
+  --root "$HOME/SonicField/ListeningStack" \
+  --yes
+```
+
+Add GERM only by selecting it explicitly:
+
+```bash
+listening-stack install \
   --component full \
   --models recommended \
   --provider auto \
   --accept-model-terms \
-  --integration codex \
   --root "$HOME/SonicField/ListeningStack" \
   --yes
 ```
@@ -216,24 +237,25 @@ for presets, individual model keys, dry runs, and automation.
 After `listening-stack start`:
 
 - Oída gateway and agent: `http://127.0.0.1:8765`
-- GERM dashboard: `http://127.0.0.1:5178/dashboard`
+- GERM dashboard, only when installed: `http://127.0.0.1:5178/dashboard`
 
 Both bind to loopback. The generated environment file contains paths and
 non-secret settings only. Hugging Face credentials stay in the Hugging Face
 CLI's own local credential store and are never copied into this repository or
 the installer state.
 
-Oída and GERM share one explicit `AKOUSMATA_PATH` under the installation root.
-GERM's allowed hosts, input roots, and model roots are bounded to the generated
-loopback and install-root paths. The bounded input set includes GERM output,
-Oída's handoff audio, and the shared Akousmata store; cloud image analysis
-remains disabled unless an operator enables it separately.
+The core uses one explicit `AKOUSMATA_PATH` under the installation root. When
+GERM is selected, Oída and GERM share that path; GERM's allowed hosts, input
+roots, and model roots are bounded to generated loopback and install-root
+paths. A core-only install records no GERM URL, creates no GERM data directory,
+and does not probe or start GERM.
 
 Oída's public schema boundary is available at:
 
 - `http://127.0.0.1:8765/gateway/schema/host-perception`
 - `http://127.0.0.1:8765/gateway/schema/listening-event`
 - `http://127.0.0.1:8765/gateway/schema/listening-context`
+- `http://127.0.0.1:8765/gateway/schema/route-outcome`
 
 ## Agent Integrations
 
@@ -279,7 +301,7 @@ a shared machine.
   contracts; it cannot
   certify model output quality or legal fitness for a particular use.
 - Stable Audio 3's optimized paths differ across CPU, CUDA, and Apple Silicon.
-- Oída and GERM interfaces remain under active development before 1.0.
+- Oída and the optional GERM interface remain under active development before 1.0.
 - Stable Audio 3's Python loader resolves gated model revisions through its
   upstream Hugging Face contract; the exact resolved cache revision is recorded
   in installer state when available.
@@ -298,8 +320,8 @@ bash -n install.sh listening-stack
 Use a dry run to inspect installation commands without changing the machine:
 
 ```bash
-./listening-stack install --component full --models recommended \
-  --accept-model-terms --yes --dry-run
+./listening-stack install --component core --models recommended --yes --dry-run
+./listening-stack install --component full --models none --yes --dry-run
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md),

@@ -50,8 +50,9 @@ host integrations succeed, so the state file remains a completed-installation
 marker rather than an optimistic plan. Its JSON input size and structure are
 bounded before lifecycle commands use it.
 
-The state also records the semantic compatibility set for accountable
-listening. When Oída is running, the doctor reads only fixed gateway/schema
+The version 2 state contract also records the selected profile, exact component
+set, and semantic compatibility set for accountable listening. When Oída is
+running, the doctor reads only fixed gateway/schema
 paths on the configured loopback origin, bounds response sizes, rejects
 redirects and non-loopback URLs, and compares the live contracts with that set.
 It does not submit recordings or listening content during this check.
@@ -62,7 +63,8 @@ The install root can contain:
 
 - downloaded model weights;
 - Oída listening events, captures, and memory;
-- GERM source material, generated audio, sessions, and lineage;
+- GERM source material, generated audio, sessions, and lineage when GERM was
+  explicitly installed;
 - service logs and process state;
 - cloned public source.
 
@@ -74,16 +76,18 @@ The local gateways bind to `127.0.0.1` by default. Exposing them to a LAN,
 overlay network, reverse proxy, or public host is a separate operator decision
 and is not automated here.
 
-The generated environment explicitly binds Oída and GERM to loopback, gives
-both applications one install-root `AKOUSMATA_PATH`, bounds GERM's accepted
-input roots to GERM output, Oída handoff audio, and the shared store, bounds
-model roots to install-managed paths, and keeps cloud image analysis off.
+The core environment binds Oída to loopback and gives it one install-root
+`AKOUSMATA_PATH`. It contains no GERM endpoint. When GERM is explicitly
+selected, the generated environment binds it to loopback, shares the same
+store, bounds accepted input roots to GERM output, Oída handoff audio, and the
+shared store, bounds model roots to install-managed paths, and keeps cloud image
+analysis off.
 Lifecycle commands reject edited state that would make them bind or probe a
 non-loopback host.
 
 ## Process Control
 
-Oída manages its own recorded gateway process. The assistant records GERM's PID
+Oída manages its own recorded gateway process. When installed, the assistant records GERM's PID
 and process-start token and checks both with its command before sending a
 signal. It refuses to stop a reused PID or a process that does not look like
 the recorded Uvicorn GERM server. A health endpoint is reused only when its

@@ -23,6 +23,8 @@ from .catalog import (
     MODELS,
     REPOSITORIES,
     memory_guidance,
+    normalize_profile,
+    profile_includes,
     source_keys,
 )
 from .installer import _normalise_git_url, environment_path, load_state, state_path
@@ -43,6 +45,7 @@ OIDA_SCHEMA_PATHS = {
     "host_perception": "/gateway/schema/host-perception",
     "listening_event": "/gateway/schema/listening-event",
     "listening_context": "/gateway/schema/listening-context",
+    "route_outcome": "/gateway/schema/route-outcome",
 }
 
 
@@ -106,8 +109,15 @@ def run_doctor(root: Path) -> Dict[str, object]:
         )
     )
 
-    component = str(state.get("component", ""))
-    if component in {"oida", "full"}:
+    component = normalize_profile(str(state.get("profile") or state.get("component")))
+    checks.append(
+        Check(
+            "state:profile",
+            "pass",
+            "%s (%s)" % (component, ", ".join(source_keys(component))),
+        )
+    )
+    if profile_includes(component, "oida"):
         recorded_contracts = state.get("contracts")
         contract_set_matches = (
             isinstance(recorded_contracts, dict)
@@ -240,8 +250,27 @@ def run_doctor(root: Path) -> Dict[str, object]:
             else "",
         )
     )
-    if component in {"germ", "full"} and isinstance(environment, dict):
+    if profile_includes(component, "germ") and isinstance(environment, dict):
         checks.append(_check_germ_boundary(root, environment))
+    elif isinstance(environment, dict):
+        unexpected_germ = sorted(
+            key
+            for key in environment
+            if str(key).startswith("GERM_") or key == "OIDA_GERM_URL"
+        )
+        checks.append(
+            Check(
+                "security:core-boundary",
+                "pass" if not unexpected_germ else "warn",
+                "no GERM endpoint or provider configuration"
+                if not unexpected_germ
+                else "core state contains optional GERM settings: %s"
+                % ", ".join(unexpected_germ),
+                "Rerun the core installer to remove optional-component settings."
+                if unexpected_germ
+                else "",
+            )
+        )
 
     try:
         running = runtime_status(root)
@@ -426,9 +455,10 @@ def _check_private_file(name: str, path: Path) -> Check:
 def _check_germ_boundary(root: Path, environment: Mapping[str, object]) -> Check:
     expected_inputs = {
         str(root / "data" / "germ"),
-        str(root / "data" / "audio"),
         str(root / "data" / "akousmata"),
     }
+    if environment.get("GERM_OIDA_URL"):
+        expected_inputs.add(str(root / "data" / "audio"))
     expected_models = {
         str(root / "vendor" / "stable-audio-3"),
         str(root / "models"),

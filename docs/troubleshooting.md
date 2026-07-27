@@ -43,19 +43,19 @@ listening-stack doctor
 ```
 
 The installer sets explicit local MOSS paths, disables silent Hub lookup, and
-downloads the immutable revisions tested with Oída 0.8.0. Rerun model download
+downloads the immutable revisions tested with Oída 0.9.0. Rerun model download
 if a checkpoint is incomplete.
 
 ## Oída is healthy but a contract or schema check fails
 
-The doctor checks more than `/health`. It reads `/gateway` and the three public
+The doctor checks more than `/health`. It reads `/gateway` and the four public
 accountable-listening schemas from the same loopback process. A failure usually
 means the running daemon predates the pinned source checkout or was started by a
 different environment.
 
 ```bash
 listening-stack stop oida
-listening-stack install --component oida --models none --yes
+listening-stack install --component core --models none --yes
 listening-stack start oida
 listening-stack doctor
 ```
@@ -72,6 +72,9 @@ rerun the same install command. The assistant fetches only the expected commit
 and never resets local work.
 
 ## GERM reports its provider unavailable
+
+First confirm that the completed state uses the `full` or `germ` profile. The
+default `core` profile deliberately has no GERM checkout, endpoint, or process.
 
 Check provider and model diagnostics:
 

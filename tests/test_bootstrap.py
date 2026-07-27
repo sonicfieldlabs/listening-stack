@@ -58,7 +58,7 @@ shutil.copyfile(Path(os.environ["BOOTSTRAP_FIXTURES"]) / name, destination)
                 "BOOTSTRAP_FIXTURES": str(fixtures),
                 "HOME": str(home),
                 "LISTENING_STACK_BIN_DIR": str(install_bin),
-                "LISTENING_STACK_VERSION": "v0.2.0",
+                "LISTENING_STACK_VERSION": "v0.3.0",
                 "PATH": str(fake_bin) + os.pathsep + environment.get("PATH", ""),
                 "TMPDIR": str(temp_dir),
             }
@@ -119,7 +119,7 @@ shutil.copyfile(Path(os.environ["BOOTSTRAP_FIXTURES"]) / name, destination)
     def test_invalid_release_tag_is_rejected_before_download(self):
         with tempfile.TemporaryDirectory() as temporary:
             install_bin, environment = self.fixture(temporary)
-            environment["LISTENING_STACK_VERSION"] = "v0.2.0/../../unexpected"
+            environment["LISTENING_STACK_VERSION"] = "v0.3.0/../../unexpected"
             result = subprocess.run(
                 ["bash", str(ROOT / "install.sh"), "models", "--json"],
                 env=environment,

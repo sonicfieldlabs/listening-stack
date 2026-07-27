@@ -1,7 +1,7 @@
 [project]
 name = "sonicfield-listening-stack"
-version = "0.2.0"
-description = "Reproducible installer and runtime verifier for the accountable local listening stack and GERM."
+version = "0.3.0"
+description = "Reproducible installer and runtime verifier for the accountable listening core and optional GERM."
 readme = "README.md"
 requires-python = ">=3.9"
 license = "Apache-2.0"
