@@ -1,4 +1,4 @@
-"""Installation orchestration for Oída, GERM, and their selected models."""
+"""Installation orchestration for the listening core and optional GERM."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from typing import Dict, List, Mapping, Sequence, Tuple
 
 from . import __version__
 from .catalog import (
+    ACCOUNTABLE_LISTENING_CONTRACTS,
     ALL_REPOSITORIES,
     MODELS,
     MOSS_AUDIO_REPOSITORY,
@@ -23,6 +24,8 @@ from .catalog import (
     STABLE_AUDIO_REPOSITORY,
     Model,
     Repository,
+    normalize_profile,
+    profile_includes,
     source_keys,
 )
 from .system import Runner, executable, is_apple_silicon
@@ -32,6 +35,7 @@ STATE_DIRECTORY = ".listening-stack"
 STATE_FILENAME = "state.json"
 ENV_FILENAME = "stack.env"
 MAX_STATE_BYTES = 2 * 1024 * 1024
+STATE_CONTRACT = "listening-stack/state/v2"
 UV_VERSION = "0.11.29"
 UV_INSTALLER_SHA256 = "504a79fd2ed0dcd47e7f04f0792cfd0871f62e24a7fe40fa8ae0f563a369f2bd"
 HF_CLI_VERSION = "1.23.0"
@@ -70,10 +74,43 @@ def load_state(root: Path) -> Dict[str, object]:
         raise ValueError("Listening Stack state is unexpectedly large at %s" % path)
     with path.open("r", encoding="utf-8") as handle:
         value = json.load(handle)
-    if not isinstance(value, dict) or value.get("schema_version") != 1:
+    if not isinstance(value, dict) or value.get("schema_version") not in {1, 2}:
         raise ValueError("Unsupported or invalid Listening Stack state at %s" % path)
-    if value.get("component") not in {"oida", "germ", "full"}:
-        raise ValueError("Listening Stack state has an invalid component at %s" % path)
+    profile = str(value.get("profile") or value.get("component") or "")
+    try:
+        canonical_profile = normalize_profile(profile)
+    except ValueError as exc:
+        raise ValueError(
+            "Listening Stack state has an invalid profile at %s" % path
+        ) from exc
+    if value.get("schema_version") == 2:
+        if (
+            value.get("contract") != STATE_CONTRACT
+            or value.get("profile") != canonical_profile
+            or value.get("component") != canonical_profile
+        ):
+            raise ValueError("Listening Stack state has an invalid contract at %s" % path)
+        components = value.get("components")
+        if not isinstance(components, list) or components != list(
+            source_keys(canonical_profile)
+        ):
+            raise ValueError(
+                "Listening Stack state has an invalid component set at %s" % path
+            )
+        expected_optional = ["germ"] if canonical_profile == "full" else []
+        if value.get("core_components") != list(source_keys("core")) or value.get(
+            "optional_components"
+        ) != expected_optional:
+            raise ValueError(
+                "Listening Stack state has invalid profile metadata at %s" % path
+            )
+        if not isinstance(value.get("contracts"), dict) or not isinstance(
+            value.get("repositories"), dict
+        ):
+            raise ValueError(
+                "Listening Stack state has no valid compatibility metadata at %s"
+                % path
+            )
     if not isinstance(value.get("environment"), dict):
         raise ValueError("Listening Stack state has no valid environment at %s" % path)
     if not isinstance(value.get("commits"), dict):
@@ -84,6 +121,7 @@ def load_state(root: Path) -> Dict[str, object]:
 class Installer:
     def __init__(self, selection: Selection, runner: Runner) -> None:
         self.selection = selection
+        self.profile = normalize_profile(selection.component)
         self.runner = runner
         self.root = selection.root.expanduser().resolve()
         self.src_root = self.root / "src"
@@ -149,8 +187,7 @@ class Installer:
 
     def _validate_selection(self) -> None:
         self._validate_root()
-        if self.selection.component not in {"oida", "germ", "full"}:
-            raise ValueError("component must be oida, germ, or full")
+        normalize_profile(self.selection.component)
         if self.selection.provider not in {"auto", "mlx", "python", "mock"}:
             raise ValueError("provider must be auto, mlx, python, or mock")
         unknown = [key for key in self.selection.model_keys if key not in MODELS]
@@ -158,11 +195,11 @@ class Installer:
             raise ValueError("Unknown models: " + ", ".join(unknown))
         if len(set(self.selection.model_keys)) != len(self.selection.model_keys):
             raise ValueError("Model selections must not contain duplicates")
-        allowed_apps = (
-            {"oida", "germ"}
-            if self.selection.component == "full"
-            else {self.selection.component}
-        )
+        allowed_apps = {
+            application
+            for application in ("oida", "germ")
+            if profile_includes(self.profile, application)
+        }
         wrong = [
             model.key for model in self.models if model.application not in allowed_apps
         ]
@@ -179,7 +216,7 @@ class Installer:
             raise ValueError("Unknown integrations: " + ", ".join(invalid_integrations))
         if len(set(self.selection.integrations)) != len(self.selection.integrations):
             raise ValueError("Integration selections must not contain duplicates")
-        if self.selection.integrations and self.selection.component == "germ":
+        if self.selection.integrations and not profile_includes(self.profile, "oida"):
             raise ValueError(
                 "Agent integrations are supplied by Oída; install Oída or the full stack first"
             )
@@ -236,23 +273,24 @@ class Installer:
             )
 
     def _make_directories(self) -> None:
-        paths = (
+        paths = [
             self.src_root,
             self.vendor_root,
             self.models_root,
             self.hf_home,
             self.models_root / "moss-audio",
             self.root / "data",
-            self.root / "data" / "oida",
-            self.root / "data" / "audio",
-            self.root / "data" / "germ",
             self.root / "data" / "akousmata",
             self.root / "logs",
             self.root / "run",
             self.root / STATE_DIRECTORY,
             self.root / STATE_DIRECTORY / "bin",
             self.root / STATE_DIRECTORY / "tools",
-        )
+        ]
+        if profile_includes(self.profile, "oida"):
+            paths.extend((self.root / "data" / "oida", self.root / "data" / "audio"))
+        if profile_includes(self.profile, "germ"):
+            paths.append(self.root / "data" / "germ")
         for path in paths:
             if path.is_symlink():
                 raise RuntimeError(
@@ -360,7 +398,7 @@ class Installer:
         self.runner.note("    Install ffmpeg before using model-backed audio decoding.")
 
     def _source_keys(self) -> Tuple[str, ...]:
-        return source_keys(self.selection.component)
+        return source_keys(self.profile)
 
     def _install_sources(self) -> None:
         for key in self._source_keys():
@@ -441,7 +479,7 @@ class Installer:
 
     def _sync_applications(self) -> None:
         model_apps = {model.application for model in self.models}
-        if self.selection.component in {"oida", "full"}:
+        if profile_includes(self.profile, "oida"):
             command = [
                 self.uv,
                 "sync",
@@ -454,7 +492,7 @@ class Installer:
             if "oida" in model_apps:
                 command.extend(["--extra", "moss"])
             self.runner.run(command, cwd=self.src_root / "oida")
-        if self.selection.component in {"germ", "full"}:
+        if profile_includes(self.profile, "germ"):
             command = [self.uv, "sync", "--locked", "--python", "3.12"]
             provider = self._resolved_provider()
             if "germ" in model_apps and provider == "python":
@@ -592,28 +630,40 @@ class Installer:
         environment: Dict[str, str] = {
             "HF_HOME": str(self.hf_home),
             "AKOUSMATA_PATH": str(akousmata_path),
-            "OIDA_DATA_DIR": str(self.root / "data" / "oida"),
-            "OIDA_AUDIO_DIR": str(oida_audio),
-            "OIDA_HOST": "127.0.0.1",
-            "OIDA_PORT": "8765",
-            "OIDA_SERVER_URL": "http://127.0.0.1:8765",
-            "OIDA_GERM_URL": "http://127.0.0.1:5178",
-            "OIDA_ALLOW_HF_HUB": "0",
-            "GERM_HOST": "127.0.0.1",
-            "GERM_PORT": "5178",
-            "GERM_ALLOWED_HOSTS": "localhost,127.0.0.1",
-            "GERM_OUTPUT_DIR": str(germ_output),
-            "GERM_ALLOWED_INPUT_ROOTS": ",".join(
-                (str(germ_output), str(oida_audio), str(akousmata_path))
-            ),
-            "GERM_ALLOWED_MODEL_ROOTS": ",".join(
-                (str(stable_repo), str(self.models_root), str(germ_output))
-            ),
-            "GERM_ENABLE_CLOUD_VISION": "0",
-            "GERM_OIDA_URL": "http://127.0.0.1:8765",
-            "GERM_OFFICIAL_REPO_DIR": str(stable_repo),
-            "GERM_MLX_REPO_DIR": str(stable_repo),
         }
+        if profile_includes(self.profile, "oida"):
+            environment.update(
+                {
+                    "OIDA_DATA_DIR": str(self.root / "data" / "oida"),
+                    "OIDA_AUDIO_DIR": str(oida_audio),
+                    "OIDA_HOST": "127.0.0.1",
+                    "OIDA_PORT": "8765",
+                    "OIDA_SERVER_URL": "http://127.0.0.1:8765",
+                    "OIDA_ALLOW_HF_HUB": "0",
+                }
+            )
+        if profile_includes(self.profile, "germ"):
+            germ_input_roots = [str(germ_output), str(akousmata_path)]
+            if self.profile == "full":
+                germ_input_roots.append(str(oida_audio))
+            environment.update(
+                {
+                    "GERM_HOST": "127.0.0.1",
+                    "GERM_PORT": "5178",
+                    "GERM_ALLOWED_HOSTS": "localhost,127.0.0.1",
+                    "GERM_OUTPUT_DIR": str(germ_output),
+                    "GERM_ALLOWED_INPUT_ROOTS": ",".join(germ_input_roots),
+                    "GERM_ALLOWED_MODEL_ROOTS": ",".join(
+                        (str(stable_repo), str(self.models_root), str(germ_output))
+                    ),
+                    "GERM_ENABLE_CLOUD_VISION": "0",
+                    "GERM_OFFICIAL_REPO_DIR": str(stable_repo),
+                    "GERM_MLX_REPO_DIR": str(stable_repo),
+                }
+            )
+        if self.profile == "full":
+            environment["OIDA_GERM_URL"] = "http://127.0.0.1:5178"
+            environment["GERM_OIDA_URL"] = "http://127.0.0.1:8765"
         moss = [model for model in self.models if model.application == "oida"]
         if moss:
             instruct = _preferred_moss(moss, "instruct")
@@ -629,18 +679,19 @@ class Installer:
                     "OIDA_MOSS_RESIDENT": "single",
                 }
             )
-        else:
+        elif profile_includes(self.profile, "oida"):
             environment.update(
                 {"OIDA_ENGINE_PROFILE": "stub", "OIDA_REQUIRE_MODEL": "0"}
             )
-        stable = [model for model in self.models if model.application == "germ"]
-        provider = self._resolved_provider()
-        environment["GERM_ACTIVE_PROVIDER"] = {
-            "mlx": "stable_audio_mlx",
-            "python": "stable_audio_python",
-            "mock": "mock",
-        }.get(provider, "mock")
-        environment["GERM_DEFAULT_MODEL"] = _preferred_stable_model(stable)
+        if profile_includes(self.profile, "germ"):
+            stable = [model for model in self.models if model.application == "germ"]
+            provider = self._resolved_provider()
+            environment["GERM_ACTIVE_PROVIDER"] = {
+                "mlx": "stable_audio_mlx",
+                "python": "stable_audio_python",
+                "mock": "mock",
+            }.get(provider, "mock")
+            environment["GERM_DEFAULT_MODEL"] = _preferred_stable_model(stable)
         return environment
 
     def _write_environment(self, environment: Mapping[str, str]) -> None:
@@ -667,16 +718,22 @@ class Installer:
             if key in ALL_REPOSITORIES
         }
         state: Dict[str, object] = {
-            "schema_version": 1,
+            "schema_version": 2,
+            "contract": STATE_CONTRACT,
             "installer_version": __version__,
             "installed_at": datetime.now(timezone.utc).isoformat(),
             "root": str(self.root),
-            "component": self.selection.component,
+            "profile": self.profile,
+            "component": self.profile,
+            "components": list(source_keys(self.profile)),
+            "core_components": list(source_keys("core")),
+            "optional_components": ["germ"] if self.profile == "full" else [],
             "models": list(self.selection.model_keys),
             "model_revisions": dict(sorted(self.model_revisions.items())),
             "provider": self._resolved_provider(),
             "integrations": list(self.selection.integrations),
             "commits": dict(self.commits),
+            "contracts": dict(ACCOUNTABLE_LISTENING_CONTRACTS),
             "repositories": repositories,
             "environment": dict(environment),
         }
@@ -698,7 +755,7 @@ class Installer:
             )
 
     def _verify_installation(self, environment: Mapping[str, str]) -> None:
-        if self.selection.component in {"oida", "full"}:
+        if profile_includes(self.profile, "oida"):
             self.runner.run(
                 [
                     self.uv,
@@ -710,7 +767,7 @@ class Installer:
                 cwd=self.src_root / "oida",
                 env=environment,
             )
-        if self.selection.component in {"germ", "full"}:
+        if profile_includes(self.profile, "germ"):
             germ_models = any(model.application == "germ" for model in self.models)
             provider = self._resolved_provider()
             import_check = "from server.main import app"

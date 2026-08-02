@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.3.0 — 2026-07-27
+
+- Make the four-project listening core—AKOÚŌ 0.9.0, Earworm 0.6.0,
+  Akousmata 0.6.0, and Oída 0.9.0—the default install profile. GERM 0.2.5 is
+  now installed and configured only through an explicit `full` or `germ`
+  selection; the former `oida` selector remains a compatibility alias.
+- Introduce `listening-stack/state/v2`, recording the canonical profile, exact
+  component set, core components, optional components, immutable revisions,
+  and the expanded accountable-listening contract matrix. Version 1 state
+  remains readable for lifecycle compatibility.
+- Remove GERM directories, endpoints, provider settings, and lifecycle probes
+  from core-only installations. Full installations retain the bounded
+  loopback, path, model, and shared-memory safeguards.
+- Pin the decision-first Oída gateway and route-outcome contract, AKOÚŌ context
+  v2, Earworm auditum v2, and Akousmata's accountable-memory contract. Extend
+  the doctor to verify the live route-outcome schema as well as host input,
+  listening events, and listening context.
+- Document attributable passes, provenance and cuts, decision-only records,
+  coded silence, honest absence, evidence attribution, reciprocal ear swarms,
+  forgetting receipts, and non-resurrection across the installed system.
+
+## 0.2.0 — 2026-07-22
+
+- Pin Oída 0.8.0, AKOÚŌ 0.8.0, Earworm 0.5.0, and Akousmata 0.5.0 by immutable
+  source revision while retaining the tested GERM 0.2.5 and model-runtime set.
+- Record the accountable-listening compatibility matrix in completed installer
+  state: Oída gateway, host-perception and listening-event contracts; AKOÚŌ
+  listening context and claims; Earworm auditums; and Akousmata navigation.
+- Extend the read-only doctor from process health to the actual integration
+  boundary. It verifies Oída's live manifest and three public schemas using
+  bounded, non-redirecting loopback requests.
+- Document single semantic ownership, situated listening context, capability
+  versus authority, honest absence, preserved disagreement, append-only
+  revision, and the nonfinancial meaning of a tokenized auditum.
+- Show the listening contracts in every Oída/full install plan and update the
+  standalone deterministic release artifact and tests for the 0.2 compatibility
+  set.
+
 ## 0.1.2 — 2026-07-16
 
 - Pin the tested compatibility set to Oída 0.6.5, GERM 0.2.5, AKOÚŌ 0.7.0,

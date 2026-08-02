@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import json
 import os
 from pathlib import Path
 import platform
@@ -11,9 +12,21 @@ import stat
 import subprocess
 import sys
 from typing import Dict, List, Mapping
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlsplit
+from urllib.request import Request, urlopen
 
 from . import __version__
-from .catalog import ALL_REPOSITORIES, MODELS, memory_guidance, source_keys
+from .catalog import (
+    ACCOUNTABLE_LISTENING_CONTRACTS,
+    ALL_REPOSITORIES,
+    MODELS,
+    REPOSITORIES,
+    memory_guidance,
+    normalize_profile,
+    profile_includes,
+    source_keys,
+)
 from .installer import _normalise_git_url, environment_path, load_state, state_path
 from .runtime import status as runtime_status
 from .system import executable, is_apple_silicon, total_ram_gb
@@ -25,6 +38,15 @@ class Check:
     status: str
     detail: str
     remedy: str = ""
+
+
+MAX_GATEWAY_CONTRACT_BYTES = 2 * 1024 * 1024
+OIDA_SCHEMA_PATHS = {
+    "host_perception": "/gateway/schema/host-perception",
+    "listening_event": "/gateway/schema/listening-event",
+    "listening_context": "/gateway/schema/listening-context",
+    "route_outcome": "/gateway/schema/route-outcome",
+}
 
 
 def run_doctor(root: Path) -> Dict[str, object]:
@@ -87,6 +109,33 @@ def run_doctor(root: Path) -> Dict[str, object]:
         )
     )
 
+    component = normalize_profile(str(state.get("profile") or state.get("component")))
+    checks.append(
+        Check(
+            "state:profile",
+            "pass",
+            "%s (%s)" % (component, ", ".join(source_keys(component))),
+        )
+    )
+    if profile_includes(component, "oida"):
+        recorded_contracts = state.get("contracts")
+        contract_set_matches = (
+            isinstance(recorded_contracts, dict)
+            and recorded_contracts == dict(ACCOUNTABLE_LISTENING_CONTRACTS)
+        )
+        checks.append(
+            Check(
+                "state:contracts",
+                "pass" if contract_set_matches else "warn",
+                "accountable-listening compatibility set recorded"
+                if contract_set_matches
+                else "missing or stale accountable-listening compatibility set",
+                "Rerun `listening-stack install` with this installer to record the current contracts."
+                if not contract_set_matches
+                else "",
+            )
+        )
+
     raw_models = state.get("models", [])
     model_keys = (
         [str(key) for key in raw_models] if isinstance(raw_models, list) else []
@@ -116,7 +165,6 @@ def run_doctor(root: Path) -> Dict[str, object]:
             )
         )
 
-    component = str(state.get("component", ""))
     commits = state.get("commits", {}) if isinstance(state.get("commits"), dict) else {}
     for key in source_keys(component):
         path = root / "src" / key
@@ -202,8 +250,27 @@ def run_doctor(root: Path) -> Dict[str, object]:
             else "",
         )
     )
-    if component in {"germ", "full"} and isinstance(environment, dict):
+    if profile_includes(component, "germ") and isinstance(environment, dict):
         checks.append(_check_germ_boundary(root, environment))
+    elif isinstance(environment, dict):
+        unexpected_germ = sorted(
+            key
+            for key in environment
+            if str(key).startswith("GERM_") or key == "OIDA_GERM_URL"
+        )
+        checks.append(
+            Check(
+                "security:core-boundary",
+                "pass" if not unexpected_germ else "warn",
+                "no GERM endpoint or provider configuration"
+                if not unexpected_germ
+                else "core state contains optional GERM settings: %s"
+                % ", ".join(unexpected_germ),
+                "Rerun the core installer to remove optional-component settings."
+                if unexpected_germ
+                else "",
+            )
+        )
 
     try:
         running = runtime_status(root)
@@ -227,7 +294,139 @@ def run_doctor(root: Path) -> Dict[str, object]:
                     else "",
                 )
             )
+            if application == "oida" and is_running:
+                checks.extend(
+                    _check_oida_accountability_contracts(str(info.get("url") or ""))
+                )
     return _result(checks, running)
+
+
+def _check_oida_accountability_contracts(base_url: str) -> List[Check]:
+    """Verify the installed listening stack at Oída's live boundary."""
+    try:
+        manifest = _fetch_local_json(base_url, "/gateway")
+    except (HTTPError, URLError, TimeoutError, ValueError, OSError) as exc:
+        return [
+            Check(
+                "contract:oida-gateway",
+                "fail",
+                "could not read the live gateway contract: %s" % exc,
+                "Restart Oída from this installation and rerun the doctor.",
+            )
+        ]
+
+    components = manifest.get("components")
+    component_contracts = components if isinstance(components, dict) else {}
+    actual = {
+        "gateway": manifest.get("contract"),
+        "akouo": _nested_value(component_contracts, "akouo", "contract"),
+        "earworm": _nested_value(component_contracts, "earworm", "contract"),
+        "akousmata": _nested_value(component_contracts, "akousmata", "contract"),
+    }
+    expected = {
+        key: ACCOUNTABLE_LISTENING_CONTRACTS[key]
+        for key in ("gateway", "akouo", "earworm", "akousmata")
+    }
+    mismatches = [
+        "%s=%s (expected %s)" % (key, actual[key] or "missing", expected[key])
+        for key in expected
+        if actual[key] != expected[key]
+    ]
+    expected_version = REPOSITORIES["oida"].version
+    if manifest.get("version") != expected_version:
+        mismatches.append(
+            "oida=%s (expected %s)"
+            % (manifest.get("version") or "missing", expected_version)
+        )
+
+    advertised = manifest.get("schemas")
+    if not isinstance(advertised, dict):
+        mismatches.append("schemas=missing")
+    else:
+        for key, path in OIDA_SCHEMA_PATHS.items():
+            if advertised.get(key) != path:
+                mismatches.append(
+                    "schema.%s=%s (expected %s)"
+                    % (key, advertised.get(key) or "missing", path)
+                )
+
+    checks = [
+        Check(
+            "contract:oida-gateway",
+            "pass" if not mismatches else "fail",
+            "Oída %s exposes %s with AKOÚŌ, Earworm, and Akousmata ownership intact"
+            % (expected_version, expected["gateway"])
+            if not mismatches
+            else "; ".join(mismatches),
+            "Rerun the installer and restart Oída to restore the pinned compatibility set."
+            if mismatches
+            else "",
+        )
+    ]
+    for key, path in OIDA_SCHEMA_PATHS.items():
+        expected_contract = ACCOUNTABLE_LISTENING_CONTRACTS[key]
+        try:
+            schema = _fetch_local_json(base_url, path)
+            actual_contract = _nested_value(schema, "properties", "contract", "const")
+            matches = actual_contract == expected_contract
+            checks.append(
+                Check(
+                    "schema:%s" % key.replace("_", "-"),
+                    "pass" if matches else "fail",
+                    "%s at %s" % (actual_contract or "contract missing", path),
+                    "Rerun the installer and restart Oída so the live schema matches %s."
+                    % expected_contract
+                    if not matches
+                    else "",
+                )
+            )
+        except (HTTPError, URLError, TimeoutError, ValueError, OSError) as exc:
+            checks.append(
+                Check(
+                    "schema:%s" % key.replace("_", "-"),
+                    "fail",
+                    "could not read %s: %s" % (path, exc),
+                    "Rerun the installer and restart Oída so this schema is available.",
+                )
+            )
+    return checks
+
+
+def _fetch_local_json(base_url: str, path: str) -> Dict[str, object]:
+    parsed = urlsplit(base_url)
+    if (
+        parsed.scheme != "http"
+        or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
+        or parsed.username
+        or parsed.password
+    ):
+        raise ValueError("gateway URL must be an unauthenticated loopback HTTP URL")
+    if not path.startswith("/") or path.startswith("//"):
+        raise ValueError("gateway path must be absolute")
+    url = base_url.rstrip("/") + path
+    request = Request(
+        url,
+        headers={"User-Agent": "sonicfield-listening-stack/%s" % __version__},
+    )
+    with urlopen(request, timeout=2.0) as response:
+        if response.geturl() != url:
+            raise ValueError("refusing redirected gateway contract response")
+        raw = response.read(MAX_GATEWAY_CONTRACT_BYTES + 1)
+    if len(raw) > MAX_GATEWAY_CONTRACT_BYTES:
+        raise ValueError("gateway contract response is too large")
+    value = json.loads(raw)
+    if not isinstance(value, dict):
+        raise ValueError("gateway contract response is not an object")
+    return value
+
+
+def _nested_value(value: object, *keys: str) -> object:
+    current = value
+    for key in keys:
+        if not isinstance(current, dict):
+            return None
+        current = current.get(key)
+    return current
 
 
 def _check_private_file(name: str, path: Path) -> Check:
@@ -256,9 +455,10 @@ def _check_private_file(name: str, path: Path) -> Check:
 def _check_germ_boundary(root: Path, environment: Mapping[str, object]) -> Check:
     expected_inputs = {
         str(root / "data" / "germ"),
-        str(root / "data" / "audio"),
         str(root / "data" / "akousmata"),
     }
+    if environment.get("GERM_OIDA_URL"):
+        expected_inputs.add(str(root / "data" / "audio"))
     expected_models = {
         str(root / "vendor" / "stable-audio-3"),
         str(root / "models"),

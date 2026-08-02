@@ -23,7 +23,7 @@ class RuntimeTests(unittest.TestCase):
     def write_state(self, root: Path, **changes):
         state = {
             "schema_version": 1,
-            "installer_version": "0.1.2",
+            "installer_version": "0.2.0",
             "root": str(root),
             "component": "full",
             "models": [],

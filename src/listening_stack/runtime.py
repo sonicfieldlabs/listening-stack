@@ -13,6 +13,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from . import __version__
+from .catalog import normalize_profile, profile_includes
 from .installer import STATE_DIRECTORY, load_state
 from .system import Runner, executable
 
@@ -29,12 +30,12 @@ def runtime_path(root: Path) -> Path:
 def status(root: Path, target: str = "all") -> Dict[str, object]:
     _validate_target(target)
     state = load_state(root)
-    component = str(state["component"])
+    component = normalize_profile(str(state.get("profile") or state["component"]))
     environment = _environment(state)
     result: Dict[str, object] = {"root": str(root), "component": component}
-    if target in {"all", "oida"} and component in {"oida", "full"}:
+    if target in {"all", "oida"} and profile_includes(component, "oida"):
         result["oida"] = _identified_status(_health_url(environment, "OIDA"), "oida")
-    if target in {"all", "germ"} and component in {"germ", "full"}:
+    if target in {"all", "germ"} and profile_includes(component, "germ"):
         result["germ"] = _identified_status(_health_url(environment, "GERM"), "germ")
     return result
 
@@ -45,13 +46,13 @@ def start(
     _validate_target(target)
     runner = runner or Runner()
     state = load_state(root)
-    component = str(state["component"])
+    component = normalize_profile(str(state.get("profile") or state["component"]))
     environment = _environment(state)
     uv = executable("uv") or "uv"
     oida_health = _health_url(environment, "OIDA")
     germ_health = _health_url(environment, "GERM")
     started: Dict[str, object] = {}
-    if target in {"all", "oida"} and component in {"oida", "full"}:
+    if target in {"all", "oida"} and profile_includes(component, "oida"):
         existing = _http_status(oida_health)
         if existing.get("running"):
             _require_identity(existing, "oida")
@@ -71,7 +72,7 @@ def start(
             started["oida"] = _wait_for(
                 oida_health, timeout=60, expected_identity="oida"
             )
-    if target in {"all", "germ"} and component in {"germ", "full"}:
+    if target in {"all", "germ"} and profile_includes(component, "germ"):
         existing = _http_status(germ_health)
         if existing.get("running"):
             _require_identity(existing, "germ")
@@ -137,12 +138,12 @@ def stop(
     _validate_target(target)
     runner = runner or Runner()
     state = load_state(root)
-    component = str(state["component"])
+    component = normalize_profile(str(state.get("profile") or state["component"]))
     environment = _environment(state)
     uv = executable("uv") or "uv"
     oida_health = _health_url(environment, "OIDA")
     stopped: Dict[str, object] = {}
-    if target in {"all", "oida"} and component in {"oida", "full"}:
+    if target in {"all", "oida"} and profile_includes(component, "oida"):
         runner.run(
             [uv, "run", "oida", "stop", "--json"],
             cwd=root / "src" / "oida",
@@ -150,7 +151,7 @@ def stop(
             check=False,
         )
         stopped["oida"] = not bool(_http_status(oida_health).get("running"))
-    if target in {"all", "germ"} and component in {"germ", "full"}:
+    if target in {"all", "germ"} and profile_includes(component, "germ"):
         runtime = _read_runtime(root)
         pid = int(runtime.get("germ_pid", 0) or 0)
         if not pid:

@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from listening_stack.catalog import (  # noqa: E402
+    ACCOUNTABLE_LISTENING_CONTRACTS,
     MODELS,
     REPOSITORIES,
     memory_guidance,
@@ -19,6 +20,11 @@ from listening_stack.catalog import (  # noqa: E402
 
 
 class CatalogTests(unittest.TestCase):
+    def test_recommended_core_set_excludes_germ(self):
+        models = selected_models(preset_models("core", "recommended"))
+        self.assertEqual({model.application for model in models}, {"oida"})
+        self.assertNotIn("germ", source_keys("core"))
+
     def test_recommended_full_set_covers_both_apps(self):
         models = selected_models(preset_models("full", "recommended"))
         self.assertEqual({model.application for model in models}, {"oida", "germ"})
@@ -41,15 +47,35 @@ class CatalogTests(unittest.TestCase):
             selected_models(["not-a-model"])
 
     def test_release_compatibility_set_is_immutable(self):
-        self.assertEqual(REPOSITORIES["oida"].version, "0.6.5")
+        self.assertEqual(REPOSITORIES["oida"].version, "0.9.0")
         self.assertEqual(REPOSITORIES["germ"].version, "0.2.5")
+        self.assertEqual(REPOSITORIES["akouo"].version, "0.9.0")
+        self.assertEqual(REPOSITORIES["earworm"].version, "0.6.0")
+        self.assertEqual(REPOSITORIES["akousmata"].version, "0.6.0")
         for repository in REPOSITORIES.values():
             self.assertEqual(len(repository.revision), 40)
             int(repository.revision, 16)
 
+    def test_accountable_listening_contracts_have_one_recorded_owner(self):
+        self.assertEqual(
+            ACCOUNTABLE_LISTENING_CONTRACTS,
+            {
+                "gateway": "oida/gateway/v0.5",
+                "host_perception": "oida/host-perception/v0.4",
+                "listening_event": "oida/listening-event/v0.3",
+                "route_outcome": "oida/route-outcome/v0.1",
+                "listening_context": "akouo/listening-context/v2",
+                "akouo": "akouo/v0.9",
+                "earworm": "earworm/v0.6",
+                "auditum": "earworm/auditum/v2",
+                "akousmata": "akousmata/v0.6",
+            },
+        )
+
     def test_source_keys_are_component_specific(self):
         self.assertEqual(source_keys("germ"), ("germ",))
-        self.assertIn("oida", source_keys("oida"))
+        self.assertEqual(source_keys("oida"), source_keys("core"))
+        self.assertIn("oida", source_keys("core"))
         self.assertIn("germ", source_keys("full"))
         with self.assertRaises(ValueError):
             source_keys("unknown")

@@ -59,9 +59,9 @@ REPOSITORIES: Mapping[str, Repository] = {
         key="oida",
         name="Oída",
         url="https://github.com/sonicfieldlabs/oida.git",
-        ref="v0.6.5",
-        version="0.6.5",
-        revision="4cd403d48dc3b4e571b05868ed668efa50631074",
+        ref="v0.9.0",
+        version="0.9.0",
+        revision="e4d47881bcc2eb247a76839575f33018d110a78a",
     ),
     "germ": Repository(
         key="germ",
@@ -75,29 +75,43 @@ REPOSITORIES: Mapping[str, Repository] = {
         key="akouo",
         name="AKOÚŌ",
         url="https://github.com/sonicfieldlabs/akouo.git",
-        ref="v0.7.0",
-        version="0.7.0",
-        revision="1b3ae90ec37f712af4bf8be97f5ace8330d1329e",
+        ref="v0.9.0",
+        version="0.9.0",
+        revision="466c4345ca57dee2636be7a5c3c7ec2615b1bf86",
     ),
     "earworm": Repository(
         key="earworm",
         name="Earworm",
         url="https://github.com/sonicfieldlabs/earworm.git",
-        ref="v0.4.0",
-        version="0.4.0",
-        revision="b3a76c1e9b5b6fbd08cf69302f4bfb6a6c29bd37",
+        ref="v0.6.0",
+        version="0.6.0",
+        revision="4aac663ab9a81cdf8d8c2f5c93f4cc84587c1572",
     ),
     "akousmata": Repository(
         key="akousmata",
         name="Akousmata",
         url="https://github.com/sonicfieldlabs/akousmata.git",
-        ref="v0.4.0",
-        version="0.4.0",
-        revision="295d6534be437ade9ea0ba3216384cb50839705a",
+        ref="v0.6.0",
+        version="0.6.0",
+        revision="7a0200ccfb98449dd545e8a8c0f7d3a36627f5ab",
     ),
 }
 
-OIDA_SOURCE_KEYS: Tuple[str, ...] = ("earworm", "akouo", "akousmata", "oida")
+# One semantic owner per contract. The installer records this matrix in local
+# state and the doctor verifies it at Oída's live gateway/schema boundary.
+ACCOUNTABLE_LISTENING_CONTRACTS: Mapping[str, str] = {
+    "gateway": "oida/gateway/v0.5",
+    "host_perception": "oida/host-perception/v0.4",
+    "listening_event": "oida/listening-event/v0.3",
+    "route_outcome": "oida/route-outcome/v0.1",
+    "listening_context": "akouo/listening-context/v2",
+    "akouo": "akouo/v0.9",
+    "earworm": "earworm/v0.6",
+    "auditum": "earworm/auditum/v2",
+    "akousmata": "akousmata/v0.6",
+}
+
+CORE_SOURCE_KEYS: Tuple[str, ...] = ("earworm", "akouo", "akousmata", "oida")
 GERM_SOURCE_KEYS: Tuple[str, ...] = ("germ",)
 
 MOSS_AUDIO_REPOSITORY = Repository(
@@ -229,6 +243,18 @@ MODELS: Mapping[str, Model] = {
 }
 
 MODEL_PRESETS: Mapping[str, Mapping[str, Tuple[str, ...]]] = {
+    "core": {
+        "recommended": ("moss-4b-instruct", "moss-4b-thinking"),
+        "4b": ("moss-4b-instruct", "moss-4b-thinking"),
+        "8b": ("moss-8b-instruct", "moss-8b-thinking"),
+        "all": (
+            "moss-4b-instruct",
+            "moss-4b-thinking",
+            "moss-8b-instruct",
+            "moss-8b-thinking",
+        ),
+        "none": (),
+    },
     "oida": {
         "recommended": ("moss-4b-instruct", "moss-4b-thinking"),
         "4b": ("moss-4b-instruct", "moss-4b-thinking"),
@@ -260,17 +286,41 @@ MODEL_PRESETS: Mapping[str, Mapping[str, Tuple[str, ...]]] = {
     },
 }
 
-RUNTIME_RESERVE_GB: Mapping[str, int] = {"oida": 7, "germ": 9, "full": 14}
+RUNTIME_RESERVE_GB: Mapping[str, int] = {
+    "core": 7,
+    "oida": 7,
+    "germ": 9,
+    "full": 14,
+}
+
+
+def normalize_profile(profile: str) -> str:
+    """Return the canonical install profile, retaining the old Oída alias."""
+    if profile == "oida":
+        return "core"
+    if profile in {"core", "germ", "full"}:
+        return profile
+    raise ValueError("profile must be core, germ, or full")
+
+
+def profile_includes(profile: str, application: str) -> bool:
+    canonical = normalize_profile(profile)
+    if application == "oida":
+        return canonical in {"core", "full"}
+    if application == "germ":
+        return canonical in {"germ", "full"}
+    raise ValueError("application must be oida or germ")
 
 
 def source_keys(component: str) -> Tuple[str, ...]:
-    if component == "oida":
-        return OIDA_SOURCE_KEYS
-    if component == "germ":
+    profile = normalize_profile(component)
+    if profile == "core":
+        return CORE_SOURCE_KEYS
+    if profile == "germ":
         return GERM_SOURCE_KEYS
-    if component == "full":
-        return OIDA_SOURCE_KEYS + GERM_SOURCE_KEYS
-    raise ValueError("component must be oida, germ, or full")
+    if profile == "full":
+        return CORE_SOURCE_KEYS + GERM_SOURCE_KEYS
+    raise AssertionError("unreachable install profile")
 
 
 def selected_models(
@@ -298,7 +348,7 @@ def model_disk_gb(models: Iterable[Model]) -> float:
 
 def planned_disk_gb(component: str, models: Sequence[Model]) -> float:
     # Keep 15% download/extraction headroom in addition to source and environments.
-    return RUNTIME_RESERVE_GB[component] + model_disk_gb(models) * 1.15
+    return RUNTIME_RESERVE_GB[normalize_profile(component)] + model_disk_gb(models) * 1.15
 
 
 def memory_guidance(models: Sequence[Model]) -> Tuple[int, int]:
