@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.1 — 2026-08-03
+
+- Advance the immutable compatibility set to Oída 0.9.1 and GERM 0.3.1 while
+  retaining AKOÚŌ 0.9.0, Earworm 0.6.0, and Akousmata 0.6.0.
+- Pin the exact reviewed release commits for Oída and GERM so a repeated
+  installation cannot drift to a moving branch or an older security boundary.
+- Carry the current loopback, origin, managed-filesystem, dependency-audit,
+  and public-error hardening into the reproducible installer set.
+
 ## 0.3.0 — 2026-07-27
 
 - Make the four-project listening core—AKOÚŌ 0.9.0, Earworm 0.6.0,

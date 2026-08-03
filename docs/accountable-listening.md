@@ -1,6 +1,6 @@
 # Accountable Listening Architecture
 
-Listening Stack 0.3.0 treats listening as a chain of bounded contracts, not as
+Listening Stack 0.3.1 treats listening as a chain of bounded contracts, not as
 one undifferentiated model response. Each concept has one semantic owner and is
 parsed once at the boundary that owns it.
 
@@ -62,7 +62,7 @@ succeed.
 When Oída is running, `listening-stack doctor` verifies:
 
 1. the process identifies as Oída on the configured loopback address;
-2. `/gateway` reports Oída 0.9.0 and the expected component contracts;
+2. `/gateway` reports Oída 0.9.1 and the expected component contracts;
 3. the gateway advertises all required schema endpoints;
 4. the host-perception schema requires `oida/host-perception/v0.4`;
 5. the listening-event schema requires `oida/listening-event/v0.3`;

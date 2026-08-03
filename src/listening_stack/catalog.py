@@ -59,17 +59,17 @@ REPOSITORIES: Mapping[str, Repository] = {
         key="oida",
         name="Oída",
         url="https://github.com/sonicfieldlabs/oida.git",
-        ref="v0.9.0",
-        version="0.9.0",
-        revision="e4d47881bcc2eb247a76839575f33018d110a78a",
+        ref="v0.9.1",
+        version="0.9.1",
+        revision="46df4b18e51a10a46a7656fb000fdd23a639fef7",
     ),
     "germ": Repository(
         key="germ",
         name="GERM",
         url="https://github.com/sonicfieldlabs/germ.git",
-        ref="v0.2.5",
-        version="0.2.5",
-        revision="cbbdd70ec52926d46527dd7f4a4040e8625ca867",
+        ref="v0.3.1",
+        version="0.3.1",
+        revision="16f427b57716cb7c4db92c68cb17a22ab1a2cde2",
     ),
     "akouo": Repository(
         key="akouo",
@@ -126,7 +126,7 @@ STABLE_AUDIO_REPOSITORY = Repository(
     name="Stable Audio 3",
     url="https://github.com/Stability-AI/stable-audio-3.git",
     ref="main",
-    # Match the immutable source revision in GERM v0.2.5's uv.lock.
+    # Match the immutable source revision in GERM v0.3.1's uv.lock.
     revision="fa5ee841dd49bae0fa361fac26904adc27fd400e",
 )
 

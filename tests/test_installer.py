@@ -50,7 +50,7 @@ class InstallerTests(unittest.TestCase):
                 state["components"], ["earworm", "akouo", "akousmata", "oida"]
             )
             self.assertEqual(state["optional_components"], [])
-            self.assertEqual(state["installer_version"], "0.3.0")
+            self.assertEqual(state["installer_version"], "0.3.1")
             self.assertEqual(state["contracts"]["gateway"], "oida/gateway/v0.5")
             self.assertEqual(
                 state["contracts"]["listening_context"],
