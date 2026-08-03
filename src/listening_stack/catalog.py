@@ -67,9 +67,9 @@ REPOSITORIES: Mapping[str, Repository] = {
         key="germ",
         name="GERM",
         url="https://github.com/sonicfieldlabs/germ.git",
-        ref="v0.3.1",
-        version="0.3.1",
-        revision="16f427b57716cb7c4db92c68cb17a22ab1a2cde2",
+        ref="v0.3.2",
+        version="0.3.2",
+        revision="55c7fc1f403c969c1053d727740681db24718bd6",
     ),
     "akouo": Repository(
         key="akouo",
@@ -126,7 +126,7 @@ STABLE_AUDIO_REPOSITORY = Repository(
     name="Stable Audio 3",
     url="https://github.com/Stability-AI/stable-audio-3.git",
     ref="main",
-    # Match the immutable source revision in GERM v0.3.1's uv.lock.
+    # Match the immutable source revision in GERM v0.3.2's uv.lock.
     revision="fa5ee841dd49bae0fa361fac26904adc27fd400e",
 )
 

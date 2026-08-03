@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.2 — 2026-08-03
+
+- Advance the immutable GERM pin to 0.3.2, whose Cosmoaudition status boundary
+  logs provider diagnostics locally while returning a stable public error.
+- Preserve the 0.3.1 compatibility set otherwise: Oída 0.9.1, AKOÚŌ 0.9.0,
+  Earworm 0.6.0, and Akousmata 0.6.0.
+
 ## 0.3.1 — 2026-08-03
 
 - Advance the immutable compatibility set to Oída 0.9.1 and GERM 0.3.1 while

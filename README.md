@@ -19,7 +19,7 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer release: `0.3.1`.
+Current installer release: `0.3.2`.
 
 ## Quick Start
 
@@ -65,25 +65,25 @@ chmod +x listening-stack.pyz
 
 Sources are cloned into a dedicated installation directory. The installer
 verifies every existing origin and refuses to update a dirty or unexpected
-checkout. Release `0.3.1` installs one immutable compatibility set and records
+checkout. Release `0.3.2` installs one immutable compatibility set and records
 the exact commits it installed in local state:
 
 | Component | Tested release |
 | --- | --- |
 | Oída | 0.9.1 |
-| GERM | 0.3.1 |
+| GERM | 0.3.2 |
 | AKOÚŌ | 0.9.0 |
 | Earworm | 0.6.0 |
 | Akousmata | 0.6.0 |
 
 The official MOSS-Audio source is pinned to the revision tested with Oída
 0.9.1. Stable Audio 3 source is pinned to the same revision locked by GERM
-0.3.1. Rerunning this installer therefore reproduces the compatibility set;
+0.3.2. Rerunning this installer therefore reproduces the compatibility set;
 it does not silently advance a checkout to a newer moving branch.
 
 ## Accountable Listening Contract
 
-Release 0.3.1 installs listening as an explicit, inspectable chain:
+Release 0.3.2 installs listening as an explicit, inspectable chain:
 
 1. AKOÚŌ owns routing and claim discipline under `akouo/v0.9`, including
    situated `akouo/listening-context/v2`, attributable listening passes,

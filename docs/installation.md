@@ -119,7 +119,7 @@ Pin the executable release used by the curl bootstrap:
 ```bash
 curl -fsSL \
   https://raw.githubusercontent.com/sonicfieldlabs/listening-stack/main/install.sh \
-  | LISTENING_STACK_VERSION=v0.3.1 bash
+  | LISTENING_STACK_VERSION=v0.3.2 bash
 ```
 
 Override the executable destination:
@@ -137,11 +137,11 @@ clean installation checkout before fetching the immutable revisions in the
 installer's compatibility set. It records the exact commits and refuses a
 checkout that resolves to anything else. It never resets a dirty tree.
 
-Listening Stack 0.3.1 pins Oída 0.9.1, GERM 0.3.1, AKOÚŌ 0.9.0, Earworm
+Listening Stack 0.3.2 pins Oída 0.9.1, GERM 0.3.2, AKOÚŌ 0.9.0, Earworm
 0.6.0, and Akousmata 0.6.0. It also records the exact accountable-listening
 contracts in `listening-stack/state/v2`. The state names the canonical profile,
 the exact component set, the four core components, and optional components. A
-later installer release may publish a newer tested set; an existing 0.3.1
+later installer release may publish a newer tested set; an existing 0.3.2
 executable continues to reproduce this one.
 
 Application version numbers remain owned by their repositories. Updating an
