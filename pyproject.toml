@@ -1,6 +1,6 @@
 [project]
 name = "sonicfield-listening-stack"
-version = "0.3.2"
+version = "0.3.3"
 description = "Reproducible installer and runtime verifier for the accountable listening core and optional GERM."
 readme = "README.md"
 requires-python = ">=3.9"

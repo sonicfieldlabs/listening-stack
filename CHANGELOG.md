@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.3 — 2026-08-03
+
+- Advance the immutable compatibility set to Oída 0.9.2, GERM 0.3.3,
+  AKOÚŌ 0.9.1, Earworm 0.6.1, and Akousmata 0.6.1.
+- Preserve the embodied-listener boundary for `heard`, attributable
+  disagreement resolution, and mechanically additive listening revisions
+  across the installed core.
+- Pin every component to its exact reviewed release commit and broaden local
+  environment-file ignore coverage.
+
 ## 0.3.2 — 2026-08-03
 
 - Advance the immutable GERM pin to 0.3.2, whose Cosmoaudition status boundary

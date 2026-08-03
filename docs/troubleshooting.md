@@ -43,7 +43,7 @@ listening-stack doctor
 ```
 
 The installer sets explicit local MOSS paths, disables silent Hub lookup, and
-downloads the immutable revisions tested with Oída 0.9.1. Rerun model download
+downloads the immutable revisions tested with Oída 0.9.2. Rerun model download
 if a checkpoint is incomplete.
 
 ## Oída is healthy but a contract or schema check fails

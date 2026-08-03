@@ -47,11 +47,11 @@ class CatalogTests(unittest.TestCase):
             selected_models(["not-a-model"])
 
     def test_release_compatibility_set_is_immutable(self):
-        self.assertEqual(REPOSITORIES["oida"].version, "0.9.1")
-        self.assertEqual(REPOSITORIES["germ"].version, "0.3.2")
-        self.assertEqual(REPOSITORIES["akouo"].version, "0.9.0")
-        self.assertEqual(REPOSITORIES["earworm"].version, "0.6.0")
-        self.assertEqual(REPOSITORIES["akousmata"].version, "0.6.0")
+        self.assertEqual(REPOSITORIES["oida"].version, "0.9.2")
+        self.assertEqual(REPOSITORIES["germ"].version, "0.3.3")
+        self.assertEqual(REPOSITORIES["akouo"].version, "0.9.1")
+        self.assertEqual(REPOSITORIES["earworm"].version, "0.6.1")
+        self.assertEqual(REPOSITORIES["akousmata"].version, "0.6.1")
         for repository in REPOSITORIES.values():
             self.assertEqual(len(repository.revision), 40)
             int(repository.revision, 16)
