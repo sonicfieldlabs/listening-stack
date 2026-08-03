@@ -108,11 +108,11 @@ class DoctorTests(unittest.TestCase):
             (Path(temporary) / ".git").mkdir()
             check = _check_repository(Path(temporary), "oida", spec.revision)
         self.assertEqual(check.status, "pass")
-        self.assertIn("v0.9.1", check.detail)
+        self.assertIn("v0.9.2", check.detail)
 
     def test_oida_live_contracts_verify_manifest_and_four_schemas(self):
         manifest = {
-            "version": "0.9.1",
+            "version": "0.9.2",
             "contract": "oida/gateway/v0.5",
             "components": {
                 "akouo": {"contract": "akouo/v0.9"},
@@ -146,7 +146,7 @@ class DoctorTests(unittest.TestCase):
 
     def test_oida_live_contracts_fail_closed_on_semantic_drift(self):
         manifest = {
-            "version": "0.9.1",
+            "version": "0.9.2",
             "contract": "oida/gateway/v0.5",
             "components": {
                 "akouo": {"contract": "akouo/v0.9"},

@@ -8,6 +8,8 @@ dist/
 build/
 *.egg-info/
 .env
+.env.*
+!.env.example
 *.env
 state.json
 runtime.json

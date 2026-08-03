@@ -19,7 +19,7 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer release: `0.3.2`.
+Current installer release: `0.3.3`.
 
 ## Quick Start
 
@@ -65,32 +65,33 @@ chmod +x listening-stack.pyz
 
 Sources are cloned into a dedicated installation directory. The installer
 verifies every existing origin and refuses to update a dirty or unexpected
-checkout. Release `0.3.2` installs one immutable compatibility set and records
+checkout. Release `0.3.3` installs one immutable compatibility set and records
 the exact commits it installed in local state:
 
 | Component | Tested release |
 | --- | --- |
-| Oída | 0.9.1 |
-| GERM | 0.3.2 |
-| AKOÚŌ | 0.9.0 |
-| Earworm | 0.6.0 |
-| Akousmata | 0.6.0 |
+| Oída | 0.9.2 |
+| GERM | 0.3.3 |
+| AKOÚŌ | 0.9.1 |
+| Earworm | 0.6.1 |
+| Akousmata | 0.6.1 |
 
 The official MOSS-Audio source is pinned to the revision tested with Oída
-0.9.1. Stable Audio 3 source is pinned to the same revision locked by GERM
-0.3.2. Rerunning this installer therefore reproduces the compatibility set;
+0.9.2. Stable Audio 3 source is pinned to the same revision locked by GERM
+0.3.3. Rerunning this installer therefore reproduces the compatibility set;
 it does not silently advance a checkout to a newer moving branch.
 
 ## Accountable Listening Contract
 
-Release 0.3.2 installs listening as an explicit, inspectable chain:
+Release 0.3.3 installs listening as an explicit, inspectable chain:
 
 1. AKOÚŌ owns routing and claim discipline under `akouo/v0.9`, including
    situated `akouo/listening-context/v2`, attributable listening passes,
    provenance and cuts, explicit route decisions, and declared ensembles.
 2. Oída owns runtime perception and the decision-first gateway. A successful
-   hearing emits `oida/listening-event/v0.3` through `oida/gateway/v0.5`; a
-   refusal before perception emits `oida/route-outcome/v0.1` instead of
+   perception pass emits `oida/listening-event/v0.3` through
+   `oida/gateway/v0.5`; a refusal before perception emits
+   `oida/route-outcome/v0.1` instead of
    fabricating an empty hearing.
 3. Earworm owns addressable, append-only `earworm/auditum/v2` lineage,
    disagreement, decision-only records, action receipts, revision, and
@@ -101,8 +102,9 @@ Release 0.3.2 installs listening as an explicit, inspectable chain:
 
 Capability and authority stay separate. A host may declare what its apparatus
 can perceive, but Oída recomputes the effective context and defaults operational
-authority to observe-only. Prompts, transcripts, and contextual descriptions
-remain attributed text rather than being relabeled as heard evidence.
+authority to observe-only. Prompts, transcripts, contextual descriptions, and
+machine observations remain attributed evidence rather than being relabeled as
+embodied hearing.
 Unsupported measurements remain absent rather than being inferred from model
 prose. A pause, refusal, withholding, or forgetting decision is recorded as a
 decision, not confused with honest absence or an undetermined claim. Distinct
@@ -148,7 +150,7 @@ MOSS-Audio code and released model checkpoints are Apache-2.0. Oída is develope
 and tested first against the 4B Instruct and Thinking checkpoints while
 remaining model-agnostic at its gateway boundary.
 
-Oída 0.9.1 requires Safetensors for its embedded model loader and pins its
+Oída 0.9.2 requires Safetensors for its embedded model loader and pins its
 compatible Torch, TorchAudio, TorchCodec, and Transformers releases. The
 installer downloads MOSS checkpoints by immutable Hugging Face commit and the
 doctor verifies both model configuration and Safetensors weights.
