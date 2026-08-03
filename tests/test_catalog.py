@@ -48,7 +48,7 @@ class CatalogTests(unittest.TestCase):
 
     def test_release_compatibility_set_is_immutable(self):
         self.assertEqual(REPOSITORIES["oida"].version, "0.9.1")
-        self.assertEqual(REPOSITORIES["germ"].version, "0.3.1")
+        self.assertEqual(REPOSITORIES["germ"].version, "0.3.2")
         self.assertEqual(REPOSITORIES["akouo"].version, "0.9.0")
         self.assertEqual(REPOSITORIES["earworm"].version, "0.6.0")
         self.assertEqual(REPOSITORIES["akousmata"].version, "0.6.0")

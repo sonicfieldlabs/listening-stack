@@ -1,6 +1,6 @@
 # Accountable Listening Architecture
 
-Listening Stack 0.3.1 treats listening as a chain of bounded contracts, not as
+Listening Stack 0.3.2 treats listening as a chain of bounded contracts, not as
 one undifferentiated model response. Each concept has one semantic owner and is
 parsed once at the boundary that owns it.
 
