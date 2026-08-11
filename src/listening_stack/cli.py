@@ -407,9 +407,13 @@ def _print_plan(
             "listening_event",
             "route_outcome",
             "listening_context",
+            "akouo",
+            "earworm",
+            "akousma_schema",
             "auditum",
+            "akousmata",
         ):
-            print("    - %s" % ACCOUNTABLE_LISTENING_CONTRACTS[key])
+            print("    - %s: %s" % (key, ACCOUNTABLE_LISTENING_CONTRACTS[key]))
     if models:
         print("  Models:")
         for model in models:

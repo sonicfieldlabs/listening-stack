@@ -8,6 +8,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from listening_stack.catalog import (  # noqa: E402
     ACCOUNTABLE_LISTENING_CONTRACTS,
+    MEMORY_ACCOUNT_CAPABILITIES,
     MODELS,
     REPOSITORIES,
     memory_guidance,
@@ -47,11 +48,21 @@ class CatalogTests(unittest.TestCase):
             selected_models(["not-a-model"])
 
     def test_release_compatibility_set_is_immutable(self):
-        self.assertEqual(REPOSITORIES["oida"].version, "0.9.2")
+        self.assertEqual(REPOSITORIES["oida"].version, "0.10.0")
         self.assertEqual(REPOSITORIES["germ"].version, "0.3.3")
-        self.assertEqual(REPOSITORIES["akouo"].version, "0.9.1")
-        self.assertEqual(REPOSITORIES["earworm"].version, "0.6.1")
-        self.assertEqual(REPOSITORIES["akousmata"].version, "0.6.1")
+        self.assertEqual(REPOSITORIES["akouo"].version, "0.9.2")
+        self.assertEqual(REPOSITORIES["earworm"].version, "0.7.0")
+        self.assertEqual(REPOSITORIES["akousmata"].version, "0.7.0")
+        self.assertEqual(
+            {key: repository.revision for key, repository in REPOSITORIES.items()},
+            {
+                "oida": "4f934c7854bceda044f5be22f2567315d4af7ba2",
+                "germ": "3cbe20054328bc2d6f2d9988865d3194d915bfa6",
+                "akouo": "d3c0405279ae00e3b6e1ebc46136aefa0889ab7a",
+                "earworm": "c130fa61423517a0cc2ca8071124537978fad825",
+                "akousmata": "838029d80360e04a01149437f30610503fd66794",
+            },
+        )
         for repository in REPOSITORIES.values():
             self.assertEqual(len(repository.revision), 40)
             int(repository.revision, 16)
@@ -60,15 +71,27 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(
             ACCOUNTABLE_LISTENING_CONTRACTS,
             {
-                "gateway": "oida/gateway/v0.5",
+                "gateway": "oida/gateway/v0.6",
                 "host_perception": "oida/host-perception/v0.4",
                 "listening_event": "oida/listening-event/v0.3",
                 "route_outcome": "oida/route-outcome/v0.1",
                 "listening_context": "akouo/listening-context/v2",
                 "akouo": "akouo/v0.9",
-                "earworm": "earworm/v0.6",
+                "earworm": "earworm/v0.7",
+                "akousma_schema": "1.6",
                 "auditum": "earworm/auditum/v2",
-                "akousmata": "akousmata/v0.6",
+                "akousmata": "akousmata/v0.7",
+            },
+        )
+
+    def test_memory_account_capabilities_are_read_only_manifest_invariants(self):
+        self.assertEqual(
+            MEMORY_ACCOUNT_CAPABILITIES,
+            {
+                "separate_human_and_machine_records": True,
+                "classification_source": "auditum.listenings[].listener_type",
+                "human_revisions": "additive_new_record",
+                "machine_core_immutable": True,
             },
         )
 

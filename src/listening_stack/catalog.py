@@ -59,9 +59,9 @@ REPOSITORIES: Mapping[str, Repository] = {
         key="oida",
         name="Oída",
         url="https://github.com/sonicfieldlabs/oida.git",
-        ref="v0.9.2",
-        version="0.9.2",
-        revision="22a99662b004f3d472d86c06d595e458b0aaf022",
+        ref="v0.10.0",
+        version="0.10.0",
+        revision="4f934c7854bceda044f5be22f2567315d4af7ba2",
     ),
     "germ": Repository(
         key="germ",
@@ -75,40 +75,50 @@ REPOSITORIES: Mapping[str, Repository] = {
         key="akouo",
         name="AKOÚŌ",
         url="https://github.com/sonicfieldlabs/akouo.git",
-        ref="v0.9.1",
-        version="0.9.1",
-        revision="9cf584acaa55a321163b5deaebd4cc90fd3c6299",
+        ref="v0.9.2",
+        version="0.9.2",
+        revision="d3c0405279ae00e3b6e1ebc46136aefa0889ab7a",
     ),
     "earworm": Repository(
         key="earworm",
         name="Earworm",
         url="https://github.com/sonicfieldlabs/earworm.git",
-        ref="v0.6.1",
-        version="0.6.1",
-        revision="48a87c5cd2eafb126c3ce9dc3eaa7b29dcc9dad1",
+        ref="v0.7.0",
+        version="0.7.0",
+        revision="c130fa61423517a0cc2ca8071124537978fad825",
     ),
     "akousmata": Repository(
         key="akousmata",
         name="Akousmata",
         url="https://github.com/sonicfieldlabs/akousmata.git",
-        ref="v0.6.1",
-        version="0.6.1",
-        revision="47d0557203f9ed286519d943245324034e6f7a54",
+        ref="v0.7.0",
+        version="0.7.0",
+        revision="838029d80360e04a01149437f30610503fd66794",
     ),
 }
 
 # One semantic owner per contract. The installer records this matrix in local
 # state and the doctor verifies it at Oída's live gateway/schema boundary.
 ACCOUNTABLE_LISTENING_CONTRACTS: Mapping[str, str] = {
-    "gateway": "oida/gateway/v0.5",
+    "gateway": "oida/gateway/v0.6",
     "host_perception": "oida/host-perception/v0.4",
     "listening_event": "oida/listening-event/v0.3",
     "route_outcome": "oida/route-outcome/v0.1",
     "listening_context": "akouo/listening-context/v2",
     "akouo": "akouo/v0.9",
-    "earworm": "earworm/v0.6",
+    "earworm": "earworm/v0.7",
+    "akousma_schema": "1.6",
     "auditum": "earworm/auditum/v2",
-    "akousmata": "akousmata/v0.6",
+    "akousmata": "akousmata/v0.7",
+}
+
+# These are semantic declarations advertised by Oída's read-only gateway
+# manifest. They describe storage behavior; they do not grant write authority.
+MEMORY_ACCOUNT_CAPABILITIES: Mapping[str, object] = {
+    "separate_human_and_machine_records": True,
+    "classification_source": "auditum.listenings[].listener_type",
+    "human_revisions": "additive_new_record",
+    "machine_core_immutable": True,
 }
 
 CORE_SOURCE_KEYS: Tuple[str, ...] = ("earworm", "akouo", "akousmata", "oida")
