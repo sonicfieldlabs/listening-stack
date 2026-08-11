@@ -20,6 +20,7 @@ from . import __version__
 from .catalog import (
     ACCOUNTABLE_LISTENING_CONTRACTS,
     ALL_REPOSITORIES,
+    MEMORY_ACCOUNT_CAPABILITIES,
     MODELS,
     REPOSITORIES,
     memory_guidance,
@@ -321,11 +322,14 @@ def _check_oida_accountability_contracts(base_url: str) -> List[Check]:
         "gateway": manifest.get("contract"),
         "akouo": _nested_value(component_contracts, "akouo", "contract"),
         "earworm": _nested_value(component_contracts, "earworm", "contract"),
+        "akousma_schema": _nested_value(
+            component_contracts, "earworm", "akousma_schema"
+        ),
         "akousmata": _nested_value(component_contracts, "akousmata", "contract"),
     }
     expected = {
         key: ACCOUNTABLE_LISTENING_CONTRACTS[key]
-        for key in ("gateway", "akouo", "earworm", "akousmata")
+        for key in ("gateway", "akouo", "earworm", "akousma_schema", "akousmata")
     }
     mismatches = [
         "%s=%s (expected %s)" % (key, actual[key] or "missing", expected[key])
@@ -350,18 +354,42 @@ def _check_oida_accountability_contracts(base_url: str) -> List[Check]:
                     % (key, advertised.get(key) or "missing", path)
                 )
 
+    memory_accounts = manifest.get("memory_accounts")
+    if not isinstance(memory_accounts, dict):
+        capability_mismatches = ["memory_accounts=missing"]
+    else:
+        capability_mismatches = [
+            "%s=%r (expected %r)"
+            % (key, memory_accounts.get(key), expected_value)
+            for key, expected_value in MEMORY_ACCOUNT_CAPABILITIES.items()
+            if memory_accounts.get(key) != expected_value
+        ]
+
     checks = [
         Check(
             "contract:oida-gateway",
             "pass" if not mismatches else "fail",
-            "Oída %s exposes %s with AKOÚŌ, Earworm, and Akousmata ownership intact"
-            % (expected_version, expected["gateway"])
+            "Oída %s exposes %s with AKOÚŌ, Earworm, Akousma %s, "
+            "and Akousmata ownership intact"
+            % (expected_version, expected["gateway"], expected["akousma_schema"])
             if not mismatches
             else "; ".join(mismatches),
             "Rerun the installer and restart Oída to restore the pinned compatibility set."
             if mismatches
             else "",
-        )
+        ),
+        Check(
+            "capability:memory-accounts",
+            "pass" if not capability_mismatches else "fail",
+            "separate human and machine records; listener_type classification; "
+            "additive human revisions; immutable machine core"
+            if not capability_mismatches
+            else "; ".join(capability_mismatches),
+            "Rerun the installer and restart Oída so its read-only gateway "
+            "manifest advertises the pinned memory-account invariants."
+            if capability_mismatches
+            else "",
+        ),
     ]
     for key, path in OIDA_SCHEMA_PATHS.items():
         expected_contract = ACCOUNTABLE_LISTENING_CONTRACTS[key]
@@ -407,6 +435,7 @@ def _fetch_local_json(base_url: str, path: str) -> Dict[str, object]:
     request = Request(
         url,
         headers={"User-Agent": "sonicfield-listening-stack/%s" % __version__},
+        method="GET",
     )
     with urlopen(request, timeout=2.0) as response:
         if response.geturl() != url:

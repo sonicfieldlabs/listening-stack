@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0 — 2026-08-11
+
+- Advance the coordinated compatibility set to Oída 0.10.0 and gateway v0.6,
+  AKOÚŌ 0.9.2 with contract v0.9, Earworm 0.7.0 with Akousma schema 1.6,
+  and Akousmata 0.7.0. GERM remains at 0.3.3.
+- Extend the GET-only doctor boundary to verify Oída's advertised separation
+  of human and machine records, classification from accountable
+  `listener_type`, additive human revisions, and machine-core immutability.
+- Preserve the standard-library-only, reproducible zipapp and keep doctor
+  probes away from record creation, revision, and deletion endpoints.
+
 ## 0.3.3 — 2026-08-03
 
 - Advance the immutable compatibility set to Oída 0.9.2, GERM 0.3.3,

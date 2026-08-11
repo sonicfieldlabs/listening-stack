@@ -55,7 +55,9 @@ set, and semantic compatibility set for accountable listening. When Oída is
 running, the doctor reads only fixed gateway/schema
 paths on the configured loopback origin, bounds response sizes, rejects
 redirects and non-loopback URLs, and compares the live contracts with that set.
-It does not submit recordings or listening content during this check.
+It also checks the gateway's memory-account declarations. All doctor HTTP
+requests are GET-only; it never calls record creation, revision, forgetting, or
+deletion endpoints, and it does not submit recordings or listening content.
 
 ## Local Data
 

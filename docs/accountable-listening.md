@@ -1,6 +1,6 @@
 # Accountable Listening Architecture
 
-Listening Stack 0.3.3 treats listening as a chain of bounded contracts, not as
+Listening Stack 0.4.0 treats listening as a chain of bounded contracts, not as
 one undifferentiated model response. Each concept has one semantic owner and is
 parsed once at the boundary that owns it.
 
@@ -8,14 +8,14 @@ parsed once at the boundary that owns it.
 
 | Boundary | Owner | Contract | Responsibility |
 | --- | --- | --- | --- |
-| Gateway | Oída | `oida/gateway/v0.5` | Decision-first runtime perception, routing, covenant application, and integration surfaces |
+| Gateway | Oída | `oida/gateway/v0.6` | Decision-first runtime perception, routing, covenant application, and integration surfaces |
 | Host input | Oída | `oida/host-perception/v0.4` | Attributed perception supplied by an audio-capable host |
 | Listening event | Oída | `oida/listening-event/v0.3` | A hearing that actually occurred, with context, passes, provenance, apparatus, decisions, and disagreement |
 | Route outcome | Oída | `oida/route-outcome/v0.1` | A complete refusal or other pre-perception stop without a fabricated hearing |
 | Listening context | AKOÚŌ | `akouo/listening-context/v2` | Position, apertures, scales, sources, participants, authority, passes, decisions, and honest absence |
 | Claims and routes | AKOÚŌ | `akouo/v0.9` | Listening modes, evidence classes, provenance, ensembles, confidence, and limits |
-| Durable auditum | Earworm | `earworm/auditum/v2` | Addressable hearing or decision lineage, disagreement, action and forgetting receipts, and revision |
-| Memory navigator | Akousmata | `akousmata/v0.6` | Rendering, querying, and structural audit without redefining claims |
+| Durable auditum | Earworm / Akousma 1.6 | `earworm/v0.7` and `earworm/auditum/v2` | Addressable human, agent, plural, hearing, or decision lineage; lossless listener types; disagreement; receipts; and revision |
+| Memory navigator | Akousmata | `akousmata/v0.7` | Human/machine rendering, querying, and structural audit without redefining claims |
 
 “Tokenized auditum” means structured, addressable, and versioned. It does not
 mean cryptocurrency, a tradable asset, or a financial token.
@@ -42,6 +42,10 @@ mean cryptocurrency, a tradable asset, or a financial token.
   reciprocal reorientation while permissions and disagreement remain intact.
 - Revision creates lineage. It does not mutate an earlier listening into a new
   historical fact.
+- Human and machine accounts remain separate records. Human edits create an
+  additive revision; machine listening cores cannot be edited in place.
+- Record class is derived from `auditum.listenings[].listener_type`, never from
+  a namespace spelling. Other listener types remain lossless.
 - Forgetting creates a receipt. A deleted record must not silently resurrect
   through an index, cache, graph, or later import.
 
@@ -62,14 +66,18 @@ succeed.
 When Oída is running, `listening-stack doctor` verifies:
 
 1. the process identifies as Oída on the configured loopback address;
-2. `/gateway` reports Oída 0.9.2 and the expected component contracts;
+2. `/gateway` reports Oída 0.10.0 and the expected component contracts;
 3. the gateway advertises all required schema endpoints;
 4. the host-perception schema requires `oida/host-perception/v0.4`;
 5. the listening-event schema requires `oida/listening-event/v0.3`;
 6. the listening-context schema requires `akouo/listening-context/v2`;
-7. the route-outcome schema requires `oida/route-outcome/v0.1`.
+7. the route-outcome schema requires `oida/route-outcome/v0.1`;
+8. the same manifest advertises separate human/machine records,
+   `listener_type` classification, additive human revisions, and immutable
+   machine cores.
 
-These checks happen at the live HTTP boundary. Package metadata is useful
+These checks use only GET requests to the live HTTP boundary; the doctor never
+creates, revises, or deletes an Akousma. Package metadata is useful
 evidence, but it is not a substitute for the contract that integrations
 actually receive.
 

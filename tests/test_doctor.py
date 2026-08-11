@@ -11,10 +11,12 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from listening_stack.catalog import (  # noqa: E402
     ACCOUNTABLE_LISTENING_CONTRACTS,
+    MEMORY_ACCOUNT_CAPABILITIES,
     MODELS,
     REPOSITORIES,
 )
 from listening_stack.doctor import (  # noqa: E402
+    OIDA_SCHEMA_PATHS,
     _check_germ_boundary,
     _check_model,
     _check_oida_accountability_contracts,
@@ -22,6 +24,28 @@ from listening_stack.doctor import (  # noqa: E402
     _check_repository,
     _fetch_local_json,
 )
+
+
+def _gateway_manifest():
+    return {
+        "version": "0.10.0",
+        "contract": "oida/gateway/v0.6",
+        "components": {
+            "akouo": {"contract": "akouo/v0.9"},
+            "earworm": {
+                "contract": "earworm/v0.7",
+                "akousma_schema": "1.6",
+            },
+            "akousmata": {"contract": "akousmata/v0.7"},
+        },
+        "schemas": {
+            "host_perception": "/gateway/schema/host-perception",
+            "listening_event": "/gateway/schema/listening-event",
+            "listening_context": "/gateway/schema/listening-context",
+            "route_outcome": "/gateway/schema/route-outcome",
+        },
+        "memory_accounts": dict(MEMORY_ACCOUNT_CAPABILITIES),
+    }
 
 
 class DoctorTests(unittest.TestCase):
@@ -108,24 +132,10 @@ class DoctorTests(unittest.TestCase):
             (Path(temporary) / ".git").mkdir()
             check = _check_repository(Path(temporary), "oida", spec.revision)
         self.assertEqual(check.status, "pass")
-        self.assertIn("v0.9.2", check.detail)
+        self.assertIn("v0.10.0", check.detail)
 
     def test_oida_live_contracts_verify_manifest_and_four_schemas(self):
-        manifest = {
-            "version": "0.9.2",
-            "contract": "oida/gateway/v0.5",
-            "components": {
-                "akouo": {"contract": "akouo/v0.9"},
-                "earworm": {"contract": "earworm/v0.6"},
-                "akousmata": {"contract": "akousmata/v0.6"},
-            },
-            "schemas": {
-                "host_perception": "/gateway/schema/host-perception",
-                "listening_event": "/gateway/schema/listening-event",
-                "listening_context": "/gateway/schema/listening-context",
-                "route_outcome": "/gateway/schema/route-outcome",
-            },
-        }
+        manifest = _gateway_manifest()
         schemas = [
             {"properties": {"contract": {"const": contract}}}
             for contract in (
@@ -141,25 +151,16 @@ class DoctorTests(unittest.TestCase):
         ) as fetch:
             checks = _check_oida_accountability_contracts("http://127.0.0.1:8765")
         self.assertEqual(fetch.call_count, 5)
-        self.assertEqual(len(checks), 5)
+        self.assertEqual(
+            [call.args[1] for call in fetch.call_args_list],
+            ["/gateway", *list(OIDA_SCHEMA_PATHS.values())],
+        )
+        self.assertEqual(len(checks), 6)
         self.assertTrue(all(check.status == "pass" for check in checks))
 
     def test_oida_live_contracts_fail_closed_on_semantic_drift(self):
-        manifest = {
-            "version": "0.9.2",
-            "contract": "oida/gateway/v0.5",
-            "components": {
-                "akouo": {"contract": "akouo/v0.9"},
-                "earworm": {"contract": "earworm/v0.5"},
-                "akousmata": {"contract": "akousmata/v0.6"},
-            },
-            "schemas": {
-                "host_perception": "/gateway/schema/host-perception",
-                "listening_event": "/gateway/schema/listening-event",
-                "listening_context": "/gateway/schema/listening-context",
-                "route_outcome": "/gateway/schema/route-outcome",
-            },
-        }
+        manifest = _gateway_manifest()
+        manifest["components"]["earworm"]["contract"] = "earworm/v0.5"
         schemas = [
             {"properties": {"contract": {"const": contract}}}
             for contract in (
@@ -174,12 +175,67 @@ class DoctorTests(unittest.TestCase):
             side_effect=[manifest, *schemas],
         ):
             checks = _check_oida_accountability_contracts("http://localhost:8765")
-        self.assertEqual(checks[0].status, "fail")
-        self.assertEqual(checks[2].status, "fail")
+        by_name = {check.name: check for check in checks}
+        self.assertEqual(by_name["contract:oida-gateway"].status, "fail")
+        self.assertEqual(by_name["schema:listening-event"].status, "fail")
+
+    def test_oida_memory_account_capabilities_fail_closed(self):
+        manifest = _gateway_manifest()
+        manifest["memory_accounts"]["machine_core_immutable"] = False
+        schemas = [
+            {"properties": {"contract": {"const": contract}}}
+            for contract in (
+                ACCOUNTABLE_LISTENING_CONTRACTS["host_perception"],
+                ACCOUNTABLE_LISTENING_CONTRACTS["listening_event"],
+                ACCOUNTABLE_LISTENING_CONTRACTS["listening_context"],
+                ACCOUNTABLE_LISTENING_CONTRACTS["route_outcome"],
+            )
+        ]
+        with patch(
+            "listening_stack.doctor._fetch_local_json",
+            side_effect=[manifest, *schemas],
+        ):
+            checks = _check_oida_accountability_contracts("http://127.0.0.1:8765")
+        by_name = {check.name: check for check in checks}
+        self.assertEqual(by_name["contract:oida-gateway"].status, "pass")
+        self.assertEqual(by_name["capability:memory-accounts"].status, "fail")
+        self.assertIn(
+            "machine_core_immutable=False",
+            by_name["capability:memory-accounts"].detail,
+        )
 
     def test_gateway_contract_fetch_rejects_non_loopback_urls(self):
         with self.assertRaisesRegex(ValueError, "loopback"):
             _fetch_local_json("https://example.com", "/gateway")
+
+    def test_gateway_contract_fetch_is_an_explicit_bodyless_get(self):
+        class Response:
+            def __init__(self, url):
+                self.url = url
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def geturl(self):
+                return self.url
+
+            def read(self, _limit):
+                return b"{}"
+
+        def open_request(request, *, timeout):
+            self.assertEqual(request.get_method(), "GET")
+            self.assertIsNone(request.data)
+            self.assertEqual(timeout, 2.0)
+            return Response(request.full_url)
+
+        with patch("listening_stack.doctor.urlopen", side_effect=open_request):
+            self.assertEqual(
+                _fetch_local_json("http://127.0.0.1:8765", "/gateway"),
+                {},
+            )
 
 
 if __name__ == "__main__":

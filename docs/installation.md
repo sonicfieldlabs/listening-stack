@@ -74,7 +74,7 @@ remain under Hugging Face's credential handling and are not written to stack
 state or environment files.
 
 MOSS-Audio checkpoints are downloaded at the immutable revisions tested by
-Oída 0.9.2. Stable Audio 3 currently resolves the selected gated model through
+Oída 0.10.0. Stable Audio 3 currently resolves the selected gated model through
 its upstream loader; when the Hugging Face cache exposes the resolved `main`
 revision, the installer records it in `state.json`.
 
@@ -119,7 +119,7 @@ Pin the executable release used by the curl bootstrap:
 ```bash
 curl -fsSL \
   https://raw.githubusercontent.com/sonicfieldlabs/listening-stack/main/install.sh \
-  | LISTENING_STACK_VERSION=v0.3.3 bash
+  | LISTENING_STACK_VERSION=v0.4.0 bash
 ```
 
 Override the executable destination:
@@ -137,17 +137,17 @@ clean installation checkout before fetching the immutable revisions in the
 installer's compatibility set. It records the exact commits and refuses a
 checkout that resolves to anything else. It never resets a dirty tree.
 
-Listening Stack 0.3.3 pins Oída 0.9.2, GERM 0.3.3, AKOÚŌ 0.9.1, Earworm
-0.6.1, and Akousmata 0.6.1. It also records the exact accountable-listening
-contracts in `listening-stack/state/v2`. The state names the canonical profile,
-the exact component set, the four core components, and optional components. A
-later installer release may publish a newer tested set; an existing 0.3.3
-executable continues to reproduce this one.
+Listening Stack 0.4.0 pins Oída 0.10.0, GERM 0.3.3, AKOÚŌ 0.9.2, Earworm
+0.7.0 with Akousma schema 1.6, and Akousmata 0.7.0. It also records the exact
+accountable-listening contracts in `listening-stack/state/v2`. The state names
+the canonical profile, the exact component set, the four core components, and
+optional components. A later installer release may publish a newer tested set;
+an existing 0.4.0 executable continues to reproduce this one.
 
 Application version numbers remain owned by their repositories. Updating an
 installer checkout does not rewrite an Oída or GERM version.
 
-Version 0.3 can read version 1 state for lifecycle compatibility. Rerunning the
+Version 0.4 can read version 1 state for lifecycle compatibility. Rerunning the
 installer writes version 2 state; it does not infer that an old `oida` selection
 included GERM.
 
@@ -155,7 +155,9 @@ After starting Oída, run `listening-stack doctor`. In addition to source and
 model checks, it verifies the live gateway manifest plus host-perception,
 listening-event, listening-context, and route-outcome schemas. This detects a
 process that is healthy at `/health` but semantically incompatible at the
-integration boundary.
+integration boundary. The same GET-only manifest probe verifies the advertised
+human/machine record separation, listener-type classification, additive human
+revisions, and immutable machine core without creating a test record.
 
 ## Removing an Installation
 
