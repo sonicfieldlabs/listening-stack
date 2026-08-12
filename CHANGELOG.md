@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.1 — 2026-08-11
+
+- Advance the optional GERM source to 0.5.0 at its exact public release commit
+  while retaining the reviewed Oída 0.10.0, AKOÚŌ 0.9.2, Earworm 0.7.0,
+  Akousma schema 1.6, and Akousmata 0.7.0 compatibility set.
+- Record the independently released MASA 0.2.0 and Cosmoaudition 0.2.0 tags,
+  commits, schemas, modulation catalog, and GERM bridge contract as structured
+  interoperability metadata for GERM-containing profiles without installing
+  either repository.
+- Preserve the Stable Audio 3 source revision locked by GERM 0.5.0 and the
+  existing origin, clean-worktree, exact-commit, and local-boundary checks.
+
 ## 0.4.0 — 2026-08-11
 
 - Advance the coordinated compatibility set to Oída 0.10.0 and gateway v0.6,

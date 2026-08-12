@@ -50,7 +50,8 @@ class InstallerTests(unittest.TestCase):
                 state["components"], ["earworm", "akouo", "akousmata", "oida"]
             )
             self.assertEqual(state["optional_components"], [])
-            self.assertEqual(state["installer_version"], "0.4.0")
+            self.assertEqual(state["installer_version"], "0.4.1")
+            self.assertEqual(state["germ_interoperability"], {})
             self.assertEqual(state["contracts"]["gateway"], "oida/gateway/v0.6")
             self.assertEqual(
                 state["contracts"]["listening_context"],
@@ -75,6 +76,22 @@ class InstallerTests(unittest.TestCase):
             self.assertEqual(state["profile"], "full")
             self.assertEqual(state["optional_components"], ["germ"])
             self.assertIn("germ", state["components"])
+            self.assertEqual(
+                state["germ_interoperability"]["repositories"]["masa"]["version"],
+                "0.2.0",
+            )
+            self.assertEqual(
+                state["germ_interoperability"]["repositories"]["cosmoaudition"][
+                    "version"
+                ],
+                "0.2.0",
+            )
+            self.assertEqual(
+                state["germ_interoperability"]["contracts"][
+                    "cosmoaudition_signal_catalog"
+                ],
+                "cosmo/signal-catalog/v0.2",
+            )
             self.assertEqual(state["environment"]["GERM_ENABLE_CLOUD_VISION"], "0")
             self.assertEqual(
                 state["environment"]["OIDA_GERM_URL"], "http://127.0.0.1:5178"
@@ -209,6 +226,29 @@ class InstallerTests(unittest.TestCase):
             }
             path.write_text(json.dumps(state), encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "profile metadata"):
+                load_state(root)
+
+    def test_load_state_rejects_malformed_germ_interoperability_metadata(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "stack"
+            path = state_path(root)
+            path.parent.mkdir(parents=True)
+            state = {
+                "schema_version": 2,
+                "contract": STATE_CONTRACT,
+                "profile": "core",
+                "component": "core",
+                "components": ["earworm", "akouo", "akousmata", "oida"],
+                "core_components": ["earworm", "akouo", "akousmata", "oida"],
+                "optional_components": [],
+                "environment": {},
+                "commits": {},
+                "contracts": {},
+                "repositories": {},
+                "germ_interoperability": "not structured metadata",
+            }
+            path.write_text(json.dumps(state), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "interoperability metadata"):
                 load_state(root)
 
     def test_install_root_inside_git_repository_is_rejected(self):

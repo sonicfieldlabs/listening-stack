@@ -24,6 +24,7 @@ from .catalog import (
     STABLE_AUDIO_REPOSITORY,
     Model,
     Repository,
+    germ_interoperability_metadata,
     normalize_profile,
     profile_includes,
     source_keys,
@@ -109,6 +110,13 @@ def load_state(root: Path) -> Dict[str, object]:
         ):
             raise ValueError(
                 "Listening Stack state has no valid compatibility metadata at %s"
+                % path
+            )
+        if "germ_interoperability" in value and not isinstance(
+            value.get("germ_interoperability"), dict
+        ):
+            raise ValueError(
+                "Listening Stack state has invalid GERM interoperability metadata at %s"
                 % path
             )
     if not isinstance(value.get("environment"), dict):
@@ -717,6 +725,9 @@ class Installer:
             for key, commit in sorted(self.commits.items())
             if key in ALL_REPOSITORIES
         }
+        germ_interoperability: Dict[str, object] = {}
+        if profile_includes(self.profile, "germ"):
+            germ_interoperability = germ_interoperability_metadata()
         state: Dict[str, object] = {
             "schema_version": 2,
             "contract": STATE_CONTRACT,
@@ -735,6 +746,7 @@ class Installer:
             "commits": dict(self.commits),
             "contracts": dict(ACCOUNTABLE_LISTENING_CONTRACTS),
             "repositories": repositories,
+            "germ_interoperability": germ_interoperability,
             "environment": dict(environment),
         }
         path = state_path(self.root)

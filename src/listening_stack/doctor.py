@@ -23,6 +23,7 @@ from .catalog import (
     MEMORY_ACCOUNT_CAPABILITIES,
     MODELS,
     REPOSITORIES,
+    germ_interoperability_metadata,
     memory_guidance,
     normalize_profile,
     profile_includes,
@@ -136,6 +137,8 @@ def run_doctor(root: Path) -> Dict[str, object]:
                 else "",
             )
         )
+    if profile_includes(component, "germ"):
+        checks.append(_check_germ_interoperability(state))
 
     raw_models = state.get("models", [])
     model_keys = (
@@ -638,3 +641,19 @@ def _result(checks: List[Check], running: Mapping[str, object]) -> Dict[str, obj
         "checks": [asdict(check) for check in checks],
         "runtime": dict(running),
     }
+
+
+def _check_germ_interoperability(state: Mapping[str, object]) -> Check:
+    matches = (
+        state.get("germ_interoperability") == germ_interoperability_metadata()
+    )
+    return Check(
+        "state:germ-interoperability",
+        "pass" if matches else "warn",
+        "GERM interoperability compatibility set recorded"
+        if matches
+        else "missing or stale GERM interoperability compatibility set",
+        "Rerun `listening-stack install` with this installer to record the current GERM boundaries."
+        if not matches
+        else "",
+    )

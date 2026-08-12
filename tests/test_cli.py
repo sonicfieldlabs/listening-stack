@@ -39,7 +39,10 @@ class CliTests(unittest.TestCase):
                 )
             self.assertIn("Dry run complete", output.getvalue())
             self.assertIn("Oída v0.10.0", output.getvalue())
-            self.assertIn("GERM v0.3.3", output.getvalue())
+            self.assertIn("GERM v0.5.0", output.getvalue())
+            self.assertIn("MASA v0.2.0", output.getvalue())
+            self.assertIn("Cosmoaudition v0.2.0", output.getvalue())
+            self.assertIn("cosmo/signal-catalog/v0.2", output.getvalue())
             self.assertIn("oida/gateway/v0.6", output.getvalue())
             self.assertIn("akouo/v0.9", output.getvalue())
             self.assertIn("earworm/v0.7", output.getvalue())
@@ -64,7 +67,9 @@ class CliTests(unittest.TestCase):
             plan = output.getvalue()
             self.assertIn("Listening core", plan)
             self.assertIn("Oída v0.10.0", plan)
-            self.assertNotIn("GERM v0.3.3", plan)
+            self.assertNotIn("GERM v0.5.0", plan)
+            self.assertNotIn("MASA v0.2.0", plan)
+            self.assertNotIn("Cosmoaudition v0.2.0", plan)
 
     def test_models_and_no_models_are_mutually_exclusive(self):
         with self.assertRaises(SystemExit) as raised:

@@ -8,6 +8,8 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from listening_stack.catalog import (  # noqa: E402
     ACCOUNTABLE_LISTENING_CONTRACTS,
+    GERM_INTEROPERABILITY_CONTRACTS,
+    GERM_INTEROPERABILITY_REPOSITORIES,
     MEMORY_ACCOUNT_CAPABILITIES,
     MODELS,
     REPOSITORIES,
@@ -49,7 +51,7 @@ class CatalogTests(unittest.TestCase):
 
     def test_release_compatibility_set_is_immutable(self):
         self.assertEqual(REPOSITORIES["oida"].version, "0.10.0")
-        self.assertEqual(REPOSITORIES["germ"].version, "0.3.3")
+        self.assertEqual(REPOSITORIES["germ"].version, "0.5.0")
         self.assertEqual(REPOSITORIES["akouo"].version, "0.9.2")
         self.assertEqual(REPOSITORIES["earworm"].version, "0.7.0")
         self.assertEqual(REPOSITORIES["akousmata"].version, "0.7.0")
@@ -57,7 +59,7 @@ class CatalogTests(unittest.TestCase):
             {key: repository.revision for key, repository in REPOSITORIES.items()},
             {
                 "oida": "4f934c7854bceda044f5be22f2567315d4af7ba2",
-                "germ": "3cbe20054328bc2d6f2d9988865d3194d915bfa6",
+                "germ": "2b765983e2e6c89008d4d6f8fba9701876ee4783",
                 "akouo": "d3c0405279ae00e3b6e1ebc46136aefa0889ab7a",
                 "earworm": "c130fa61423517a0cc2ca8071124537978fad825",
                 "akousmata": "838029d80360e04a01149437f30610503fd66794",
@@ -66,6 +68,42 @@ class CatalogTests(unittest.TestCase):
         for repository in REPOSITORIES.values():
             self.assertEqual(len(repository.revision), 40)
             int(repository.revision, 16)
+
+    def test_germ_interoperability_releases_and_contracts_are_immutable(self):
+        self.assertEqual(
+            {
+                key: (repository.version, repository.revision)
+                for key, repository in GERM_INTEROPERABILITY_REPOSITORIES.items()
+            },
+            {
+                "masa": (
+                    "0.2.0",
+                    "a967339d77cb7adfb977061e6f3299ff27e55619",
+                ),
+                "cosmoaudition": (
+                    "0.2.0",
+                    "d56e76a2be7b3385fc3b0ce5a9f3b307f502b4f6",
+                ),
+            },
+        )
+        self.assertEqual(
+            GERM_INTEROPERABILITY_CONTRACTS,
+            {
+                "masa_version": "0.2.0",
+                "masa_matter_record": (
+                    "https://masa.sonicfield.org/schemas/0.2.0/"
+                    "matter-record.schema.json"
+                ),
+                "masa_processing_request": (
+                    "https://masa.sonicfield.org/schemas/0.2.0/"
+                    "processing-request.schema.json"
+                ),
+                "cosmoaudition_version": "0.2.0",
+                "cosmoaudition_bridge": "cosmoaudition-germ/v0.2",
+                "cosmoaudition_modulation": "cosmo/modulation/v0.2",
+                "cosmoaudition_signal_catalog": "cosmo/signal-catalog/v0.2",
+            },
+        )
 
     def test_accountable_listening_contracts_have_one_recorded_owner(self):
         self.assertEqual(

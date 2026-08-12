@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from listening_stack.catalog import (  # noqa: E402
     ACCOUNTABLE_LISTENING_CONTRACTS,
+    germ_interoperability_metadata,
     MEMORY_ACCOUNT_CAPABILITIES,
     MODELS,
     REPOSITORIES,
@@ -18,6 +19,7 @@ from listening_stack.catalog import (  # noqa: E402
 from listening_stack.doctor import (  # noqa: E402
     OIDA_SCHEMA_PATHS,
     _check_germ_boundary,
+    _check_germ_interoperability,
     _check_model,
     _check_oida_accountability_contracts,
     _check_private_file,
@@ -49,6 +51,12 @@ def _gateway_manifest():
 
 
 class DoctorTests(unittest.TestCase):
+    def test_germ_interoperability_state_is_compared_to_current_release_set(self):
+        current = {"germ_interoperability": germ_interoperability_metadata()}
+        self.assertEqual(_check_germ_interoperability(current).status, "pass")
+        current["germ_interoperability"]["contracts"]["masa_version"] = "0.1.0"
+        self.assertEqual(_check_germ_interoperability(current).status, "warn")
+
     def test_germ_boundary_accepts_only_the_installer_local_paths(self):
         root = Path("/tmp/listening-stack-fixture")
         environment = {

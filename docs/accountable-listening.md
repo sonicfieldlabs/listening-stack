@@ -1,6 +1,6 @@
 # Accountable Listening Architecture
 
-Listening Stack 0.4.0 treats listening as a chain of bounded contracts, not as
+Listening Stack 0.4.1 treats listening as a chain of bounded contracts, not as
 one undifferentiated model response. Each concept has one semantic owner and is
 parsed once at the boundary that owns it.
 
@@ -62,6 +62,12 @@ matrix under `listening-stack/state/v2`. Its profile and exact component list
 make the four-project core distinguishable from the optional GERM layer. The
 installer writes state only after source synchronization and import verification
 succeed.
+
+For a GERM-containing profile, state separately records the exact MASA 0.2.0
+and Cosmoaudition 0.2.0 release references plus the schemas and transport
+contracts consumed by GERM 0.5.0. The doctor can detect stale recorded metadata,
+but this is compatibility evidence rather than a claim that either independent
+system is installed, running, or semantically healthy.
 
 When Oída is running, `listening-stack doctor` verifies:
 
