@@ -9,7 +9,7 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, replace
 import json
-from typing import Iterable, List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -67,9 +67,9 @@ REPOSITORIES: Mapping[str, Repository] = {
         key="germ",
         name="GERM",
         url="https://github.com/sonicfieldlabs/germ.git",
-        ref="v0.3.3",
-        version="0.3.3",
-        revision="3cbe20054328bc2d6f2d9988865d3194d915bfa6",
+        ref="v0.5.0",
+        version="0.5.0",
+        revision="2b765983e2e6c89008d4d6f8fba9701876ee4783",
     ),
     "akouo": Repository(
         key="akouo",
@@ -96,6 +96,63 @@ REPOSITORIES: Mapping[str, Repository] = {
         revision="838029d80360e04a01149437f30610503fd66794",
     ),
 }
+
+# GERM consumes these released protocols over explicit interoperability
+# boundaries. They are compatibility references, not installer-managed source
+# checkouts: the Listening Stack installs GERM and records which independent
+# releases its bridge was reviewed against.
+GERM_INTEROPERABILITY_REPOSITORIES: Mapping[str, Repository] = {
+    "masa": Repository(
+        key="masa",
+        name="MASA",
+        url="https://github.com/sonicfieldlabs/MASA.git",
+        ref="v0.2.0",
+        version="0.2.0",
+        revision="a967339d77cb7adfb977061e6f3299ff27e55619",
+    ),
+    "cosmoaudition": Repository(
+        key="cosmoaudition",
+        name="Cosmoaudition",
+        url="https://github.com/sonicfieldlabs/cosmoaudition.git",
+        ref="v0.2.0",
+        version="0.2.0",
+        revision="d56e76a2be7b3385fc3b0ce5a9f3b307f502b4f6",
+    ),
+}
+
+GERM_INTEROPERABILITY_CONTRACTS: Mapping[str, str] = {
+    "masa_version": "0.2.0",
+    "masa_matter_record": (
+        "https://masa.sonicfield.org/schemas/0.2.0/matter-record.schema.json"
+    ),
+    "masa_processing_request": (
+        "https://masa.sonicfield.org/schemas/0.2.0/processing-request.schema.json"
+    ),
+    "cosmoaudition_version": "0.2.0",
+    "cosmoaudition_bridge": "cosmoaudition-germ/v0.2",
+    "cosmoaudition_modulation": "cosmo/modulation/v0.2",
+    "cosmoaudition_signal_catalog": "cosmo/signal-catalog/v0.2",
+}
+
+
+def germ_interoperability_metadata() -> Dict[str, object]:
+    """Return JSON-compatible compatibility metadata for GERM profiles."""
+
+    return {
+        "contracts": dict(GERM_INTEROPERABILITY_CONTRACTS),
+        "repositories": {
+            key: {
+                "name": repository.name,
+                "url": repository.url,
+                "ref": repository.ref,
+                "version": repository.version,
+                "revision": repository.revision,
+            }
+            for key, repository in sorted(
+                GERM_INTEROPERABILITY_REPOSITORIES.items()
+            )
+        },
+    }
 
 # One semantic owner per contract. The installer records this matrix in local
 # state and the doctor verifies it at Oída's live gateway/schema boundary.
@@ -136,7 +193,7 @@ STABLE_AUDIO_REPOSITORY = Repository(
     name="Stable Audio 3",
     url="https://github.com/Stability-AI/stable-audio-3.git",
     ref="main",
-    # Match the immutable source revision in GERM v0.3.3's uv.lock.
+    # Match the immutable source revision in GERM v0.5.0's uv.lock.
     revision="fa5ee841dd49bae0fa361fac26904adc27fd400e",
 )
 

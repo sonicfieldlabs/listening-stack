@@ -12,6 +12,8 @@ from typing import Iterable, List, Mapping, Optional, Sequence, Tuple
 from . import __version__
 from .catalog import (
     ACCOUNTABLE_LISTENING_CONTRACTS,
+    GERM_INTEROPERABILITY_CONTRACTS,
+    GERM_INTEROPERABILITY_REPOSITORIES,
     MODELS,
     MODEL_PRESETS,
     REPOSITORIES,
@@ -414,6 +416,16 @@ def _print_plan(
             "akousmata",
         ):
             print("    - %s: %s" % (key, ACCOUNTABLE_LISTENING_CONTRACTS[key]))
+    if profile_includes(component, "germ"):
+        print("  GERM interoperability (compatibility references; not installed):")
+        for repository in GERM_INTEROPERABILITY_REPOSITORIES.values():
+            print(
+                "    - %s v%s (%s)"
+                % (repository.name, repository.version, repository.revision[:12])
+            )
+        print("  GERM interoperability contracts:")
+        for key, contract in GERM_INTEROPERABILITY_CONTRACTS.items():
+            print("    - %s: %s" % (key, contract))
     if models:
         print("  Models:")
         for model in models:

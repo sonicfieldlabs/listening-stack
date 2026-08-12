@@ -119,7 +119,7 @@ Pin the executable release used by the curl bootstrap:
 ```bash
 curl -fsSL \
   https://raw.githubusercontent.com/sonicfieldlabs/listening-stack/main/install.sh \
-  | LISTENING_STACK_VERSION=v0.4.0 bash
+  | LISTENING_STACK_VERSION=v0.4.1 bash
 ```
 
 Override the executable destination:
@@ -137,12 +137,18 @@ clean installation checkout before fetching the immutable revisions in the
 installer's compatibility set. It records the exact commits and refuses a
 checkout that resolves to anything else. It never resets a dirty tree.
 
-Listening Stack 0.4.0 pins Oída 0.10.0, GERM 0.3.3, AKOÚŌ 0.9.2, Earworm
+Listening Stack 0.4.1 pins Oída 0.10.0, GERM 0.5.0, AKOÚŌ 0.9.2, Earworm
 0.7.0 with Akousma schema 1.6, and Akousmata 0.7.0. It also records the exact
 accountable-listening contracts in `listening-stack/state/v2`. The state names
 the canonical profile, the exact component set, the four core components, and
 optional components. A later installer release may publish a newer tested set;
-an existing 0.4.0 executable continues to reproduce this one.
+an existing 0.4.1 executable continues to reproduce this one.
+
+When the profile contains GERM, the same state records MASA 0.2.0 and
+Cosmoaudition 0.2.0 as immutable interoperability references, along with the
+exact MASA record/processing schemas and Cosmoaudition bridge, modulation, and
+signal-catalog contracts consumed by GERM 0.5.0. They are not installed source
+components; an operator deploys either independent system separately.
 
 Application version numbers remain owned by their repositories. Updating an
 installer checkout does not rewrite an Oída or GERM version.
