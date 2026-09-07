@@ -32,6 +32,7 @@ from .catalog import (
 from .installer import _normalise_git_url, environment_path, load_state, state_path
 from .runtime import status as runtime_status
 from .system import executable, is_apple_silicon, total_ram_gb
+from .verification import core_probe_command
 
 
 @dataclass
@@ -238,6 +239,8 @@ def run_doctor(root: Path) -> Dict[str, object]:
         checks.append(Check("provider", "fail", "unknown provider %s" % provider))
 
     environment = state.get("environment", {})
+    if profile_includes(component, "oida"):
+        checks.append(_check_core_environment(root, environment))
     shared_store = (
         str(environment.get("AKOUSMATA_PATH", ""))
         if isinstance(environment, dict)
@@ -399,12 +402,15 @@ def _check_oida_accountability_contracts(base_url: str) -> List[Check]:
         try:
             schema = _fetch_local_json(base_url, path)
             actual_contract = _nested_value(schema, "properties", "contract", "const")
-            matches = actual_contract == expected_contract
+            accepted = _nested_value(schema, "properties", "contract", "enum")
+            matches = (actual_contract in (None, expected_contract)
+                       and (accepted is None or isinstance(accepted, list) and expected_contract in accepted)
+                       and (actual_contract is not None or accepted is not None))
             checks.append(
                 Check(
                     "schema:%s" % key.replace("_", "-"),
                     "pass" if matches else "fail",
-                    "%s at %s" % (actual_contract or "contract missing", path),
+                    "%s at %s" % (actual_contract or accepted or "contract missing", path),
                     "Rerun the installer and restart Oída so the live schema matches %s."
                     % expected_contract
                     if not matches
@@ -554,6 +560,24 @@ def _contains_file(root: Path, pattern: str) -> bool:
         return any(path.is_file() for path in root.rglob(pattern))
     except OSError:
         return False
+
+
+def _check_core_environment(root: Path, environment: Mapping[str, object]) -> Check:
+    merged = os.environ.copy()
+    merged.update({str(key): str(value) for key, value in environment.items()})
+    try:
+        result = subprocess.run(core_probe_command(root), env=merged, text=True,
+                                capture_output=True, timeout=20, check=False)
+        if result.returncode != 0:
+            raise ValueError("installed core import or path verification failed")
+        details = json.loads(result.stdout)
+        if not isinstance(details, dict) or not isinstance(details.get("modules"), dict) or len(details["modules"]) != 4:
+            raise ValueError("incomplete installed core verification")
+    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+        return Check("environment:core", "fail", str(exc),
+                     "Rerun the installer to restore its core environment and bounded paths.")
+    return Check("environment:core", "pass",
+                 "Four pinned distributions import from this installation; store and model/config paths match.")
 
 
 def _module_available(python: Path, module: str) -> bool:

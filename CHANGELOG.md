@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Install the pinned core as built packages so AKOÚŌ's bundled schemas are
+  available to Oída. Lifecycle and integration commands preserve the verified
+  environment with `uv run --no-sync`.
+- Share an isolated import, package-origin, version and selected-path probe
+  between installation and doctor. Reject borrowed development imports, missing
+  schema resources and store paths redirected outside the installation.
+- Accept compatible schema contract enums while rejecting conflicting constraints.
+- Document local core verification, configuration migration/rollback limits and
+  remaining host/profile evidence. Release versions and source pins are unchanged.
+
 ## 0.4.1 — 2026-08-11
 
 - Advance the optional GERM source to 0.5.0 at its exact public release commit

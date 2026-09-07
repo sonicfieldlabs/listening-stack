@@ -321,6 +321,9 @@ a shared machine.
 
 ## Development
 
+See [local installation verification](docs/local-verification.md) for isolated
+core checks, bundled-schema verification and configuration rollback limits.
+
 The assistant uses only the Python standard library.
 
 ```bash

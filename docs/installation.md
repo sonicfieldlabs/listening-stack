@@ -137,6 +137,12 @@ clean installation checkout before fetching the immutable revisions in the
 installer's compatibility set. It records the exact commits and refuses a
 checkout that resolves to anything else. It never resets a dirty tree.
 
+The core Python environment installs built packages with `uv sync --locked
+--no-editable`. This includes AKOÚŌ's bundled schemas, which are absent from its
+editable package directory. Oída lifecycle and integration commands use
+`uv run --no-sync` to preserve that verified environment. Run the installer to
+update dependencies; do not resync the managed Oída checkout manually.
+
 Listening Stack 0.4.1 pins Oída 0.10.0, GERM 0.5.0, AKOÚŌ 0.9.2, Earworm
 0.7.0 with Akousma schema 1.6, and Akousmata 0.7.0. It also records the exact
 accountable-listening contracts in `listening-stack/state/v2`. The state names
@@ -166,6 +172,9 @@ human/machine record separation, listener-type classification, additive human
 revisions, and immutable machine core without creating a test record.
 
 ## Removing an Installation
+
+For isolated verification, configuration migration and rollback limits, see
+[local verification](local-verification.md).
 
 Stop managed services first:
 

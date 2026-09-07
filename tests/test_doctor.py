@@ -187,6 +187,20 @@ class DoctorTests(unittest.TestCase):
         self.assertEqual(by_name["contract:oida-gateway"].status, "fail")
         self.assertEqual(by_name["schema:listening-event"].status, "fail")
 
+    def test_compatible_schema_enum_and_conflicting_constraints(self):
+        expected = ACCOUNTABLE_LISTENING_CONTRACTS['host_perception']
+        for rule, status in [({'enum': ['oida/host-perception/v0.3', expected]}, 'pass'),
+                             ({'enum': ['oida/host-perception/v0.3']}, 'fail'),
+                             ({'const': expected, 'enum': ['other']}, 'fail'),
+                             ({}, 'fail')]:
+            with self.subTest(rule=rule):
+                schemas = [{'properties': {'contract': {'const': ACCOUNTABLE_LISTENING_CONTRACTS[key]}}}
+                           for key in OIDA_SCHEMA_PATHS]
+                schemas[0]['properties']['contract'] = rule
+                with patch('listening_stack.doctor._fetch_local_json', side_effect=[_gateway_manifest(), *schemas]):
+                    checks = _check_oida_accountability_contracts('http://127.0.0.1:8765')
+                self.assertEqual(next(c.status for c in checks if c.name == 'schema:host-perception'), status)
+
     def test_oida_memory_account_capabilities_fail_closed(self):
         manifest = _gateway_manifest()
         manifest["memory_accounts"]["machine_core_immutable"] = False

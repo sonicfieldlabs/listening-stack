@@ -569,7 +569,7 @@ def _integrate(args: argparse.Namespace) -> None:
     uv = shutil.which("uv") or "uv"
     for target in targets:
         runner.run(
-            [uv, "run", "oida", "integrate", target, "--json"],
+            [uv, "run", "--no-sync", "oida", "integrate", target, "--json"],
             cwd=root / "src" / "oida",
             env=environment,
         )

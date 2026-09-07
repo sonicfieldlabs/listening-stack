@@ -30,6 +30,7 @@ from .catalog import (
     source_keys,
 )
 from .system import Runner, executable, is_apple_silicon
+from .verification import core_probe_command
 
 
 STATE_DIRECTORY = ".listening-stack"
@@ -492,6 +493,7 @@ class Installer:
                 self.uv,
                 "sync",
                 "--locked",
+                "--no-editable",
                 "--python",
                 "3.12",
                 "--extra",
@@ -761,7 +763,7 @@ class Installer:
         oida = self.src_root / "oida"
         for integration in self.selection.integrations:
             self.runner.run(
-                [self.uv, "run", "oida", "integrate", integration, "--json"],
+                [self.uv, "run", "--no-sync", "oida", "integrate", integration, "--json"],
                 cwd=oida,
                 env=environment,
             )
@@ -769,14 +771,7 @@ class Installer:
     def _verify_installation(self, environment: Mapping[str, str]) -> None:
         if profile_includes(self.profile, "oida"):
             self.runner.run(
-                [
-                    self.uv,
-                    "run",
-                    "python",
-                    "-c",
-                    "import oida; print('Oída import: ok')",
-                ],
-                cwd=self.src_root / "oida",
+                core_probe_command(self.root),
                 env=environment,
             )
         if profile_includes(self.profile, "germ"):

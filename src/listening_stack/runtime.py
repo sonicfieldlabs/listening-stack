@@ -65,7 +65,7 @@ def start(
                 else "stub"
             )
             runner.run(
-                [uv, "run", "oida", "start", "--profile", profile, "--json"],
+                [uv, "run", "--no-sync", "oida", "start", "--profile", profile, "--json"],
                 cwd=root / "src" / "oida",
                 env=environment,
             )
@@ -145,7 +145,7 @@ def stop(
     stopped: Dict[str, object] = {}
     if target in {"all", "oida"} and profile_includes(component, "oida"):
         runner.run(
-            [uv, "run", "oida", "stop", "--json"],
+            [uv, "run", "--no-sync", "oida", "stop", "--json"],
             cwd=root / "src" / "oida",
             env=environment,
             check=False,
