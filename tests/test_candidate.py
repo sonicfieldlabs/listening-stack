@@ -8,7 +8,7 @@ import zipfile
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from listening_stack.candidate import verify, install, CONTRACT, PHASE5
+from listening_stack.candidate import verify, install, CONTRACT, PHASE5, PHASE7
 
 
 class CandidateTests(unittest.TestCase):
@@ -88,7 +88,7 @@ class CandidateTests(unittest.TestCase):
             value = json.loads(manifest.read_text())
             value["compatibility_profile"] = "centaur-phase5/v1"
             manifest.write_text(json.dumps(value))
-            with self.assertRaisesRegex(ValueError, "Phase 5"):
+            with self.assertRaisesRegex(ValueError, "Candidate profile"):
                 verify(manifest)
             wheels = []
             for name, version in PHASE5.items():
@@ -112,4 +112,37 @@ class CandidateTests(unittest.TestCase):
             manifest.write_text(json.dumps(value))
             self.assertEqual(
                 verify(manifest)["compatibility_profile"], "centaur-phase5/v1"
+            )
+
+    def test_phase7_requires_matching_contract_versions_before_install(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            manifest = self.fixture(root)
+            value = json.loads(manifest.read_text())
+            value["compatibility_profile"] = "centaur-phase7/v1"
+            manifest.write_text(json.dumps(value))
+            with self.assertRaisesRegex(ValueError, "Candidate profile"):
+                verify(manifest)
+            wheels = []
+            for name, version in PHASE7.items():
+                path = root / (
+                    name.replace("-", "_") + "-" + version + "-py3-none-any.whl"
+                )
+                with zipfile.ZipFile(path, "w") as archive:
+                    archive.writestr(
+                        name + ".dist-info/METADATA",
+                        f"Name: {name}\nVersion: {version}\n",
+                    )
+                wheels.append(
+                    dict(
+                        file=path.name,
+                        distribution=name,
+                        version=version,
+                        sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+                    )
+                )
+            value["wheels"] = wheels
+            manifest.write_text(json.dumps(value))
+            self.assertEqual(
+                verify(manifest)["compatibility_profile"], "centaur-phase7/v1"
             )

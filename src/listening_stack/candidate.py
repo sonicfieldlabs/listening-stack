@@ -23,6 +23,9 @@ PHASE5 = {
 }
 
 
+PHASE7 = {**PHASE5, "listeningstackweb": "0.2.0", "sonicfield-listening-stack": "0.4.2"}
+
+
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -78,12 +81,13 @@ def verify(manifest):
         raise ValueError("Candidate is missing a required core or application wheel")
     profile = value.get("compatibility_profile")
     if profile is not None:
-        if profile != "centaur-phase5/v1":
+        if profile not in {"centaur-phase5/v1", "centaur-phase7/v1"}:
             raise ValueError("Unknown candidate compatibility profile")
         actual = {item["distribution"]: item["version"] for item in wheels}
-        if any(actual.get(name) != version for name, version in PHASE5.items()):
+        required = PHASE7 if profile == "centaur-phase7/v1" else PHASE5
+        if any(actual.get(name) != version for name, version in required.items()):
             raise ValueError(
-                "Phase 5 requires the qualified GERM and listening contract versions"
+                "Candidate profile requires its exact qualified application and contract versions"
             )
     return value
 

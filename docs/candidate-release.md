@@ -94,3 +94,19 @@ MASA extension. No published source tag is changed or implied by this local cand
 Station/GERM audio playback grants are ephemeral browser state, excluded from candidate
 manifests, data snapshots, presets and agent-sounds packs. Installing a wheel or importing a
 pack never enables playback. Keep operator data and active services separate from candidate QA.
+
+## Centaur Phase 7 candidate (local, unpublished)
+
+Installer 0.4.2 adds `centaur-phase7/v1` while preserving the Phase 5 profile. It
+requires Station 0.2.0, installer 0.4.2, Oída 0.11.1, akousma and Akousmata 0.8.1,
+AKOÚŌ 0.10.0, and GERM 0.6.0. Every wheel still carries an independent SHA-256;
+a version string is not a substitute for verifying its bytes. The final offline
+set contains 51 distributions and passes isolated imports, RECORD hashes and
+dependency checks. Its manifest SHA-256 is
+`f66b8de3b48190102156b4c518332bee48c29bee6bad6d02cc6fbccdbb189834`.
+
+The profile and local commits are not a published release. Existing published
+tag/SHA pins in `catalog.py` remain unchanged. Use the candidate install/doctor
+commands above with a new root; no service restart or operator-store migration
+is implicit. See the Station's Phase 7 acceptance note for browser and artifact
+evidence, physical-device limits and public spectral publication constraints.
