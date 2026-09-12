@@ -1,0 +1,313 @@
+{
+  "contract": "listening-stack/candidate-set/v1",
+  "published": false,
+  "wheels": [
+    {
+      "file": "akouo_contract-0.10.0-py3-none-any.whl",
+      "distribution": "akouo-contract",
+      "version": "0.10.0",
+      "sha256": "ab1e2ddd9dede91ff3a930ed9860e5c175d6eee7b5aa7ca1212b73f9f3795ba9"
+    },
+    {
+      "file": "akousma-0.8.1-py3-none-any.whl",
+      "distribution": "akousma",
+      "version": "0.8.1",
+      "sha256": "fe65e851369ce9d1555b4da8a536f106ff4cd77d9c84a90f60ea2924a5030242"
+    },
+    {
+      "file": "akousmata-0.8.1-py3-none-any.whl",
+      "distribution": "akousmata",
+      "version": "0.8.1",
+      "sha256": "8d61595e86437f1687757f3c1ea714b211e2a786cbcde23ee45c0b29e946f93b"
+    },
+    {
+      "file": "annotated_doc-0.0.5-py3-none-any.whl",
+      "distribution": "annotated-doc",
+      "version": "0.0.5",
+      "sha256": "117bac03a25ede5df5440e855b32d556049ca169ead221505badf432fed4b101"
+    },
+    {
+      "file": "annotated_types-0.8.0-py3-none-any.whl",
+      "distribution": "annotated-types",
+      "version": "0.8.0",
+      "sha256": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0"
+    },
+    {
+      "file": "anyio-4.15.1-py3-none-any.whl",
+      "distribution": "anyio",
+      "version": "4.15.1",
+      "sha256": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101"
+    },
+    {
+      "file": "attrs-26.1.0-py3-none-any.whl",
+      "distribution": "attrs",
+      "version": "26.1.0",
+      "sha256": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309"
+    },
+    {
+      "file": "certifi-2026.7.22-py3-none-any.whl",
+      "distribution": "certifi",
+      "version": "2026.7.22",
+      "sha256": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775"
+    },
+    {
+      "file": "cffi-2.1.1-cp313-cp313-macosx_11_0_arm64.whl",
+      "distribution": "cffi",
+      "version": "2.1.1",
+      "sha256": "19ee6127ee34de7d83ce3d371ebc5ed91addbdcc39f9ab15ce4eb35a4e534971"
+    },
+    {
+      "file": "click-8.5.0-py3-none-any.whl",
+      "distribution": "click",
+      "version": "8.5.0",
+      "sha256": "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360"
+    },
+    {
+      "file": "cryptography-50.0.1-cp311-abi3-macosx_11_0_arm64.whl",
+      "distribution": "cryptography",
+      "version": "50.0.1",
+      "sha256": "b8f852c65863251b9e3a1b8c150ce21e59b522dbb6a7d4bc80e680d38388e986"
+    },
+    {
+      "file": "fastapi-0.141.1-py3-none-any.whl",
+      "distribution": "fastapi",
+      "version": "0.141.1",
+      "sha256": "bfb91aa2d334c61cb35ba9a116fc123b3d3df31640b801cf57a7a78ec3f603b3"
+    },
+    {
+      "file": "germ-0.6.1-py3-none-any.whl",
+      "distribution": "germ",
+      "version": "0.6.1",
+      "sha256": "c24b3cfa25dbf76ddb8e536137efc081880d71508b07981021afac088c093f40"
+    },
+    {
+      "file": "h11-0.16.0-py3-none-any.whl",
+      "distribution": "h11",
+      "version": "0.16.0",
+      "sha256": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86"
+    },
+    {
+      "file": "httpcore-1.0.9-py3-none-any.whl",
+      "distribution": "httpcore",
+      "version": "1.0.9",
+      "sha256": "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55"
+    },
+    {
+      "file": "httptools-0.8.0-cp313-cp313-macosx_11_0_arm64.whl",
+      "distribution": "httptools",
+      "version": "0.8.0",
+      "sha256": "2d689918c15a013c65ef52d9fd495d766893ab831a2c8d89f2ac5940a5df847c"
+    },
+    {
+      "file": "httpx-0.28.1-py3-none-any.whl",
+      "distribution": "httpx",
+      "version": "0.28.1",
+      "sha256": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad"
+    },
+    {
+      "file": "httpx_sse-0.4.3-py3-none-any.whl",
+      "distribution": "httpx-sse",
+      "version": "0.4.3",
+      "sha256": "0ac1c9fe3c0afad2e0ebb25a934a59f4c7823b60792691f779fad2c5568830fc"
+    },
+    {
+      "file": "idna-3.19-py3-none-any.whl",
+      "distribution": "idna",
+      "version": "3.19",
+      "sha256": "815e7be7a7806d54abb586dc943addc79e8b2ee16915059658cbeff4b1b43bf4"
+    },
+    {
+      "file": "iniconfig-2.3.0-py3-none-any.whl",
+      "distribution": "iniconfig",
+      "version": "2.3.0",
+      "sha256": "f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12"
+    },
+    {
+      "file": "jsonschema-4.26.0-py3-none-any.whl",
+      "distribution": "jsonschema",
+      "version": "4.26.0",
+      "sha256": "d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce"
+    },
+    {
+      "file": "jsonschema_specifications-2025.9.1-py3-none-any.whl",
+      "distribution": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "sha256": "98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe"
+    },
+    {
+      "file": "listeningstackweb-0.2.1-py3-none-any.whl",
+      "distribution": "listeningstackweb",
+      "version": "0.2.1",
+      "sha256": "2205a5552a11fce13892bbfcf5a4c5a3b6aece83c5fb30a1e1d46f808b81578d"
+    },
+    {
+      "file": "mcp-1.29.1-py3-none-any.whl",
+      "distribution": "mcp",
+      "version": "1.29.1",
+      "sha256": "b6310eeb59153300c4ab8b9aec4c52f4819a2d6a8e429eb43d908bed7c783648"
+    },
+    {
+      "file": "numpy-2.5.3-cp313-cp313-macosx_14_0_arm64.whl",
+      "distribution": "numpy",
+      "version": "2.5.3",
+      "sha256": "f9a2353b37a1a9e78fd82b27ad7e2a32a2d036604d18f02b05e3136c62ca3b09"
+    },
+    {
+      "file": "packaging-26.3-py3-none-any.whl",
+      "distribution": "packaging",
+      "version": "26.3",
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+    },
+    {
+      "file": "pluggy-1.6.0-py3-none-any.whl",
+      "distribution": "pluggy",
+      "version": "1.6.0",
+      "sha256": "e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746"
+    },
+    {
+      "file": "pycparser-3.0-py3-none-any.whl",
+      "distribution": "pycparser",
+      "version": "3.0",
+      "sha256": "b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"
+    },
+    {
+      "file": "pydantic-2.13.5-py3-none-any.whl",
+      "distribution": "pydantic",
+      "version": "2.13.5",
+      "sha256": "346a034f080da3755d8e9cb5e00e8b07de1d39e4f6e2c87d8ab7cafa0b269a73"
+    },
+    {
+      "file": "pydantic_core-2.46.5-cp313-cp313-macosx_11_0_arm64.whl",
+      "distribution": "pydantic-core",
+      "version": "2.46.5",
+      "sha256": "f332f0e72a5a0400141f830744e141bf9f97917878dbe968669e8a7fefea78ff"
+    },
+    {
+      "file": "pydantic_settings-2.15.0-py3-none-any.whl",
+      "distribution": "pydantic-settings",
+      "version": "2.15.0",
+      "sha256": "0ba092c291c94baceb5eff768aa0d56400a457585bc0175925a5a5510303da42"
+    },
+    {
+      "file": "pygments-2.21.0-py3-none-any.whl",
+      "distribution": "pygments",
+      "version": "2.21.0",
+      "sha256": "2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9"
+    },
+    {
+      "file": "pyjwt-2.13.0-py3-none-any.whl",
+      "distribution": "pyjwt",
+      "version": "2.13.0",
+      "sha256": "66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728"
+    },
+    {
+      "file": "pytest-9.1.1-py3-none-any.whl",
+      "distribution": "pytest",
+      "version": "9.1.1",
+      "sha256": "37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c"
+    },
+    {
+      "file": "python_dotenv-1.2.3-py3-none-any.whl",
+      "distribution": "python-dotenv",
+      "version": "1.2.3",
+      "sha256": "904552145e8bfed22162c09dab1c2b9b54fefa7b23ba780f4f26ca0316b0f0d9"
+    },
+    {
+      "file": "python_multipart-0.0.32-py3-none-any.whl",
+      "distribution": "python-multipart",
+      "version": "0.0.32",
+      "sha256": "ff6d3f776f16878c894e52e107296ffc890e913c611b1a4ec6c44e2821fe2e23"
+    },
+    {
+      "file": "pyyaml-6.0.3-cp313-cp313-macosx_11_0_arm64.whl",
+      "distribution": "pyyaml",
+      "version": "6.0.3",
+      "sha256": "2283a07e2c21a2aa78d9c4442724ec1eb15f5e42a723b99cb3d822d48f5f7ad1"
+    },
+    {
+      "file": "referencing-0.37.0-py3-none-any.whl",
+      "distribution": "referencing",
+      "version": "0.37.0",
+      "sha256": "381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231"
+    },
+    {
+      "file": "rpds_py-2026.6.3-cp313-cp313-macosx_11_0_arm64.whl",
+      "distribution": "rpds-py",
+      "version": "2026.6.3",
+      "sha256": "f4d78253f6996be4901669ad25319f842f740eccf4d58e3c7f3dd39e6dde1d8f"
+    },
+    {
+      "file": "scipy-1.18.1-cp313-cp313-macosx_14_0_arm64.whl",
+      "distribution": "scipy",
+      "version": "1.18.1",
+      "sha256": "ea324d9dd34c38bfb9bec8ca4d1b407db97dbb74029f566b8e322b1b6fe56fe6"
+    },
+    {
+      "file": "sonicfield_listening_stack-0.4.3-py3-none-any.whl",
+      "distribution": "sonicfield-listening-stack",
+      "version": "0.4.3",
+      "sha256": "593c56e2ddcb1b3855b5ec06ce0c56fccc91510be33cae1878cfd87776656f17"
+    },
+    {
+      "file": "sonicfield_oida-0.11.1-py3-none-any.whl",
+      "distribution": "sonicfield-oida",
+      "version": "0.11.1",
+      "sha256": "806de05bacee8fb79e438c28669c8aa01d59573fbbf34f5e1935f8d3ec79b4b7"
+    },
+    {
+      "file": "soundfile-0.14.0-py2.py3-none-macosx_11_0_arm64.whl",
+      "distribution": "soundfile",
+      "version": "0.14.0",
+      "sha256": "d828d35a059626da52f1415b5faee610aeab393319cb3fc4a9aef47b619fc14c"
+    },
+    {
+      "file": "sse_starlette-3.4.11-py3-none-any.whl",
+      "distribution": "sse-starlette",
+      "version": "3.4.11",
+      "sha256": "c7b2244bdff016fe7f64e10075e89a3e6bbf899649cc89b0fe884b5545042453"
+    },
+    {
+      "file": "starlette-1.6.0-py3-none-any.whl",
+      "distribution": "starlette",
+      "version": "1.6.0",
+      "sha256": "a86dd39d14bb45f85a3d18525215a9ef0cfd1f192ac793220e72598c90335f0c"
+    },
+    {
+      "file": "typing_extensions-4.16.0-py3-none-any.whl",
+      "distribution": "typing-extensions",
+      "version": "4.16.0",
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+    },
+    {
+      "file": "typing_inspection-0.4.4-py3-none-any.whl",
+      "distribution": "typing-inspection",
+      "version": "0.4.4",
+      "sha256": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147"
+    },
+    {
+      "file": "uvicorn-0.52.4-py3-none-any.whl",
+      "distribution": "uvicorn",
+      "version": "0.52.4",
+      "sha256": "f86e41a149d7d05a9969337e3946a9c171c06a5d42680896daaba624aeac8da1"
+    },
+    {
+      "file": "uvloop-0.22.1-cp313-cp313-macosx_10_13_universal2.whl",
+      "distribution": "uvloop",
+      "version": "0.22.1",
+      "sha256": "561577354eb94200d75aca23fbde86ee11be36b00e52a4eaf8f50fb0c86b7705"
+    },
+    {
+      "file": "watchfiles-1.2.0-cp313-cp313-macosx_11_0_arm64.whl",
+      "distribution": "watchfiles",
+      "version": "1.2.0",
+      "sha256": "7ba0480b9a74af058f43b337e937a451e109295c420916d68ad24e3dc02f5e44"
+    },
+    {
+      "file": "websockets-17.1-cp313-cp313-macosx_11_0_arm64.whl",
+      "distribution": "websockets",
+      "version": "17.1",
+      "sha256": "fd8f47dbf2e8adb15c847215f83436de3fdb120b51fdae0fbbdf69fd97a3ad80"
+    }
+  ],
+  "compatibility_profile": "centaur-phase9/v1"
+}

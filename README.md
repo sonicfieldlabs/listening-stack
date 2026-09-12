@@ -19,7 +19,7 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer release: `0.4.1`.
+Current installer release: `0.4.3`.
 
 ## Quick Start
 
@@ -374,3 +374,5 @@ checkpoint, runtime and evaluation evidence, and writes `deployments.json`.
 The existing generation/listening settings are not migrated or replaced.
 See `../listeningstackweb/docs/model-ecology-p7.md` for the local environment,
 profile gates, artifact contract, evaluation limits and upstream sources.
+
+The local `centaur-phase9/v1` candidate pins Station 0.2.1, GERM 0.6.1 and installer 0.4.3. It includes Earworm 1.8 bundle restore with current forgetting-ledger preservation. See [candidate handback](docs/candidate-release.md); this candidate has not been published.

@@ -8,6 +8,7 @@ CONTRACTS = [
     "earworm/listening-memories/v1",
     "earworm/akousma/v1.6",
     "earworm/akousma/v1.7",
+    "earworm/akousma/v1.8",
 ]
 
 
@@ -31,7 +32,7 @@ def restore(bundle: Path, current_store: Path, *, supported_contracts=None):
         receipt = import_bundle(
             store,
             bundle.read_bytes(),
-            supported_contracts=supported_contracts or CONTRACTS,
+            supported_contracts=CONTRACTS if supported_contracts is None else supported_contracts,
         )
         after = store.forgetting_receipts()
         if not {r["receipt_id"] for r in before} <= {r["receipt_id"] for r in after}:

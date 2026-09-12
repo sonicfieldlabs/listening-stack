@@ -110,3 +110,46 @@ tag/SHA pins in `catalog.py` remain unchanged. Use the candidate install/doctor
 commands above with a new root; no service restart or operator-store migration
 is implicit. See the Station's Phase 7 acceptance note for browser and artifact
 evidence, physical-device limits and public spectral publication constraints.
+
+## Centaur Phase 9 handback (local, unpublished)
+
+Installer 0.4.3 adds `centaur-phase9/v1`: Oída 0.11.1, AKOÚŌ 0.10.0,
+Akousma/Akousmata 0.8.1, GERM 0.6.1 and Station 0.2.1. Earlier profiles and
+published source pins stay intact. The [exact manifest](candidates/centaur-phase9.json)
+is a checksum register; place a copy beside its 51 wheels to install it. This is
+macOS arm64 / Python 3.13 evidence, not a cross-platform release qualification.
+Akousmata 0.8.1 has different local candidate bytes after the restore fix: use the
+manifest hash, not its version alone, to identify the tested package.
+
+The private `listening-stack-worklog/expansion-20260911/phase9/` handback contains
+`wheels/`, `artifacts/`, `candidate/`, `runtime/`, gate logs and the final repository
+HEAD table. Its runtime helper launches the installed wheels with isolated imports,
+Oída's stub profile, GERM synthesis, an isolated store and loopback ports
+5788 (Station), 5799 (Oída), 5798 (GERM), 5790 (Akousmata). Cosmoaudition is absent
+in this fixture; its separate release archive passed its own final gate.
+
+From that private Phase 9 directory:
+
+```sh
+candidate/.venv/bin/python -I -m listening_stack.candidate doctor --root "$PWD/candidate"
+python3 runtime/control.py start
+# Open http://127.0.0.1:5788; after a restart explicitly Resume the stopped transport.
+python3 runtime/control.py stop
+```
+
+Wait for each service's startup-complete log; Oída's first import takes longer.
+The helper preserves `runtime/data/` and checks process ownership before stopping.
+It is a synthetic review runtime, not an operator installation or model demo.
+For another fresh install, use the install command above with this wheel manifest
+and a new absolute root. The retained helper uses the sibling `candidate/` root.
+
+Restore now admits ordinary 1.8 canonical records, preserves opaque fields and
+current revocations, and supports retry without duplication. An explicitly empty
+supported-contract list is refused. Canonical bundles do not contain spectral
+objects or supply native-evidence host validators; records requiring them are
+refused before writes. Preserve those stores and their referenced objects in place;
+a record-only ZIP is not a full spectral-store backup. For recovery, stop services,
+keep the current store and forgetting ledger together, select a compatible prior
+runtime, and import only supported bundles into the current initialized store.
+Never replace that ledger with an older database. Ordinary source-installer
+start/doctor commands describe managed installations, not this isolated candidate.
