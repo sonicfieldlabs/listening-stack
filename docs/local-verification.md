@@ -52,17 +52,90 @@ and environments; a failed update may leave sources changed with older completed
 state. Restore a verified whole installation backup or rerun the pinned installer
 to recover. The installer never automatically deletes retained data.
 
+## Optional GERM verification
+
+GERM installation uses Python 3.12. The installer and lifecycle preserve that
+selected environment with `uv run --no-sync --python 3.12`; verification and
+startup must not replace it using the application's `.python-version` preference.
+
+Doctor runs a separate isolated `environment:germ` probe. It checks the actual
+managed source/version, Python 3.12, the installed Akousma version and Git revision,
+and the selected GERM output, shared store and model-cache paths. The probe imports
+configuration without starting the application or creating store records. Normal
+installation additionally checks that the application imports successfully.
+
 ## Evidence and remaining checks
 
-Local verification on macOS arm64 with Python 3.12 exercised a fresh core install,
-built core packages, a live stub gateway and all 28 doctor checks, plus version
-1-to-2 configuration migration and restoration at unchanged pins. The dependency
-inventory records installed distribution metadata and retained licence-file hashes;
-missing metadata is an explicit absence, not an inferred licence approval.
+The local installation matrix currently has the following evidence. Each live
+check uses released repository pins, a separately installed CLI wheel, disposable
+roots outside development checkouts and temporary loopback ports. The lifecycle
+checks compare environment metadata before/after and confirm that their ports close.
 
-This evidence covers the released pinned core with unreleased installer fixes.
-Unpublished working-tree changes in other repositories are not part of that pin
-set. Linux, macOS Intel, optional GERM/full profiles, model/provider downloads,
-accelerators, devices and agent integrations still need their own fresh-install
-evidence. A Linux container being available on the test host is not such evidence.
-The installer version and released compatibility pins remain unchanged.
+| Environment | Profile | Runtime | Doctor result |
+| --- | --- | --- | --- |
+| macOS arm64 | core | stub | 28 passed (earlier verification) |
+| macOS arm64 | germ | mock | 19 passed; no warnings/failures |
+| macOS arm64 | full | stub + mock | 32 passed; no warnings/failures |
+| Linux arm64 container | full | stub + mock | 31 passed; one memory warning; no failures |
+
+The container ran an actual fresh installation and both gateways, without mounting
+development source trees or exposing ports to the host. Its VM reported 7.7 GB,
+below the existing 8 GB recommendation. This is Linux container runtime evidence;
+it does not establish native Linux audio devices, GPU providers or x86 host support.
+
+The first optional-profile run exposed GERM verification replacing Python 3.12
+with 3.10. The corrected installer and lifecycle preserve 3.12 and packaged dependency
+metadata. Regression checks cover dependency/version drift, redirected output paths,
+missing interpreters and read-only verification. Synthetic unit fixtures exercise
+probe failures; the installation matrix above supplies separate real runtime evidence.
+
+Earlier core verification also covered version 1-to-2 configuration migration and
+restoration at unchanged pins. Dependency inventories record distribution metadata
+and retained licence-file hashes; absence is not inferred licence approval.
+
+The full supported-host/profile gate remains open for Intel macOS, native Linux
+hardware and other architecture checks, real selected model/provider installations,
+accelerators, physical devices and agent-host integration. Pi's new adapter belongs
+to the later integration work. Previously measured full-model execution in a
+separate application environment does not establish installer-profile compatibility.
+
+These checks use released component pins with local installer fixes. The recent
+unpublished repository implementations are not silently substituted into the pinned
+set. Testing a new combined candidate set and updating release pins remain separate
+compatibility/release preparation. The installer version and pins are unchanged.
+
+## Model-install retries and agent runtime binding
+
+The dedicated Hugging Face CLI installed by uv is normally a symlink. Model-install
+retries accept it only when it resolves to the exact managed
+`.listening-stack/tools/huggingface-hub/bin/hf` target without a redirected parent.
+The pinned CLI version is still checked. Foreign targets remain refused. This
+prevents the installer from rejecting the tool it created during an earlier run.
+
+A locally cached model may be used for offline model installation after checking
+its recorded revision and file hashes. This verifies the local installation path;
+it does not establish remote-download availability. Model-free tests do not
+substitute for an actual listening call with fallback disabled.
+
+Current Oída adapters persist an allowlist of the selected data/store/model paths
+and gateway settings. They do not copy arbitrary environment variables or credentials.
+Hermes uses its recorded interpreter before PATH. This runtime-binding improvement
+is part of the local Oída candidate, not a silent change to released installer pins.
+Existing host registrations need explicit reinstallation to receive it.
+
+Isolated integration verification exercised real Hermes and OpenCode installation
+and tool discovery, Claude manifest validation, and MCP initialization/capability
+calls for Codex, Claude and OpenClaw bundles. These checks do not claim that every
+host's full interactive agent workflow or the new Pi adapter is complete.
+
+
+A macOS arm64 released-pin core installation with MOSS 4B Instruct completed a
+real synthetic listening call, retained its Akousma, and passed all 30 doctor
+checks with fallback disabled. The checkpoint was copied locally and its three
+weight shards checked against cached revision metadata. An initial decoder failure
+exposed an FFmpeg 9/TorchCodec 0.10 mismatch. This released-pin run required
+`DYLD_LIBRARY_PATH=/opt/homebrew/opt/ffmpeg@8/lib` in the invoking process; doctor
+alone had not detected the decoder failure. Do not infer model readiness from an
+import-only doctor pass. The local Oída candidate discovers an existing FFmpeg 8
+keg automatically; published pins remain unchanged. This is execution/storage
+proof with synthetic input, not a model-quality benchmark or microphone test.

@@ -69,3 +69,45 @@ print(json.dumps({"modules": results, "store": str(store_root()), "paths_checked
 '''
     return [str(root / "src/oida/.venv/bin/python"), "-I", "-B", "-c", script,
             json.dumps(expected), str(root)]
+
+
+def germ_probe_command(root: Path) -> List[str]:
+    """Verify GERM's selected source, interpreter, dependency and paths without app startup."""
+    root = root.resolve()
+    expected = {"germ_version": REPOSITORIES["germ"].version,
+                "akousma_version": REPOSITORIES["earworm"].version,
+                "akousma_revision": REPOSITORIES["earworm"].revision}
+    script = '''import importlib.metadata, json, os, sys
+from pathlib import Path
+root = Path(sys.argv[1])
+expected = json.loads(sys.argv[2])
+project = root / 'src/germ'
+if project.resolve() != project or sys.version_info[:2] != (3, 12):
+    raise RuntimeError('GERM needs its selected source and Python 3.12 environment')
+sys.path.insert(0, str(project))
+import server.identity, server.config, akousma
+if Path(server.identity.__file__).resolve().parent != project / 'server':
+    raise RuntimeError('GERM imported from another checkout')
+if server.identity.__version__ != expected['germ_version']:
+    raise RuntimeError('GERM version mismatch')
+dist = importlib.metadata.distribution('akousma')
+site = Path(dist.locate_file('')).resolve()
+if project / '.venv' not in site.parents or Path(akousma.__file__).resolve().parent != site / 'akousma':
+    raise RuntimeError('GERM dependency imported outside its environment')
+direct = json.loads(dist.read_text('direct_url.json') or '{}')
+if dist.version != expected['akousma_version'] or direct.get('vcs_info', {}).get('commit_id') != expected['akousma_revision']:
+    raise RuntimeError('GERM Akousma dependency does not match the pinned revision')
+settings = server.config.get_settings()
+for name, relative in {'GERM_OUTPUT_DIR': 'data/germ', 'AKOUSMATA_PATH': 'data/akousmata',
+                       'HF_HOME': 'models/huggingface'}.items():
+    wanted = root / relative
+    if os.environ.get(name) != str(wanted) or wanted.resolve() != wanted:
+        raise RuntimeError('GERM configured path outside selected installation: ' + name)
+if settings.output_root.resolve() != root / 'data/germ':
+    raise RuntimeError('GERM resolves an unselected output directory')
+print(json.dumps({'germ_version': server.identity.__version__, 'python': sys.version.split()[0],
+                  'akousma_version': dist.version, 'akousma_revision': expected['akousma_revision'],
+                  'source': str(project), 'output': str(settings.output_root)}))
+'''
+    return [str(root / "src/germ/.venv/bin/python"), "-I", "-B", "-c", script,
+            str(root), json.dumps(expected)]

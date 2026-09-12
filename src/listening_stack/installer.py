@@ -30,7 +30,7 @@ from .catalog import (
     source_keys,
 )
 from .system import Runner, executable, is_apple_silicon
-from .verification import core_probe_command
+from .verification import core_probe_command, germ_probe_command
 
 
 STATE_DIRECTORY = ".listening-stack"
@@ -41,7 +41,7 @@ STATE_CONTRACT = "listening-stack/state/v2"
 UV_VERSION = "0.11.29"
 UV_INSTALLER_SHA256 = "504a79fd2ed0dcd47e7f04f0792cfd0871f62e24a7fe40fa8ae0f563a369f2bd"
 HF_CLI_VERSION = "1.23.0"
-ALLOWED_INTEGRATIONS = ("hermes", "codex", "claude", "openclaw", "opencode")
+ALLOWED_INTEGRATIONS = ("hermes", "codex", "claude", "openclaw", "opencode", "pi")
 
 
 @dataclass
@@ -531,10 +531,7 @@ class Installer:
 
     def _ensure_hf(self) -> None:
         binary = Path(self.hf)
-        if binary.is_symlink():
-            raise RuntimeError(
-                "Refusing to use a symlinked Hugging Face CLI: %s" % binary
-            )
+        self._validate_hf_binary(binary)
         if binary.is_file() and os.access(binary, os.X_OK):
             version = self.runner.capture([str(binary), "--version"], check=False)
             if _reported_version(version) == HF_CLI_VERSION:
@@ -570,12 +567,27 @@ class Installer:
                 % binary
             )
         if not self.runner.dry_run:
+            self._validate_hf_binary(binary)
             version = self.runner.capture([str(binary), "--version"], check=False)
             if _reported_version(version) != HF_CLI_VERSION:
                 raise RuntimeError(
                     "Hugging Face CLI reports %s instead of pinned version %s"
                     % (version or "no version", HF_CLI_VERSION)
                 )
+
+    def _validate_hf_binary(self, binary: Path) -> None:
+        # uv tool install intentionally creates this link. Accept only its exact
+        # managed target; foreign or redirected tool trees remain refused.
+        if binary.is_symlink():
+            expected = self.root / STATE_DIRECTORY / "tools" / "huggingface-hub" / "bin" / "hf"
+            try:
+                valid = (binary.parent.resolve(strict=True) == binary.parent
+                         and expected.parent.resolve(strict=True) == expected.parent
+                         and binary.resolve(strict=True) == expected)
+            except OSError:
+                valid = False
+            if not valid:
+                raise RuntimeError("Refusing unselected Hugging Face CLI symlink: %s" % binary)
 
     def _download_models(self) -> None:
         environment = {"HF_HOME": str(self.hf_home)}
@@ -775,6 +787,7 @@ class Installer:
                 env=environment,
             )
         if profile_includes(self.profile, "germ"):
+            self.runner.run(germ_probe_command(self.root), env=environment)
             germ_models = any(model.application == "germ" for model in self.models)
             provider = self._resolved_provider()
             import_check = "from server.main import app"
@@ -784,6 +797,9 @@ class Installer:
                 [
                     self.uv,
                     "run",
+                    "--no-sync",
+                    "--python",
+                    "3.12",
                     "python",
                     "-c",
                     import_check + "; print('GERM import: ' + app.title)",

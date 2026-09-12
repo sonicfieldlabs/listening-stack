@@ -88,6 +88,9 @@ def start(
                     [
                         uv,
                         "run",
+                        "--no-sync",
+                        "--python",
+                        "3.12",
                         "uvicorn",
                         "server.main:app",
                         "--host",
@@ -186,6 +189,7 @@ def _environment(state: Mapping[str, object]) -> Dict[str, str]:
     if not isinstance(raw, dict):
         raise ValueError("Installation state contains no valid environment")
     environment = {str(key): str(value) for key, value in raw.items()}
+    environment.setdefault("LISTENINGSTACK_RESOURCE_DIR", str(Path.home() / ".local/share/listening-stack/resources"))
     environment.setdefault("OIDA_HOST", "127.0.0.1")
     environment.setdefault("OIDA_PORT", "8765")
     environment.setdefault("GERM_HOST", "127.0.0.1")

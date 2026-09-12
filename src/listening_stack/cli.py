@@ -127,6 +127,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     integrate.add_argument("--root", type=Path, default=DEFAULT_ROOT)
     integrate.add_argument("--dry-run", action="store_true")
+    restore = subparsers.add_parser("restore-memory", help="Restore a verified bundle through the current store and revocation ledger.")
+    restore.add_argument("bundle", type=Path)
+    restore.add_argument("--store", type=Path, required=True)
     return parser
 
 
@@ -156,6 +159,9 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
             _emit(
                 runtime_status(args.root.expanduser().resolve(), args.target), args.json
             )
+        elif command == "restore-memory":
+            from .memory_restore import restore
+            _emit(restore(args.bundle, args.store), True)
         elif command == "integrate":
             _integrate(args)
         else:
@@ -225,6 +231,7 @@ def _install(args: argparse.Namespace) -> None:
                 ("claude", "Claude"),
                 ("openclaw", "OpenClaw"),
                 ("opencode", "OpenCode"),
+                ("pi", "Pi"),
             ],
         )
     invalid_integrations = [

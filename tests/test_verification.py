@@ -20,7 +20,7 @@ class CoreVerificationTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name).resolve() / "install"
         self.python_root = self.root / "src/oida/.venv"
-        venv.EnvBuilder(with_pip=False).create(self.python_root)
+        venv.EnvBuilder(with_pip=False, symlinks=True).create(self.python_root)
         self.command = core_probe_command(self.root)
         self.expected = json.loads(self.command[-2])
         python = self.command[0]
@@ -95,6 +95,64 @@ class CoreVerificationTests(unittest.TestCase):
         origin.write_text(json.dumps({'url': (Path(self.tmp.name)/'unselected-project').as_uri()}))
         self.assertEqual(_check_core_environment(self.root, self.environment).status, 'fail')
 
+
+
+@unittest.skipUnless(sys.version_info[:2] == (3, 12), "GERM installs Python 3.12")
+class GermVerificationTests(unittest.TestCase):
+    def setUp(self):
+        from listening_stack.catalog import REPOSITORIES
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name).resolve() / "install"
+        project = self.root / "src/germ"
+        venv.EnvBuilder(with_pip=False, symlinks=True).create(project / ".venv")
+        python = project / ".venv/bin/python"
+        site = Path(subprocess.check_output([str(python), "-I", "-c",
+            "import sysconfig; print(sysconfig.get_path('purelib'))"], text=True).strip())
+        (site / "akousma").mkdir()
+        (site / "akousma/__init__.py").write_text("")
+        self.metadata = site / "akousma-0.7.0.dist-info"
+        self.metadata.mkdir()
+        (self.metadata / "METADATA").write_text("Name: akousma\nVersion: 0.7.0\n")
+        (self.metadata / "direct_url.json").write_text(json.dumps({
+            "vcs_info": {"commit_id": REPOSITORIES["earworm"].revision}}))
+        (project / "server").mkdir()
+        (project / "server/__init__.py").write_text("")
+        (project / "server/identity.py").write_text("__version__ = '0.5.0'\n")
+        (project / "server/config.py").write_text(
+            "import os\nfrom pathlib import Path\nfrom types import SimpleNamespace\n"
+            "def get_settings(): return SimpleNamespace(output_root=Path(os.environ['GERM_OUTPUT_DIR']))\n")
+        self.environment = Installer(Selection('germ', [], [], 'mock', self.root),
+                                     Runner(quiet=True))._environment()
+        for relative in ('data/germ', 'data/akousmata', 'models/huggingface'):
+            (self.root / relative).mkdir(parents=True)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def check(self):
+        from listening_stack.doctor import _check_germ_environment
+        return _check_germ_environment(self.root, self.environment).status
+
+    def test_selected_source_dependency_and_paths_pass_without_writes(self):
+        self.assertEqual(self.check(), 'pass')
+        self.assertEqual(list((self.root / 'data/germ').iterdir()), [])
+        self.assertEqual(list(self.root.glob('src/germ/server/__pycache__')), [])
+
+    def test_pinned_dependency_revision_drift_fails(self):
+        (self.metadata / 'direct_url.json').write_text('{}')
+        self.assertEqual(self.check(), 'fail')
+
+    def test_output_escape_fails(self):
+        self.environment['GERM_OUTPUT_DIR'] = self.tmp.name
+        self.assertEqual(self.check(), 'fail')
+
+    def test_germ_source_version_drift_fails(self):
+        (self.root / 'src/germ/server/identity.py').write_text("__version__ = 'different'\n")
+        self.assertEqual(self.check(), 'fail')
+
+    def test_missing_interpreter_fails(self):
+        (self.root / 'src/germ/.venv/bin/python').unlink()
+        self.assertEqual(self.check(), 'fail')
 
 if __name__ == '__main__':
     unittest.main()

@@ -32,7 +32,7 @@ from .catalog import (
 from .installer import _normalise_git_url, environment_path, load_state, state_path
 from .runtime import status as runtime_status
 from .system import executable, is_apple_silicon, total_ram_gb
-from .verification import core_probe_command
+from .verification import core_probe_command, germ_probe_command
 
 
 @dataclass
@@ -258,6 +258,7 @@ def run_doctor(root: Path) -> Dict[str, object]:
         )
     )
     if profile_includes(component, "germ") and isinstance(environment, dict):
+        checks.append(_check_germ_environment(root, environment))
         checks.append(_check_germ_boundary(root, environment))
     elif isinstance(environment, dict):
         unexpected_germ = sorted(
@@ -579,6 +580,24 @@ def _check_core_environment(root: Path, environment: Mapping[str, object]) -> Ch
     return Check("environment:core", "pass",
                  "Four pinned distributions import from this installation; store and model/config paths match.")
 
+
+
+def _check_germ_environment(root: Path, environment: Mapping[str, object]) -> Check:
+    merged = os.environ.copy()
+    merged.update({str(key): str(value) for key, value in environment.items()})
+    try:
+        result = subprocess.run(germ_probe_command(root), env=merged, text=True,
+                                capture_output=True, timeout=20, check=False)
+        if result.returncode != 0:
+            raise ValueError("installed GERM interpreter, dependency or path verification failed")
+        details = json.loads(result.stdout)
+        if details.get("germ_version") != REPOSITORIES["germ"].version:
+            raise ValueError("incomplete installed GERM verification")
+    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+        return Check("environment:germ", "fail", str(exc),
+                     "Rerun the installer to restore GERM's selected Python 3.12 environment.")
+    return Check("environment:germ", "pass",
+                 "Pinned GERM source and Akousma dependency verified with selected paths on Python 3.12.")
 
 def _module_available(python: Path, module: str) -> bool:
     if not python.is_file() or not os.access(python, os.X_OK):

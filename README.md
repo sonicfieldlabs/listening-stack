@@ -347,3 +347,18 @@ See [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md),
 
 The installer source is licensed under Apache-2.0. Installed repositories,
 models, datasets, inputs, and outputs retain their own licenses and terms.
+
+D5 local integration: [memory-restore](docs/memory-restore.md). Unreleased; no automatic publication.
+
+D7 local development handoff: [checksum-pinned offline candidate, component ownership and rollback](docs/candidate-release.md).
+Published release pins remain unchanged; uncommitted builds use a separate candidate manifest.
+
+### Evaluated research instruments
+
+The optional P7 admission helper, `python -m listening_stack.research`, provisions
+an already downloaded and evaluated IIL guitar RAVE export and Basic Pitch ONNX.
+It requires `--root`, `--germ` and `--evaluation` paths, verifies the exact worker,
+checkpoint, runtime and evaluation evidence, and writes `deployments.json`.
+The existing generation/listening settings are not migrated or replaced.
+See `../listeningstackweb/docs/model-ecology-p7.md` for the local environment,
+profile gates, artifact contract, evaluation limits and upstream sources.
