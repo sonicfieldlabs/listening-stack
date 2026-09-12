@@ -1,6 +1,6 @@
 # D7 local candidate and journal handoff
 
-The current development work is uncommitted. Published tag/SHA pins in
+The original D7 handoff captured uncommitted development work. Published tag/SHA pins in
 `catalog.py` identify the earlier release and cannot identify these working-tree
 bytes. They remain unchanged. The D7 candidate instead pins every wheel by SHA-256,
 distribution and version in an explicitly unpublished manifest. Package numbers
@@ -79,3 +79,18 @@ See the local worklog `evidence/d7/` for the candidate archive, exact manifest,
 licence inventory, Pi loader/API receipts, installation checks and remaining gaps.
 Release publication and replacing published Git pins require actual reviewed
 release commits and compatible artifacts; this local handoff does neither.
+
+
+## Centaur Phase 5 candidate (2026-09-12)
+
+The optional manifest field `compatibility_profile: "centaur-phase5/v1"` requires GERM 0.6.0,
+Oída 0.11.1, AKOÚŌ contract 0.10.0, Akousma and Akousmata 0.8.1, Station 0.1.0 and installer
+0.4.1. Every wheel still needs its exact SHA-256. The profile fails before environment creation
+if a component is missing or its contract version differs. Use Python 3.13 and the complete
+macOS arm64 wheel set; Akousmata supplies GERM's retained-derivative authorization.
+Cosmoaudition's separately qualified 0.3.0 archive must include the retained observation-series
+MASA extension. No published source tag is changed or implied by this local candidate.
+
+Station/GERM audio playback grants are ephemeral browser state, excluded from candidate
+manifests, data snapshots, presets and agent-sounds packs. Installing a wheel or importing a
+pack never enables playback. Keep operator data and active services separate from candidate QA.

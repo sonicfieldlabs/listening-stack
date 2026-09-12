@@ -12,6 +12,15 @@ import zipfile
 from email.parser import BytesParser
 
 CONTRACT = "listening-stack/candidate-set/v1"
+PHASE5 = {
+    "sonicfield-oida": "0.11.1",
+    "akousma": "0.8.1",
+    "akousmata": "0.8.1",
+    "akouo-contract": "0.10.0",
+    "germ": "0.6.0",
+    "listeningstackweb": "0.1.0",
+    "sonicfield-listening-stack": "0.4.1",
+}
 
 
 def digest(path):
@@ -67,6 +76,15 @@ def verify(manifest):
         <= distributions
     ):
         raise ValueError("Candidate is missing a required core or application wheel")
+    profile = value.get("compatibility_profile")
+    if profile is not None:
+        if profile != "centaur-phase5/v1":
+            raise ValueError("Unknown candidate compatibility profile")
+        actual = {item["distribution"]: item["version"] for item in wheels}
+        if any(actual.get(name) != version for name, version in PHASE5.items()):
+            raise ValueError(
+                "Phase 5 requires the qualified GERM and listening contract versions"
+            )
     return value
 
 
@@ -109,6 +127,7 @@ def install(manifest, root, python="3.13"):
         "contract": CONTRACT,
         "manifest_sha256": digest(manifest),
         "wheels": value["wheels"],
+        "compatibility_profile": value.get("compatibility_profile"),
         "mode": "isolated-candidate",
         "managed_source_install": False,
         "memory_migration": "not_requested",
@@ -134,7 +153,9 @@ for item in expected:
   if file.hash:
    actual=base64.urlsafe_b64encode(hashlib.new(file.hash.mode,Path(d.locate_file(file)).read_bytes()).digest()).rstrip(b'=').decode()
    assert actual==file.hash.value, str(file)
-for name in ('oida','akousma','akousmata_app','akouo_contract','listening_stack','listeningstackweb'):
+modules=['oida','akousma','akousmata_app','akouo_contract','listening_stack','listeningstackweb']
+if any(item['distribution']=='germ' for item in expected): modules.append('server.identity')
+for name in modules:
  m=importlib.import_module(name);assert prefix in Path(m.__file__).resolve().parents,name
 print(json.dumps({'isolated_imports':True,'installed_record_hashes':True,'distribution_count':len(expected)}))
 """
