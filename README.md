@@ -353,6 +353,18 @@ D5 local integration: [memory-restore](docs/memory-restore.md). Unreleased; no a
 D7 local development handoff: [checksum-pinned offline candidate, component ownership and rollback](docs/candidate-release.md).
 Published release pins remain unchanged; uncommitted builds use a separate candidate manifest.
 
+### Optional native spectral workers
+
+`python -m listening_stack.spectral --python /isolated/venv/bin/python
+--worker /checkout/oida/oida/spectral_worker.py --destination /local/spectral-workers.json`
+qualifies a separately provisioned Python 3.12 environment with NumPy 1.26.4,
+SciPy 1.14.1, NSGT 0.19 and Kymatio 0.3.0. Install NumPy, setuptools and wheel
+before NSGT, using `--no-build-isolation` for NSGT. Qualification applies a
+source-hash-guarded integer-window compatibility fix to NSGT and records it.
+The manifest binds code, interpreter, libraries, notices and synthetic results.
+Set `OIDA_SPECTRAL_WORKERS_CONFIG` only to enable a qualified deployment; default
+installation and published core pins do not enable these optional workers.
+
 ### Evaluated research instruments
 
 The optional P7 admission helper, `python -m listening_stack.research`, provisions
