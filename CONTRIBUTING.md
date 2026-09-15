@@ -21,7 +21,7 @@ testable without downloading model weights.
 ## Development
 
 ```bash
-python3 -m unittest discover -s tests -v
+python3 -m pytest tests -v
 python3 scripts/build_release.py
 first="$(shasum -a 256 dist/listening-stack.pyz | cut -d' ' -f1)"
 python3 scripts/build_release.py

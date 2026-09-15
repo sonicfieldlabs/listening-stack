@@ -327,7 +327,7 @@ core checks, bundled-schema verification and configuration rollback limits.
 The assistant uses only the Python standard library.
 
 ```bash
-python3 -m unittest discover -s tests -v
+python3 -m pytest tests -v
 python3 scripts/build_release.py
 ./dist/listening-stack.pyz models --json
 bash -n install.sh listening-stack
