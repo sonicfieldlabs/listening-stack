@@ -27,6 +27,7 @@ def prepare(root:Path,germ:Path,evaluation:Path):
     python=root/'.venv/bin/python'
     site=Path(subprocess.check_output([str(python),'-c','import site;print(site.getsitepackages()[0])'],text=True).strip())
     files=[worker,germ/'server/providers/ace_step_provider.py',germ/'server/ace/deployment.py',root/'requirements.lock',root/'upstream.json',root/'license-review.json',evaluation,python.resolve()]
+    files.append(germ/'server/deployment_validation.py')
     files += [p for p in (root/'checkpoints').rglob('*') if p.is_file() and '.cache' not in p.parts and '__pycache__' not in p.parts]
     for package in ['acestep','mlx','mlx_lm','torch','transformers','diffusers','tokenizers','torchaudio']:
         files += [p for p in (site/package).rglob('*') if p.is_file() and '__pycache__' not in p.parts]

@@ -26,6 +26,7 @@ def prepare(root:Path,germ:Path,evaluation:Path):
     version=subprocess.check_output([str(python),'-c','from importlib.metadata import version;print(version("basic-pitch"))'],text=True).strip()
     if version!='0.4.0':raise ValueError('Unreviewed Basic Pitch package')
     common=[worker,germ/'server/providers/research_provider.py',germ/'server/research/deployment.py',root/'requirements.lock',root/'upstream.json',root/'README.md',root/'license-review.json',evaluation,python.resolve()]
+    common.append(germ/'server/deployment_validation.py')
     packages=['torch','numpy','librosa','soundfile.py','onnxruntime','basic_pitch','pretty_midi','resampy','mir_eval']
     for package in packages:
         path=site/package
