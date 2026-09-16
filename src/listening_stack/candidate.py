@@ -27,7 +27,11 @@ PHASE7 = {**PHASE5, "listeningstackweb": "0.2.0", "sonicfield-listening-stack": 
 
 
 PHASE9 = {**PHASE7, "germ": "0.6.1", "listeningstackweb": "0.2.1", "sonicfield-listening-stack": "0.4.3"}
-PROFILES = {"centaur-phase5/v1": PHASE5, "centaur-phase7/v1": PHASE7, "centaur-phase9/v1": PHASE9}
+# Admission profile for the new isolated qualification run, not a runtime verdict.
+# Exact wheel hashes and resource identities belong to each candidate manifest.
+PHASE17 = {**PHASE9, "listeningstackweb": "0.4.0"}
+PROFILES = {"centaur-phase5/v1": PHASE5, "centaur-phase7/v1": PHASE7, "centaur-phase9/v1": PHASE9,
+            "centaur-phase17/v1": PHASE17}
 
 
 def digest(path):
@@ -91,7 +95,7 @@ def verify(manifest):
         required = PROFILES[profile]
         if any(actual.get(name) != version for name, version in required.items()):
             raise ValueError(
-                "Candidate profile requires its exact qualified application and contract versions"
+                "Candidate profile requires its exact declared application and contract versions"
             )
     return value
 

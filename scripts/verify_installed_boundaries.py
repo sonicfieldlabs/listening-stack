@@ -16,6 +16,41 @@ from importlib.metadata import distribution
 from pathlib import Path
 
 PROFILES = {
+    "oida-planning": (
+        "oida", ["tests/test_planning_extensions.py", "tests/test_local_planning_gateway.py",
+                 "tests/test_planning_request_schema.py",
+                 "tests/test_situated_listener.py", "tests/test_reasoning_core.py"],
+        {"oida.reasoning.registry": "sonicfield-oida",
+         "oida.reasoning.local.gateway": "sonicfield-oida", "akousma": "akousma"},
+    ),
+    "oida-relisten": (
+        "oida", ["tests/test_relisten.py", "tests/test_relisten_projection.py",
+                 "tests/test_listening_claim_inputs.py", "tests/test_reasoning_core.py",
+                 "tests/test_reasoning_orchestrator.py", "tests/test_reasoning_public_api.py",
+                 "tests/test_reasoning_server.py", "tests/test_situated_listener.py",
+                 "tests/test_input_binding.py"],
+        {"oida.relisten": "sonicfield-oida",
+         "oida.reasoning.orchestrator": "sonicfield-oida",
+         "akousma": "akousma"},
+    ),
+    "central-publication": (
+        "listeningstackweb", ["tests/test_phase9_publication.py"],
+        {"listeningstackweb": "listeningstackweb",
+         "akousmata_app.publication": "akousmata",
+         "akousmata_app.editorial_grants": "akousmata"},
+    ),
+    "central-control": (
+        "listeningstackweb", ["tests/test_control.py", "tests/test_transport.py"],
+        {"listeningstackweb.control": "listeningstackweb", "listeningstackweb.transport": "listeningstackweb"},
+    ),
+    "oida-selection": (
+        "oida", ["tests/test_engine_readiness.py", "tests/test_audio_selection.py",
+                 "tests/test_local_model_resolution.py",
+                 "tests/test_runtime_attribution.py", "tests/test_input_binding.py",
+                 "tests/test_audit_regressions.py"],
+        {"oida.engine": "sonicfield-oida", "oida.reasoning.audio_selection": "sonicfield-oida",
+         "akousma": "akousma"},
+    ),
     "germ-full": (
         "germ", ["tests"],
         {"server": "germ", "pyroomacoustics": "pyroomacoustics", "akousmata_app.derivatives": "akousmata", "akousma": "akousma"},

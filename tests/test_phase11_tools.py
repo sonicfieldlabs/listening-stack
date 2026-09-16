@@ -1,4 +1,5 @@
 import runpy
+import zipfile
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -31,3 +32,13 @@ def test_boundary_gate_counts_collection_skips_and_setup_failures():
     results.pytest_collectreport(SimpleNamespace(skipped=True, failed=False))
     results.pytest_runtest_logreport(SimpleNamespace(skipped=False, failed=True, when="setup", passed=False))
     assert results.skipped == 1 and results.failed == 1 and results.passed == 0
+
+
+def test_weight_inventory_does_not_count_typescript_as_torchscript(tmp_path):
+    (tmp_path / "index.ts").write_text("export const example = true;")
+    with zipfile.ZipFile(tmp_path / "rave.ts", "w") as archive:
+        archive.writestr("archive/data.pkl", b"fixture; never unpickle")
+        archive.writestr("archive/constants.pkl", b"fixture; never unpickle")
+    result = tool("inventory_weights.py")["inventory"]({"selected": tmp_path})
+    assert [row["ref"] for row in result["files"]] == ["selected/rave.ts"]
+    assert result["excluded_nonweight_files"][0]["ref"] == "selected/index.ts"

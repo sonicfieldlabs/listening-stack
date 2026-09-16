@@ -8,10 +8,35 @@ import zipfile
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from listening_stack.candidate import verify, install, CONTRACT, PHASE5, PHASE7, PHASE9
+from listening_stack.candidate import verify, install, CONTRACT, PHASE5, PHASE7, PHASE9, PHASE17
 
 
 class CandidateTests(unittest.TestCase):
+    def test_phase17_preserves_historical_profiles_and_refuses_wrong_central(self):
+        self.assertEqual(PHASE9["listeningstackweb"], "0.2.1")
+        self.assertEqual(PHASE17["listeningstackweb"], "0.4.0")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for central_version in ("0.4.0", "0.2.1"):
+                wheels = []
+                for name, version in {**PHASE17, "listeningstackweb": central_version}.items():
+                    path = root / (name.replace("-", "_") + "-" + version + "-py3-none-any.whl")
+                    with zipfile.ZipFile(path, "w") as archive:
+                        archive.writestr(name + ".dist-info/METADATA", f"Name: {name}\nVersion: {version}\n")
+                    wheels.append(dict(file=path.name, distribution=name, version=version,
+                                       sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
+                manifest = root / "manifest.json"
+                manifest.write_text(json.dumps(dict(contract=CONTRACT, published=False,
+                    compatibility_profile="centaur-phase17/v1", wheels=wheels)))
+                if central_version == "0.4.0":
+                    self.assertEqual(verify(manifest)["compatibility_profile"], "centaur-phase17/v1")
+                else:
+                    with patch("listening_stack.candidate.subprocess.run") as run:
+                        with self.assertRaisesRegex(ValueError, "Candidate profile"):
+                            install(manifest, root / "candidate")
+                        run.assert_not_called()
+                        self.assertFalse((root / "candidate").exists())
+
     def fixture(self, root):
         wheels = []
         for name in (
