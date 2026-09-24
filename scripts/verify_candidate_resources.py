@@ -13,6 +13,7 @@ from pathlib import Path
 import sys
 
 APPLICATIONS = {"sonicfield-listening-stack", "sonicfield-oida", "akouo-contract", "akousma", "akousmata", "germ", "listeningstackweb"}
+TELAR_APPLICATIONS = (APPLICATIONS - {"listeningstackweb"}) | {"sonicfield-telar"}
 
 
 def digest(path):
@@ -21,8 +22,10 @@ def digest(path):
 
 def check(manifest: Path):
     value = json.loads(manifest.read_text())
-    if value.get("published") is not False or value.get("compatibility_profile") != "centaur-phase17/v1":
-        raise ValueError("Expected unpublished Phase 17 manifest")
+    profile = value.get("compatibility_profile")
+    if value.get("published") is not False or profile not in {"centaur-phase17/v1", "telar-local/v1"}:
+        raise ValueError("Expected unpublished Phase 17 or Telar manifest")
+    applications = TELAR_APPLICATIONS if profile == "telar-local/v1" else APPLICATIONS
     resources = manifest.parent / "wheel-resources.json"
     if digest(resources) != value["wheel_resources_sha256"]:
         raise ValueError("Resource inventory changed")
@@ -31,7 +34,7 @@ def check(manifest: Path):
     result = {}
     for wheel in value["wheels"]:
         name = wheel["distribution"]
-        if name not in APPLICATIONS:
+        if name not in applications:
             continue
         if digest(manifest.parent / wheel["file"]) != wheel["sha256"]:
             raise ValueError("Pinned wheel changed: " + name)
@@ -52,7 +55,7 @@ def check(manifest: Path):
             non_python += not member.endswith(".py")
         result[name] = {"version": dist.version, "wheel_sha256": wheel["sha256"],
                         "checked_files": count, "non_python_files": non_python}
-    if set(result) != APPLICATIONS:
+    if set(result) != applications:
         raise ValueError("Missing application resource inventory")
     return {"status": "passed", "scope": "installed application bytes, not model inference",
             "manifest_sha256": digest(manifest), "applications": result}

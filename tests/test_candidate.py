@@ -8,10 +8,38 @@ import zipfile
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from listening_stack.candidate import verify, install, CONTRACT, PHASE5, PHASE7, PHASE9, PHASE17
+from listening_stack.candidate import verify, install, CONTRACT, PHASE5, PHASE7, PHASE9, PHASE17, TELAR
 
 
 class CandidateTests(unittest.TestCase):
+    def test_telar_profile_preserves_legacy_and_refuses_mixed_applications(self):
+        self.assertIn("listeningstackweb", PHASE17)
+        self.assertNotIn("listeningstackweb", TELAR)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            wheels = []
+            for name, version in TELAR.items():
+                path = root / (name.replace("-", "_") + "-" + version + "-py3-none-any.whl")
+                with zipfile.ZipFile(path, "w") as archive:
+                    archive.writestr(name + ".dist-info/METADATA", f"Name: {name}\nVersion: {version}\n")
+                wheels.append(dict(file=path.name, distribution=name, version=version, sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
+            value = dict(contract=CONTRACT, published=False, compatibility_profile="telar-local/v1", wheels=wheels)
+            manifest = root / "manifest.json"
+            manifest.write_text(json.dumps(value))
+            self.assertEqual(verify(manifest)["compatibility_profile"], "telar-local/v1")
+            value["compatibility_profile"] = "centaur-phase17/v1"
+            manifest.write_text(json.dumps(value))
+            with self.assertRaisesRegex(ValueError, "Candidate profile"):
+                verify(manifest)
+            value["compatibility_profile"] = "telar-local/v1"
+            legacy = root / "listeningstackweb-0.4.0-py3-none-any.whl"
+            with zipfile.ZipFile(legacy, "w") as archive:
+                archive.writestr("listeningstackweb.dist-info/METADATA", "Name: listeningstackweb\nVersion: 0.4.0\n")
+            wheels.append(dict(file=legacy.name, distribution="listeningstackweb", version="0.4.0", sha256=hashlib.sha256(legacy.read_bytes()).hexdigest()))
+            manifest.write_text(json.dumps(value))
+            with self.assertRaisesRegex(ValueError, "exactly one"):
+                verify(manifest)
+
     def test_phase17_preserves_historical_profiles_and_refuses_wrong_central(self):
         self.assertEqual(PHASE9["listeningstackweb"], "0.2.1")
         self.assertEqual(PHASE17["listeningstackweb"], "0.4.0")

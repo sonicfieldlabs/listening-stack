@@ -34,14 +34,14 @@ PROFILES = {
          "akousma": "akousma"},
     ),
     "central-publication": (
-        "listeningstackweb", ["tests/test_phase9_publication.py"],
-        {"listeningstackweb": "listeningstackweb",
+        "telar", ["tests/test_phase9_publication.py"],
+        {"telar": "sonicfield-telar",
          "akousmata_app.publication": "akousmata",
          "akousmata_app.editorial_grants": "akousmata"},
     ),
     "central-control": (
-        "listeningstackweb", ["tests/test_control.py", "tests/test_transport.py"],
-        {"listeningstackweb.control": "listeningstackweb", "listeningstackweb.transport": "listeningstackweb"},
+        "telar", ["tests/test_control.py", "tests/test_transport.py"],
+        {"telar.control": "sonicfield-telar", "telar.transport": "sonicfield-telar"},
     ),
     "oida-selection": (
         "oida", ["tests/test_engine_readiness.py", "tests/test_audio_selection.py",
@@ -60,8 +60,8 @@ PROFILES = {
         {"listening_stack": "sonicfield-listening-stack", "akousma": "akousma", "akousmata_app": "akousmata"},
     ),
     "central-owner": (
-        "listeningstackweb", ["tests/test_c1_owner_boundaries.py"],
-        {"listeningstackweb": "listeningstackweb", "oida.source_capture": "sonicfield-oida", "akousma": "akousma"},
+        "telar", ["tests/test_c1_owner_boundaries.py"],
+        {"telar": "sonicfield-telar", "oida.source_capture": "sonicfield-oida", "akousma": "akousma"},
     ),
     "records": (
         "akouo", ["tests/test_record_workflows.py"],

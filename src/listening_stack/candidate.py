@@ -30,8 +30,10 @@ PHASE9 = {**PHASE7, "germ": "0.6.1", "listeningstackweb": "0.2.1", "sonicfield-l
 # Admission profile for the new isolated qualification run, not a runtime verdict.
 # Exact wheel hashes and resource identities belong to each candidate manifest.
 PHASE17 = {**PHASE9, "listeningstackweb": "0.4.0"}
+TELAR = {name: version for name, version in PHASE17.items() if name != "listeningstackweb"}
+TELAR["sonicfield-telar"] = "0.4.0"
 PROFILES = {"centaur-phase5/v1": PHASE5, "centaur-phase7/v1": PHASE7, "centaur-phase9/v1": PHASE9,
-            "centaur-phase17/v1": PHASE17}
+            "centaur-phase17/v1": PHASE17, "telar-local/v1": TELAR}
 
 
 def digest(path):
@@ -82,11 +84,12 @@ def verify(manifest):
             "akousmata",
             "akouo-contract",
             "sonicfield-listening-stack",
-            "listeningstackweb",
         }
         <= distributions
     ):
         raise ValueError("Candidate is missing a required core or application wheel")
+    if len(distributions & {"listeningstackweb", "sonicfield-telar"}) != 1:
+        raise ValueError("Candidate requires exactly one legacy Central or Telar application wheel")
     profile = value.get("compatibility_profile")
     if profile is not None:
         if profile not in PROFILES:
@@ -166,6 +169,7 @@ for item in expected:
    actual=base64.urlsafe_b64encode(hashlib.new(file.hash.mode,Path(d.locate_file(file)).read_bytes()).digest()).rstrip(b'=').decode()
    assert actual==file.hash.value, str(file)
 modules=['oida','akousma','akousmata_app','akouo_contract','listening_stack','listeningstackweb']
+if any(item['distribution']=='sonicfield-telar' for item in expected): modules.append('telar')
 if any(item['distribution']=='germ' for item in expected): modules.append('server.identity')
 for name in modules:
  m=importlib.import_module(name);assert prefix in Path(m.__file__).resolve().parents,name

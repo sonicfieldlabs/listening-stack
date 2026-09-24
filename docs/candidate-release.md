@@ -8,6 +8,20 @@ are unchanged; hashes distinguish these builds from published packages.
 
 ## Install and verify the candidate
 
+For the current Telar application use `compatibility_profile: "telar-local/v1"`.
+It retains the Phase 17 core versions and replaces only the former application
+distribution with `sonicfield-telar==0.4.0`. Historical profiles are unchanged.
+Exactly one application distribution is permitted; never co-install the legacy
+application wheel and Telar. The current Telar wheel already contains its import
+and command compatibility interfaces. Pin every wheel by its actual SHA-256,
+including the GERM build providing `/workspace/library/by-memory/{record_id}`.
+Version numbers alone do not distinguish local development builds.
+
+The installed-resource verifier accepts the new profile. The disconnected-process
+qualifier selects the canonical import/resource directory from the manifest's
+distribution identity, and still supports historical manifests. Neither check
+promotes a candidate or modifies published source pins.
+
 The local handoff archive contains the installer zipapp, a complete offline
 wheel directory and `manifest.json`. Use a new environment root:
 

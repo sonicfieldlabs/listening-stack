@@ -11,8 +11,8 @@ import json
 from pathlib import Path
 import subprocess
 
-OWNERS = ("listening-stack", "oida", "akouo", "earworm", "akousmata", "germ", "listeningstackweb")
-APPLICATIONS = {"sonicfield-listening-stack", "sonicfield-oida", "akouo-contract", "akousma", "akousmata", "germ", "listeningstackweb"}
+OWNERS = ("listening-stack", "oida", "akouo", "earworm", "akousmata", "germ", "telar")
+APPLICATIONS = {"sonicfield-listening-stack", "sonicfield-oida", "akouo-contract", "akousma", "akousmata", "germ", "sonicfield-telar"}
 
 
 def sha(data: bytes) -> str:

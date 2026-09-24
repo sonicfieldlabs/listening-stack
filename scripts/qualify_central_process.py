@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import http.client
 import json
 import os
@@ -30,23 +31,28 @@ def main():
     args = parser.parse_args()
     if not sys.flags.isolated or args.output.exists() or not args.output.is_absolute():
         parser.error("Candidate Python -I and fresh absolute output required")
-    import listeningstackweb
-    from listeningstackweb.runtime_identity import snapshot
-
-    root = Path(listeningstackweb.__file__).resolve().parent
-    if not root.is_relative_to(Path(sys.prefix).resolve()) or "site-packages" not in root.parts:
-        raise ValueError("Installed Central required")
     manifest_bytes = args.manifest.read_bytes()
     manifest = json.loads(manifest_bytes)
     if manifest.get("published") is not False:
         raise ValueError("Unpublished candidate required")
-    row = next(w for w in manifest["wheels"] if w["distribution"] == "listeningstackweb")
+    rows = [w for w in manifest["wheels"] if w["distribution"] in {"listeningstackweb", "sonicfield-telar"}]
+    if len(rows) != 1:
+        raise ValueError("Exactly one Central or Telar wheel required")
+    row = rows[0]
+    package = "telar" if row["distribution"] == "sonicfield-telar" else "listeningstackweb"
+    module = importlib.import_module(package)
+    snapshot = importlib.import_module(package + ".runtime_identity").snapshot
+    root = Path(module.__file__).resolve().parent
+    if not root.is_relative_to(Path(sys.prefix).resolve()) or "site-packages" not in root.parts:
+        raise ValueError("Installed Central required")
     wheel = args.manifest.parent / row["file"]
     if sha(wheel.read_bytes()) != row["sha256"]:
         raise ValueError("Wheel identity changed")
     with zipfile.ZipFile(wheel) as archive:
-        resources = {name.removeprefix("listeningstackweb/"): archive.read(name)
-                     for name in archive.namelist() if name.startswith("listeningstackweb/") and not name.endswith("/")}
+        resources = {name.removeprefix(package + "/"): archive.read(name)
+                     for name in archive.namelist() if name.startswith(package + "/") and not name.endswith("/")}
+    if not resources:
+        raise ValueError("Application resource inventory is empty")
 
     def verify_installed():
         for name, data in resources.items():
@@ -69,7 +75,7 @@ def main():
             report["starts"].append(record)
             log_path = args.output / f"central-{cycle}.log"
             with log_path.open("x") as log:
-                child = subprocess.Popen([sys.executable, "-I", "-m", "listeningstackweb.server", "--port", "0"],
+                child = subprocess.Popen([sys.executable, "-I", "-m", package + ".server", "--port", "0"],
                                          cwd=args.output, env=environment, stdout=log, stderr=subprocess.STDOUT)
                 record["pid"] = child.pid
                 try:
