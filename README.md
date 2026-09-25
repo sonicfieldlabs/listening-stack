@@ -324,10 +324,15 @@ a shared machine.
 See [local installation verification](docs/local-verification.md) for isolated
 core checks, bundled-schema verification and configuration rollback limits.
 
-The assistant uses only the Python standard library.
+The assistant uses only the Python standard library. The tests need more than the assistant does:
+- **Python 3.11 or later.** They use `datetime.UTC`.
+- **`src` on the path.** They import the package from `src/`.
+- **Oída importable.** `tests/test_situated_owner_qualification.py` imports it.
+
+A sibling Oída checkout's environment provides all three:
 
 ```bash
-python3 -m pytest tests -v
+PYTHONPATH=src ../oida/.venv/bin/python -m pytest tests -v
 python3 scripts/build_release.py
 ./dist/listening-stack.pyz models --json
 bash -n install.sh listening-stack
