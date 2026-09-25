@@ -11,7 +11,11 @@ are unchanged; hashes distinguish these builds from published packages.
 For the current Khipu application use `compatibility_profile: "khipu-local/v1"`: the same
 core versions with `sonicfield-khipu==0.5.0`, whose wheel also carries the `telar` and
 `listeningstackweb` import and command aliases. Khipu was named Telar until 25 September 2026;
-`telar-local/v1`, below, still admits a Telar wheel and is unchanged.
+`telar-local/v1`, below, still admits a Telar wheel and is unchanged. Since 25 September a
+Khipu wheel built from Khipu `34f1b56` or later also carries the Station page (`/station`), the
+Listening Station player that used to be a separate `SFL/station` checkout: nothing else is
+installed for it, and the profile does not change. A wheel built at Khipu `d54280e` was checked
+to contain the page's assets.
 
 For a Telar application wheel use `compatibility_profile: "telar-local/v1"`.
 It retains the Phase 17 core versions and replaces only the former application

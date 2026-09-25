@@ -375,4 +375,4 @@ The existing generation/listening settings are not migrated or replaced.
 See `../listeningstackweb/docs/model-ecology-p7.md` for the local environment,
 profile gates, artifact contract, evaluation limits and upstream sources.
 
-The local `centaur-phase9/v1` candidate pins Station 0.2.1, GERM 0.6.1 and installer 0.4.3. It includes Earworm 1.8 bundle restore with current forgetting-ledger preservation. See [candidate handback](docs/candidate-release.md); this candidate has not been published.
+For the current Khipu application, use the `khipu-local/v1` profile in the [candidate handback](docs/candidate-release.md); its wheel carries Khipu's Station page. The local `centaur-phase9/v1` candidate pins Station 0.2.1, GERM 0.6.1 and installer 0.4.3. It includes Earworm 1.8 bundle restore with current forgetting-ledger preservation. See [candidate handback](docs/candidate-release.md); this candidate has not been published.
