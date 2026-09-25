@@ -14,6 +14,8 @@ import sys
 
 APPLICATIONS = {"sonicfield-listening-stack", "sonicfield-oida", "akouo-contract", "akousma", "akousmata", "germ", "listeningstackweb"}
 TELAR_APPLICATIONS = (APPLICATIONS - {"listeningstackweb"}) | {"sonicfield-telar"}
+KHIPU_APPLICATIONS = (APPLICATIONS - {"listeningstackweb"}) | {"sonicfield-khipu"}
+PROFILE_APPLICATIONS = {"centaur-phase17/v1": APPLICATIONS, "telar-local/v1": TELAR_APPLICATIONS, "khipu-local/v1": KHIPU_APPLICATIONS}
 
 
 def digest(path):
@@ -23,9 +25,9 @@ def digest(path):
 def check(manifest: Path):
     value = json.loads(manifest.read_text())
     profile = value.get("compatibility_profile")
-    if value.get("published") is not False or profile not in {"centaur-phase17/v1", "telar-local/v1"}:
-        raise ValueError("Expected unpublished Phase 17 or Telar manifest")
-    applications = TELAR_APPLICATIONS if profile == "telar-local/v1" else APPLICATIONS
+    if value.get("published") is not False or profile not in PROFILE_APPLICATIONS:
+        raise ValueError("Expected unpublished Phase 17, Telar or Khipu manifest")
+    applications = PROFILE_APPLICATIONS[profile]
     resources = manifest.parent / "wheel-resources.json"
     if digest(resources) != value["wheel_resources_sha256"]:
         raise ValueError("Resource inventory changed")

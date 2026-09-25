@@ -8,7 +8,12 @@ are unchanged; hashes distinguish these builds from published packages.
 
 ## Install and verify the candidate
 
-For the current Telar application use `compatibility_profile: "telar-local/v1"`.
+For the current Khipu application use `compatibility_profile: "khipu-local/v1"`: the same
+core versions with `sonicfield-khipu==0.5.0`, whose wheel also carries the `telar` and
+`listeningstackweb` import and command aliases. Khipu was named Telar until 25 September 2026;
+`telar-local/v1`, below, still admits a Telar wheel and is unchanged.
+
+For a Telar application wheel use `compatibility_profile: "telar-local/v1"`.
 It retains the Phase 17 core versions and replaces only the former application
 distribution with `sonicfield-telar==0.4.0`. Historical profiles are unchanged.
 Exactly one application distribution is permitted; never co-install the legacy

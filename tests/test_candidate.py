@@ -8,10 +8,32 @@ import zipfile
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from listening_stack.candidate import verify, install, CONTRACT, PHASE5, PHASE7, PHASE9, PHASE17, TELAR
+from listening_stack.candidate import verify, install, CONTRACT, PHASE5, PHASE7, PHASE9, PHASE17, TELAR, KHIPU
 
 
 class CandidateTests(unittest.TestCase):
+    def test_khipu_profile_admits_the_renamed_wheel_and_refuses_it_beside_telar(self):
+        self.assertEqual(KHIPU["sonicfield-khipu"], "0.5.0")
+        self.assertNotIn("sonicfield-telar", KHIPU)
+        self.assertEqual({k: v for k, v in KHIPU.items() if k != "sonicfield-khipu"},
+                         {k: v for k, v in TELAR.items() if k != "sonicfield-telar"})
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            wheels = []
+            for name, version in [*KHIPU.items(), ("sonicfield-telar", "0.4.0")]:
+                path = root / (name.replace("-", "_") + "-" + version + "-py3-none-any.whl")
+                with zipfile.ZipFile(path, "w") as archive:
+                    archive.writestr(name + ".dist-info/METADATA", f"Name: {name}\nVersion: {version}\n")
+                wheels.append(dict(file=path.name, distribution=name, version=version, sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
+            manifest = root / "manifest.json"
+            value = dict(contract=CONTRACT, published=False, compatibility_profile="khipu-local/v1", wheels=wheels[:-1])
+            manifest.write_text(json.dumps(value))
+            self.assertEqual(verify(manifest)["compatibility_profile"], "khipu-local/v1")
+            value["wheels"] = wheels
+            manifest.write_text(json.dumps(value))
+            with self.assertRaisesRegex(ValueError, "exactly one"):
+                verify(manifest)
+
     def test_telar_profile_preserves_legacy_and_refuses_mixed_applications(self):
         self.assertIn("listeningstackweb", PHASE17)
         self.assertNotIn("listeningstackweb", TELAR)

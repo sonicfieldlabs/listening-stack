@@ -35,11 +35,12 @@ def main():
     manifest = json.loads(manifest_bytes)
     if manifest.get("published") is not False:
         raise ValueError("Unpublished candidate required")
-    rows = [w for w in manifest["wheels"] if w["distribution"] in {"listeningstackweb", "sonicfield-telar"}]
+    packages = {"sonicfield-khipu": "khipu", "sonicfield-telar": "telar", "listeningstackweb": "listeningstackweb"}
+    rows = [w for w in manifest["wheels"] if w["distribution"] in packages]
     if len(rows) != 1:
-        raise ValueError("Exactly one Central or Telar wheel required")
+        raise ValueError("Exactly one Khipu, Telar or Central wheel required")
     row = rows[0]
-    package = "telar" if row["distribution"] == "sonicfield-telar" else "listeningstackweb"
+    package = packages[row["distribution"]]
     module = importlib.import_module(package)
     snapshot = importlib.import_module(package + ".runtime_identity").snapshot
     root = Path(module.__file__).resolve().parent
