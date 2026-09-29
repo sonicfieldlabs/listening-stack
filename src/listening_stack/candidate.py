@@ -36,9 +36,12 @@ TELAR["sonicfield-telar"] = "0.4.0"
 # sonicfield-khipu, whose wheel also carries the telar and listeningstackweb aliases.
 KHIPU = {name: version for name, version in TELAR.items() if name != "sonicfield-telar"}
 KHIPU["sonicfield-khipu"] = "0.5.0"
+# Additive safety candidate; historical profiles keep their exact old versions.
+KHIPU_SAFETY = {**KHIPU, "akousma": "0.8.3", "akousmata": "0.8.2"}
 APPLICATION_WHEELS = {"listeningstackweb", "sonicfield-telar", "sonicfield-khipu"}
 PROFILES = {"centaur-phase5/v1": PHASE5, "centaur-phase7/v1": PHASE7, "centaur-phase9/v1": PHASE9,
-            "centaur-phase17/v1": PHASE17, "telar-local/v1": TELAR, "khipu-local/v1": KHIPU}
+            "centaur-phase17/v1": PHASE17, "telar-local/v1": TELAR, "khipu-local/v1": KHIPU,
+            "khipu-safety/v1": KHIPU_SAFETY}
 
 
 def digest(path):

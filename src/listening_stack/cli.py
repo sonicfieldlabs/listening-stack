@@ -30,6 +30,7 @@ from .catalog import (
 )
 from .doctor import run_doctor
 from .installer import ALLOWED_INTEGRATIONS, Installer, Selection, load_state
+from .integration_catalog import select_integrations, supported_integrations
 from .runtime import start as start_runtime
 from .runtime import status as runtime_status
 from .runtime import stop as stop_runtime
@@ -123,7 +124,7 @@ def build_parser() -> argparse.ArgumentParser:
         "integrate", help="Install Oída adapters for selected agent hosts."
     )
     integrate.add_argument(
-        "targets", nargs="+", choices=list(ALLOWED_INTEGRATIONS) + ["all"]
+        "targets", nargs="+", help="Adapters supported by the installed compatibility pin, or all."
     )
     integrate.add_argument("--root", type=Path, default=DEFAULT_ROOT)
     integrate.add_argument("--dry-run", action="store_true")
@@ -219,20 +220,18 @@ def _install(args: argparse.Namespace) -> None:
                 "\nGERM will use the Python provider. Small models can run on CPU; Medium expects CUDA upstream."
             )
 
-    integrations = _flatten(args.integration)
-    if "all" in integrations:
-        integrations = list(ALLOWED_INTEGRATIONS)
+    integrations = select_integrations(_flatten(args.integration), component)
     if profile_includes(component, "oida") and not integrations and interactive:
         integrations = _choose_many(
             "Optional Oída agent integrations (press Enter for none)",
-            [
+            [item for item in [
                 ("hermes", "Hermes"),
                 ("codex", "Codex"),
                 ("claude", "Claude"),
                 ("openclaw", "OpenClaw"),
                 ("opencode", "OpenCode"),
                 ("pi", "Pi"),
-            ],
+            ] if item[0] in supported_integrations(component)],
         )
     invalid_integrations = [
         item for item in integrations if item not in ALLOWED_INTEGRATIONS
@@ -564,11 +563,7 @@ def _integrate(args: argparse.Namespace) -> None:
     profile = normalize_profile(str(state.get("profile") or state.get("component")))
     if not profile_includes(profile, "oida"):
         raise ValueError("This installation does not include Oída")
-    targets = (
-        list(ALLOWED_INTEGRATIONS)
-        if "all" in args.targets
-        else list(dict.fromkeys(args.targets))
-    )
+    targets = select_integrations(args.targets, profile, revision=state["commits"].get("oida", ""))
     environment = {
         str(key): str(value) for key, value in dict(state["environment"]).items()
     }

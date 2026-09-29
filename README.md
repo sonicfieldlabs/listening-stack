@@ -324,19 +324,35 @@ a shared machine.
 See [local installation verification](docs/local-verification.md) for isolated
 core checks, bundled-schema verification and configuration rollback limits.
 
-The assistant uses only the Python standard library. The tests need more than the assistant does:
-- **Python 3.11 or later.** They use `datetime.UTC`.
-- **`src` on the path.** They import the package from `src/`.
-- **Oída importable.** `tests/test_situated_owner_qualification.py` imports it.
+The assistant uses only the Python standard library. Tests are split into a
+unit environment with `.[test]` and an owner environment with `.[owner-test]`.
+Use Python 3.11+; CI exercises 3.11, 3.12 and 3.13, and the GERM interpreter
+verification cases execute on 3.12. No sibling environment is required.
 
-A sibling Oída checkout's environment provides all three:
+In a fresh unit virtual environment:
 
 ```bash
-PYTHONPATH=src ../oida/.venv/bin/python -m pytest tests -v
-python3 scripts/build_release.py
+python -m pip install '.[test]'
+python -I scripts/check_tests.py unit --junitxml /tmp/installer-unit.xml
+python scripts/build_release.py
 ./dist/listening-stack.pyz models --json
 bash -n install.sh listening-stack
 ```
+
+In a separate fresh owner-test virtual environment:
+
+```bash
+shasum -a 256 -c vendor/SHA256SUMS
+python -m pip install --find-links vendor '.[owner-test]'
+python -I scripts/check_tests.py owners --junitxml /tmp/installer-owners.xml
+```
+
+The owner test wheels are explicitly unpublished fixtures; they do not change
+the public installer pins. Managed adapter availability follows the selected
+Oída revision: the pinned 0.10.0 supports Hermes, Codex, Claude, OpenClaw and
+OpenCode. Pi belongs to newer Oída candidates and is refused by this managed
+profile before installation changes. `all` expands only to supported adapters.
+The release workflow reuses the complete CI workflow before publishing.
 
 Use a dry run to inspect installation commands without changing the machine:
 

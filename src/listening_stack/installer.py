@@ -31,6 +31,7 @@ from .catalog import (
 )
 from .system import Runner, executable, is_apple_silicon
 from .verification import core_probe_command, germ_probe_command
+from .integration_catalog import select_integrations, supported_integrations
 
 
 STATE_DIRECTORY = ".listening-stack"
@@ -41,7 +42,7 @@ STATE_CONTRACT = "listening-stack/state/v2"
 UV_VERSION = "0.11.29"
 UV_INSTALLER_SHA256 = "504a79fd2ed0dcd47e7f04f0792cfd0871f62e24a7fe40fa8ae0f563a369f2bd"
 HF_CLI_VERSION = "1.23.0"
-ALLOWED_INTEGRATIONS = ("hermes", "codex", "claude", "openclaw", "opencode", "pi")
+ALLOWED_INTEGRATIONS = supported_integrations()
 
 
 @dataclass
@@ -195,6 +196,8 @@ class Installer:
         return self._write_state(environment)
 
     def _validate_selection(self) -> None:
+        # Refuse unsupported adapters before root creation or any install command.
+        select_integrations(self.selection.integrations, self.profile)
         self._validate_root()
         normalize_profile(self.selection.component)
         if self.selection.provider not in {"auto", "mlx", "python", "mock"}:

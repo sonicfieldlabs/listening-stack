@@ -15,7 +15,8 @@ import sys
 APPLICATIONS = {"sonicfield-listening-stack", "sonicfield-oida", "akouo-contract", "akousma", "akousmata", "germ", "listeningstackweb"}
 TELAR_APPLICATIONS = (APPLICATIONS - {"listeningstackweb"}) | {"sonicfield-telar"}
 KHIPU_APPLICATIONS = (APPLICATIONS - {"listeningstackweb"}) | {"sonicfield-khipu"}
-PROFILE_APPLICATIONS = {"centaur-phase17/v1": APPLICATIONS, "telar-local/v1": TELAR_APPLICATIONS, "khipu-local/v1": KHIPU_APPLICATIONS}
+PROFILE_APPLICATIONS = {"centaur-phase17/v1": APPLICATIONS, "telar-local/v1": TELAR_APPLICATIONS, "khipu-local/v1": KHIPU_APPLICATIONS,
+                        "khipu-safety/v1": KHIPU_APPLICATIONS}
 
 
 def digest(path):

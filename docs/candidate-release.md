@@ -8,6 +8,14 @@ are unchanged; hashes distinguish these builds from published packages.
 
 ## Install and verify the candidate
 
+Phase 1 adds `compatibility_profile: "khipu-safety/v1"` for the reviewed
+26 September candidate. It preserves the `khipu-local/v1` application versions
+and requires `akousma==0.8.3` plus `akousmata==0.8.2`. AKOÚŌ 0.10.0 is now also
+a core Akousmata runtime dependency. The new profile is additive: every older
+profile and the public source installer pins remain unchanged. Use exact wheel
+hashes, isolated installations and the installed-resource verifier; the profile
+name alone does not qualify model inference or authorize publication.
+
 For the current Khipu application use `compatibility_profile: "khipu-local/v1"`: the same
 core versions with `sonicfield-khipu==0.5.0`, whose wheel also carries the `telar` and
 `listeningstackweb` import and command aliases. Khipu was named Telar until 25 September 2026;

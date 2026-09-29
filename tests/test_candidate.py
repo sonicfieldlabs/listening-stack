@@ -8,10 +8,37 @@ import zipfile
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from listening_stack.candidate import verify, install, CONTRACT, PHASE5, PHASE7, PHASE9, PHASE17, TELAR, KHIPU
+from listening_stack.candidate import verify, install, CONTRACT, PHASE5, PHASE7, PHASE9, PHASE17, TELAR, KHIPU, KHIPU_SAFETY
 
 
 class CandidateTests(unittest.TestCase):
+    def test_safety_profile_refuses_old_dependency_versions_without_changing_history(self):
+        self.assertEqual(KHIPU["akousma"], "0.8.1")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            wheels = []
+            for name, version in KHIPU_SAFETY.items():
+                path = root / (name.replace("-", "_") + "-" + version + "-py3-none-any.whl")
+                with zipfile.ZipFile(path, "w") as archive:
+                    archive.writestr(name + ".dist-info/METADATA", f"Name: {name}\nVersion: {version}\n")
+                wheels.append(dict(file=path.name, distribution=name, version=version, sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
+            value = dict(contract=CONTRACT, published=False, compatibility_profile="khipu-safety/v1", wheels=wheels)
+            manifest = root / "manifest.json"
+            manifest.write_text(json.dumps(value))
+            verify(manifest)
+            value["compatibility_profile"] = "khipu-local/v1"
+            manifest.write_text(json.dumps(value))
+            with self.assertRaisesRegex(ValueError, "exact declared"):
+                verify(manifest)
+            value["compatibility_profile"] = "khipu-safety/v1"
+            wheel = next(item for item in wheels if item["distribution"] == "akousma")
+            with zipfile.ZipFile(root / wheel["file"], "w") as archive:
+                archive.writestr("akousma.dist-info/METADATA", "Name: akousma\nVersion: 0.8.1\n")
+            wheel.update(version="0.8.1", sha256=hashlib.sha256((root / wheel["file"]).read_bytes()).hexdigest())
+            manifest.write_text(json.dumps(value))
+            with self.assertRaisesRegex(ValueError, "exact declared"):
+                verify(manifest)
+
     def test_khipu_profile_admits_the_renamed_wheel_and_refuses_it_beside_telar(self):
         self.assertEqual(KHIPU["sonicfield-khipu"], "0.5.0")
         self.assertNotIn("sonicfield-telar", KHIPU)

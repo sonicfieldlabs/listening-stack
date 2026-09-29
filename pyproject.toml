@@ -25,6 +25,19 @@ classifiers = [
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
+owner-test = [
+  "pytest>=8",
+  "sonicfield-oida==0.11.1",
+  "akousma==0.8.3",
+  "akousmata==0.8.2",
+  "akouo-contract==0.10.0",
+]
+
+[tool.uv.sources]
+sonicfield-oida = { path = "vendor/sonicfield_oida-0.11.1-py3-none-any.whl" }
+akousma = { path = "vendor/akousma-0.8.3-py3-none-any.whl" }
+akousmata = { path = "vendor/akousmata-0.8.2-py3-none-any.whl" }
+akouo-contract = { path = "vendor/akouo_contract-0.10.0-py3-none-any.whl" }
 
 [project.urls]
 Homepage = "https://sonicfield.org/stack"

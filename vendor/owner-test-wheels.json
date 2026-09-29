@@ -1,0 +1,31 @@
+{
+  "purpose": "Unpublished Phase 2 owner integration fixtures; not public installer release pins",
+  "wheels": [
+    {
+      "file": "akouo_contract-0.10.0-py3-none-any.whl",
+      "distribution": "akouo-contract",
+      "version": "0.10.0",
+      "sha256": "36c45fa83473744b5e3e55a914238e2aa55b9de4fae74f3a546b20994c2f2993"
+    },
+    {
+      "file": "akousma-0.8.3-py3-none-any.whl",
+      "distribution": "akousma",
+      "version": "0.8.3",
+      "sha256": "cd1349b6cb15ead974416e626d19555ef79f3482df24441dd53156fa479f07f0"
+    },
+    {
+      "file": "akousmata-0.8.2-py3-none-any.whl",
+      "distribution": "akousmata",
+      "version": "0.8.2",
+      "sha256": "fc5a39968904903a408dbeccc2caf47123e789c670d348dc5e0f943d151dc22e"
+    },
+    {
+      "file": "sonicfield_oida-0.11.1-py3-none-any.whl",
+      "distribution": "sonicfield-oida",
+      "version": "0.11.1",
+      "sha256": "c78f69b37632f1b9f10c92bdc45e8ff32d2cb13df425fc129c805b658a6489a9"
+    }
+  ],
+  "compatibility_basis": "khipu-safety/v1",
+  "oida_metadata_review": "Phase 2 adds the AnyIO security minimum; Phase 1 candidate artifacts remain immutable."
+}
