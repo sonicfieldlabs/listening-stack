@@ -40,16 +40,17 @@
     {
       "distribution": "sonicfield-oida",
       "version": "0.11.2",
-      "sha256": "f6c55cc6126454a373032a08da56214a0a926036b583f2e982fe4e33447f913a",
+      "sha256": "b9ea9fcf72bd81bd9b14ded00dd942d55ad661058542015949caa3d106614ba8",
       "source_repository": "oida",
       "base_commit": "c595c22e373589c6d0ef244f7d8f38af6b2c30dd",
-      "build_state": "Uncommitted sanitized candidate; inherited public base is not complete source identity.",
-      "source_changes_sha256": "fe84e151214eaf9aeedc9e00309c12e49eb480971d90caaa88bf88803c1900d5",
+      "build_state": "Reviewed source candidate committed for release-branch validation.",
+      "source_changes_sha256": "07ca24901a7be98eaca74f45953aa0d00ba0ef49a69e29853b9cce8f9e9fa37d",
       "source_changes_basis": "SHA256 of compact sorted JSON mapping explicit source-distribution inputs to file SHA256; excludes generated PKG-INFO.",
       "published": false,
-      "file": "sonicfield_oida-0.11.2-py3-none-any.whl"
+      "file": "sonicfield_oida-0.11.2-py3-none-any.whl",
+      "source_commit": "06651bedb6dc778f10526a3b3c886efd3a8f9605"
     }
   ],
   "compatibility_basis": "listening-stack-owner-contracts/v1",
-  "oida_metadata_review": "Current owner source digests and immutable Phase 4 artifact hashes; no publication claim."
+  "oida_metadata_review": "Current committed Oida candidate includes bounded error responses and strict receipt identifiers; package publication remains separate."
 }

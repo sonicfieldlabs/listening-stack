@@ -1252,7 +1252,7 @@ dependencies = [
     { name = "uvicorn", extra = ["standard"], marker = "python_full_version >= '3.12'" },
 ]
 wheels = [
-    { filename = "sonicfield_oida-0.11.2-py3-none-any.whl", hash = "sha256:f6c55cc6126454a373032a08da56214a0a926036b583f2e982fe4e33447f913a" },
+    { filename = "sonicfield_oida-0.11.2-py3-none-any.whl", hash = "sha256:b9ea9fcf72bd81bd9b14ded00dd942d55ad661058542015949caa3d106614ba8" },
 ]
 
 [package.metadata]
