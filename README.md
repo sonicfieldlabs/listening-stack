@@ -19,7 +19,7 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer release: `0.4.1`.
+Current installer candidate: `0.4.4` (unpublished).
 
 ## Quick Start
 
@@ -321,14 +321,39 @@ a shared machine.
 
 ## Development
 
-The assistant uses only the Python standard library.
+See [local installation verification](docs/local-verification.md) for isolated
+core checks, bundled-schema verification and configuration rollback limits.
+
+The assistant uses only the Python standard library. Tests are split into a
+unit environment with `.[test]` and an owner environment with `.[owner-test]`.
+Use Python 3.11+; CI exercises 3.11, 3.12 and 3.13, and the GERM interpreter
+verification cases execute on 3.12. No sibling environment is required.
+
+In a fresh unit virtual environment:
 
 ```bash
-python3 -m unittest discover -s tests -v
-python3 scripts/build_release.py
+python -m pip install '.[test]'
+python -I scripts/check_tests.py unit --junitxml /tmp/installer-unit.xml
+python scripts/build_release.py
 ./dist/listening-stack.pyz models --json
 bash -n install.sh listening-stack
 ```
+
+In a separate fresh owner-test virtual environment using Python 3.12 or newer
+(the bundled Oída owner package requires 3.12):
+
+```bash
+shasum -a 256 -c vendor/SHA256SUMS
+python -m pip install --find-links vendor '.[owner-test]'
+python -I scripts/check_tests.py owners --junitxml /tmp/installer-owners.xml
+```
+
+The owner test wheels are explicitly unpublished fixtures; they do not change
+the public installer pins. Managed adapter availability follows the selected
+Oída revision: the pinned 0.10.0 supports Hermes, Codex, Claude, OpenClaw and
+OpenCode. Pi belongs to newer Oída candidates and is refused by this managed
+profile before installation changes. `all` expands only to supported adapters.
+The release workflow reuses the complete CI workflow before publishing.
 
 Use a dry run to inspect installation commands without changing the machine:
 
@@ -338,9 +363,36 @@ Use a dry run to inspect installation commands without changing the machine:
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md),
-[ROADMAP.md](ROADMAP.md), and [CITATION.cff](CITATION.cff).
+[CITATION.cff](CITATION.cff).
 
 ## License
 
 The installer source is licensed under Apache-2.0. Installed repositories,
 models, datasets, inputs, and outputs retain their own licenses and terms.
+
+D5 local integration: [memory-restore](docs/memory-restore.md). Unreleased; no automatic publication.
+
+Local development setup: [checksum-pinned offline candidate, component ownership and rollback](docs/candidate-release.md).
+Published release pins remain unchanged; uncommitted builds use a separate candidate manifest.
+
+### Optional native spectral workers
+
+`python -m listening_stack.spectral --python /isolated/venv/bin/python
+--worker /checkout/oida/oida/spectral_worker.py --destination /local/spectral-workers.json`
+qualifies a separately provisioned Python 3.12 environment with NumPy 1.26.4,
+SciPy 1.14.1, NSGT 0.19 and Kymatio 0.3.0. Install NumPy, setuptools and wheel
+before NSGT, using `--no-build-isolation` for NSGT. Qualification applies a
+source-hash-guarded integer-window compatibility fix to NSGT and records it.
+The manifest binds code, interpreter, libraries, notices and synthetic results.
+Set `OIDA_SPECTRAL_WORKERS_CONFIG` only to enable a qualified deployment; default
+installation and published core pins do not enable these optional workers.
+
+### Evaluated research instruments
+
+The optional P7 admission helper, `python -m listening_stack.research`, provisions
+an already downloaded and evaluated IIL guitar RAVE export and Basic Pitch ONNX.
+It requires `--root`, `--germ` and `--evaluation` paths, verifies the exact worker,
+checkpoint, runtime and evaluation evidence, and writes `deployments.json`.
+The existing generation/listening settings are not migrated or replaced.
+The helper requires independently reviewed evaluation and license evidence.
+It does not enable a research instrument in the default installation.

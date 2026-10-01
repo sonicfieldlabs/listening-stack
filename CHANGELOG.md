@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+- Prepare installer 0.4.4 with separate unpublished core/full wheel profiles.
+  Verify every wheel before creating an environment and compare installed owner
+  bytes directly with pinned archives in an isolated store configuration.
+- Preflight every selected source owner before snapshotting. Assemble candidates
+  without editorial workspaces or private application dependencies.
+- Allow the refreshed owner-test wheel filenames in Git. Keep the published
+  repository revisions, contract matrix and managed adapter selection unchanged.
+- Install the pinned core as built packages so AKOÚŌ's bundled schemas are
+  available to Oída. Lifecycle and integration commands preserve the verified
+  environment with `uv run --no-sync`.
+- Share an isolated import, package-origin, version and selected-path probe
+  between installation and doctor. Reject borrowed development imports, missing
+  schema resources and store paths redirected outside the installation.
+- Accept compatible schema contract enums while rejecting conflicting constraints.
+- Document local core verification, configuration migration/rollback limits and
+  remaining host/profile evidence. Release versions and source pins are unchanged.
+
 ## 0.4.1 — 2026-08-11
 
 - Advance the optional GERM source to 0.5.0 at its exact public release commit

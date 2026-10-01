@@ -32,7 +32,7 @@ class ReleaseTests(unittest.TestCase):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn('version = "%s"' % __version__, pyproject)
         self.assertIn("version: %s" % __version__, citation)
-        self.assertIn("Current installer release: `%s`" % __version__, readme)
+        self.assertIn("Current installer candidate: `%s`" % __version__, readme)
 
     def test_archive_is_reproducible_across_source_mtime_changes(self):
         builder = load_builder()
