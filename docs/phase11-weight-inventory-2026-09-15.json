@@ -1,0 +1,172 @@
+{
+  "scope": "Selected roots only; suffix-filtered weight artifacts; no license admission or model execution. Blob directories omitted; snapshot file symlinks included without traversing directory symlinks.",
+  "content_hashing": true,
+  "roots": [
+    "ace",
+    "hub",
+    "managed-models",
+    "research",
+    "specialists"
+  ],
+  "files": [
+    {
+      "ref": "hub/models--mlx-community--whisper-large-v3-turbo/snapshots/a4aaeec0636e6fef84abdcbe3544cb2bf7e9f6fb/weights.safetensors",
+      "status": "content_hashed",
+      "bytes": 1613977612,
+      "symlink": true,
+      "content_sha256": "951ed3fc1203e6a62467abb2144a96ce7eafca8fa77e3704fdb8635ff3e7f8a6"
+    },
+    {
+      "ref": "hub/models--mlx-community--whisper-small.en-mlx/snapshots/52a88bf6e98b114a210c21bb83e22d6e1505cb73/weights.npz",
+      "status": "content_hashed",
+      "bytes": 481306200,
+      "symlink": true,
+      "content_sha256": "1bb29b030aca711a035f7a084a0eefac6251ecc2bdd356fa748858fbad082f5a"
+    },
+    {
+      "ref": "hub/models--sentence-transformers--all-MiniLM-L6-v2/snapshots/c9745ed1d9f207416be6d2e6f8de32d1f16199bf/model.safetensors",
+      "status": "content_hashed",
+      "bytes": 90868376,
+      "symlink": true,
+      "content_sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db"
+    },
+    {
+      "ref": "hub/models--stabilityai--stable-audio-3-optimized/snapshots/62164ab66e497577779a0036f082412e8de688d2/MLX/dit_medium_f16.npz",
+      "status": "content_hashed",
+      "bytes": 2907300946,
+      "symlink": true,
+      "content_sha256": "f9e5647ea3225818657d47d47ae4b34afa29c0568206ca89566c1a758944a38e"
+    },
+    {
+      "ref": "hub/models--stabilityai--stable-audio-3-optimized/snapshots/62164ab66e497577779a0036f082412e8de688d2/MLX/dit_sm-music_f16.npz",
+      "status": "content_hashed",
+      "bytes": 919193814,
+      "symlink": true,
+      "content_sha256": "8ed3f38e2597f361ee675051f1265d9aa2ae2fffce1c61acd2e9fe31e1db1cbc"
+    },
+    {
+      "ref": "hub/models--stabilityai--stable-audio-3-optimized/snapshots/62164ab66e497577779a0036f082412e8de688d2/MLX/dit_sm-sfx_f16.npz",
+      "status": "content_hashed",
+      "bytes": 919193814,
+      "symlink": true,
+      "content_sha256": "7e702d2640699a57fe436ca975fda16832040ba568c1e092c2ae826987558118"
+    },
+    {
+      "ref": "hub/models--stabilityai--stable-audio-3-optimized/snapshots/62164ab66e497577779a0036f082412e8de688d2/MLX/same_l_decoder_f32.npz",
+      "status": "content_hashed",
+      "bytes": 1704311976,
+      "symlink": true,
+      "content_sha256": "84924be2122d3a20fce443f40b782d9cd88e8e73707476326003ac47659a2287"
+    },
+    {
+      "ref": "hub/models--stabilityai--stable-audio-3-optimized/snapshots/62164ab66e497577779a0036f082412e8de688d2/MLX/same_l_encoder_f32.npz",
+      "status": "content_hashed",
+      "bytes": 1704313504,
+      "symlink": true,
+      "content_sha256": "c5caafc6bd29fc3d4cb7a08b0d3725041fa2100711f86a4f05d2638c532871d2"
+    },
+    {
+      "ref": "hub/models--stabilityai--stable-audio-3-optimized/snapshots/62164ab66e497577779a0036f082412e8de688d2/MLX/same_s_decoder_f32.npz",
+      "status": "content_hashed",
+      "bytes": 218090820,
+      "symlink": true,
+      "content_sha256": "909928a8e6937c1ebe6ac4b729f0462bd3773704a11ea18278e42671dc69bfe4"
+    },
+    {
+      "ref": "hub/models--stabilityai--stable-audio-3-optimized/snapshots/62164ab66e497577779a0036f082412e8de688d2/MLX/same_s_encoder_f32.npz",
+      "status": "content_hashed",
+      "bytes": 214946620,
+      "symlink": true,
+      "content_sha256": "a48f80d81c30d74c45e2a3047082c4891f715e24c44645adb9c1f4f07afdaf0c"
+    },
+    {
+      "ref": "hub/models--stabilityai--stable-audio-3-optimized/snapshots/62164ab66e497577779a0036f082412e8de688d2/MLX/t5gemma_f16.npz",
+      "status": "content_hashed",
+      "bytes": 567443068,
+      "symlink": true,
+      "content_sha256": "8deb20489f36d9aec539f26c9c67321f99bc5fe300d470435ed6e76be4f16bbd"
+    },
+    {
+      "ref": "managed-models/MOSS-Audio-4B-Instruct/model-00001-of-00003.safetensors",
+      "status": "content_hashed",
+      "bytes": 4993537896,
+      "symlink": false,
+      "content_sha256": "a87bddad846a58affb7a737d70c9cb01a41225887b0b25048fc1b543ecaba110"
+    },
+    {
+      "ref": "managed-models/MOSS-Audio-4B-Instruct/model-00002-of-00003.safetensors",
+      "status": "content_hashed",
+      "bytes": 4674299440,
+      "symlink": false,
+      "content_sha256": "1a25d9dec4fd4336bc5197c336733d2874f00e51569ac9c0042460d4579ded77"
+    },
+    {
+      "ref": "managed-models/MOSS-Audio-4B-Instruct/model-00003-of-00003.safetensors",
+      "status": "content_hashed",
+      "bytes": 777912448,
+      "symlink": false,
+      "content_sha256": "09ec9f23bdf35a0e7668d94276b8808bc40b05cf5a594508264fa5883c0057d0"
+    },
+    {
+      "ref": "ace/Qwen3-Embedding-0.6B/model.safetensors",
+      "status": "content_hashed",
+      "bytes": 1191586416,
+      "symlink": false,
+      "content_sha256": "0437e45c94563b09e13cb7a64478fc406947a93cb34a7e05870fc8dcd48e23fd"
+    },
+    {
+      "ref": "ace/acestep-v15-turbo/model.safetensors",
+      "status": "content_hashed",
+      "bytes": 4787825604,
+      "symlink": false,
+      "content_sha256": "3f6e0797fad420a39bd33979eb6e840e30989e34a3794e843d23b60ec6e422d7"
+    },
+    {
+      "ref": "ace/acestep-v15-turbo/silence_latent.pt",
+      "status": "content_hashed",
+      "bytes": 3841215,
+      "symlink": false,
+      "content_sha256": "a778e9dd942f5e8b2c09c55370782d318834432b03dabbcdf70e6ed49ad6358b"
+    },
+    {
+      "ref": "ace/vae/diffusion_pytorch_model.safetensors",
+      "status": "content_hashed",
+      "bytes": 337431388,
+      "symlink": false,
+      "content_sha256": "da17edb604c40deaf09e9b24974e590d1ca83a374070e5d0884cfa4bed9a99b0"
+    },
+    {
+      "ref": "research/guitar_iil_b2048_r48000_z16.ts",
+      "status": "content_hashed",
+      "bytes": 163881670,
+      "symlink": false,
+      "content_sha256": "02458214e23890d6818504319a5b9903eabfe87a524491f6524f453e7f3dbcf0"
+    },
+    {
+      "ref": "research/percussion.ts",
+      "status": "content_hashed",
+      "bytes": 71097032,
+      "symlink": false,
+      "content_sha256": "12e044fa4cf0f461fa78dc5e108253d5ffaa395604a66aa43e3a9c3967dee0f9"
+    },
+    {
+      "ref": "specialists/mn04_as.pt",
+      "status": "content_hashed",
+      "bytes": 4066513,
+      "symlink": false,
+      "content_sha256": "899a8c6217063f6941793102a2780b3dd788ab11fce468d9cf5f0577c453321c"
+    },
+    {
+      "ref": "specialists/small0.ckpt",
+      "status": "content_hashed",
+      "bytes": 8451101,
+      "symlink": false,
+      "content_sha256": "6074be2c4d490c5f6101fcc374a1ec72ae93456e23bb6019783b849f5dc7d47b"
+    }
+  ],
+  "same_file_aliases": [],
+  "same_name_size_candidates": [],
+  "same_content_sha256": {},
+  "deletion_authorized": false,
+  "note": "Same-name/size is only a candidate relation. Content hashes establish byte equality, not license or safe deletion; deployment-reference review remains required."
+}

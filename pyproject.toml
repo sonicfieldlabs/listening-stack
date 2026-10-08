@@ -1,6 +1,6 @@
 [project]
 name = "sonicfield-listening-stack"
-version = "0.4.4"
+version = "0.5.0"
 description = "Reproducible installer and runtime verifier for the accountable listening core and optional GERM."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -27,14 +27,14 @@ classifiers = [
 test = ["pytest>=8"]
 owner-test = [
   "pytest>=8",
-  "sonicfield-oida==0.11.2; python_version >= '3.12'",
+  "sonicfield-oida==0.12.0; python_version >= '3.12'",
   "akousma==0.8.4",
   "akousmata==0.8.3",
   "akouo-contract==0.10.1",
 ]
 
 [tool.uv.sources]
-sonicfield-oida = { path = "vendor/sonicfield_oida-0.11.2-py3-none-any.whl" }
+sonicfield-oida = { path = "vendor/sonicfield_oida-0.12.0-py3-none-any.whl" }
 akousma = { path = "vendor/akousma-0.8.4-py3-none-any.whl" }
 akousmata = { path = "vendor/akousmata-0.8.3-py3-none-any.whl" }
 akouo-contract = { path = "vendor/akouo_contract-0.10.1-py3-none-any.whl" }

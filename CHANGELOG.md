@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0 — 2026-10-08
+
+- Assemble the repaired owner cohort with source-bound wheel identities. Preserve immutable public installer pins until their actual merge commits are available.
+- Source release only; no package registry publication or service activation.
+
 ## Unreleased
 
 - Prepare installer 0.4.4 with separate unpublished core/full wheel profiles.

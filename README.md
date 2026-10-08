@@ -19,7 +19,7 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer candidate: `0.4.4` (unpublished).
+Current installer candidate: `0.5.0` (unpublished).
 
 ## Quick Start
 
@@ -189,7 +189,7 @@ runtime paths, and attribution guidance.
 - A Hugging Face account only for gated Stable Audio 3 weights.
 
 When `uv` is absent, the assistant downloads the checksum-pinned official
-installer for tested `uv` 0.11.29 without modifying shell startup files. A
+installer for tested `uv` 0.12.09 without modifying shell startup files. A
 pinned Hugging Face CLI is installed inside the selected Listening Stack root,
 not into the host's global tool directory.
 
