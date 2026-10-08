@@ -1,134 +1,79 @@
-#!/usr/bin/env python3
-"""Package the explicitly selected offline wheels and cached journal handoff."""
+"""Assemble an unpublished offline public wheel bundle with source identities."""
+from __future__ import annotations
 
 import argparse
-from email.parser import BytesParser
-import hashlib
 import json
 from pathlib import Path
-import platform
-import re
 import shutil
 import sys
-import zipfile
+import tempfile
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src"))
-from listening_stack.candidate import CONTRACT, verify  # noqa: E402
-from build_release import build_archive  # noqa: E402
-
-
-def sha(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from listening_stack.candidate import CONTRACT, PROFILES, digest, verify, verify_value, wheel_identity
+from prepare_local_candidate import OWNERS
 
 
-def main():
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--wheel-dir", type=Path, required=True)
-    p.add_argument("--static-dir", type=Path, required=True)
-    p.add_argument("--editorial-dir", type=Path, required=True)
-    p.add_argument("--source-inventory", type=Path, required=True)
-    p.add_argument("--output", type=Path, required=True)
-    args = p.parse_args()
-    out = args.output.resolve()
-    if out.exists():
-        raise ValueError("Choose a new output directory")
-    out.mkdir(parents=True)
-    (out / "wheels").mkdir()
+def build(wheel_dir, output, profile, source_inventory):
+    wheel_dir, output = Path(wheel_dir).resolve(), Path(output).absolute()
+    if output.exists() or output.is_symlink():
+        raise ValueError("Fresh output required")
+    if any((parent / ".git").exists() for parent in output.resolve().parents):
+        raise ValueError("Candidate output must be outside source checkouts")
+    if output.resolve().is_relative_to(wheel_dir) or wheel_dir.is_relative_to(output.resolve()):
+        raise ValueError("Wheel inputs and output must be separate")
+    if profile not in PROFILES:
+        raise ValueError("Unknown candidate compatibility profile")
+    source_inventory = Path(source_inventory)
+    if source_inventory.is_symlink() or not source_inventory.is_file():
+        raise ValueError("Expected a regular source inventory")
+    inventory_bytes = source_inventory.read_bytes()
+    inventory = json.loads(inventory_bytes)
+    if not inventory or any(owner not in OWNERS for owner in inventory):
+        raise ValueError("Expected public owner source identities")
+    if any(not item.get("base_commit") or not item.get("source_inputs_sha256") for item in inventory.values()):
+        raise ValueError("Missing source identity")
+    sources = sorted(wheel_dir.glob("*.whl"))
     wheels = []
-    for source in sorted(args.wheel_dir.glob("*.whl")):
-        if source.is_symlink():
+    for source in sources:
+        if source.is_symlink() or not source.is_file():
             raise ValueError("Wheel symlinks are refused")
-        target = out / "wheels" / source.name
-        shutil.copy2(source, target)
-        with zipfile.ZipFile(target) as z:
-            m = BytesParser().parsebytes(
-                z.read(
-                    next(n for n in z.namelist() if n.endswith(".dist-info/METADATA"))
-                )
-            )
-            licenses = [
-                n
-                for n in z.namelist()
-                if any(s in n.lower() for s in ("license", "notice", "copying"))
-            ]
-        wheels.append(
-            dict(
-                file=target.name,
-                sha256=sha(target),
-                distribution=re.sub(r"[-_.]+", "-", m["Name"]).lower(),
-                version=m["Version"],
-                license_expression=m.get("License-Expression"),
-                license_files=licenses,
-            )
-        )
-    manifest = dict(
-        contract=CONTRACT,
-        published=False,
-        wheels=wheels,
-        scope="Uncommitted local candidate; published Git refs unchanged",
-        host=dict(
-            system=platform.system(),
-            machine=platform.machine(),
-            python="3.13",
-            qualification="This wheel set only; not full L2 coverage",
-        ),
-        integrations=["hermes", "claude", "codex", "opencode", "openclaw", "pi"],
-        separate_installations=[
-            "GERM and models/providers",
-            "MASA",
-            "Cosmoaudition",
-            "Cesta",
-            "ListeningMD clients",
-        ],
-    )
-    (out / "wheels/manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    verify(out / "wheels/manifest.json")
-    for file in args.static_dir.rglob("*"):
-        if file.is_symlink():
-            raise ValueError("Static symlinks are refused")
-    shutil.copytree(args.static_dir, out / "static")
-    (out / "editorial").mkdir()
-    for name in (
-        "figures_v25.md",
-        "diagram_content_v1.json",
-        "five_stage_captions_v1.md",
-        "schema_examples_v1.md",
-    ):
-        shutil.copy2(args.editorial_dir / name, out / "editorial" / name)
-    for source in sorted(args.editorial_dir.glob("antikythera_v25_d*.svg")):
-        shutil.copy2(source, out / "editorial" / source.name)
-    shutil.copy2(args.source_inventory, out / "source-sha256.json")
-    shutil.copy2(ROOT / "docs/candidate-release.md", out / "README.md")
-    shutil.copy2(ROOT / "LICENSE", out / "INSTALLER-LICENSE")
-    build_archive(out / "listening-stack.pyz")
-    checks = {
-        str(p.relative_to(out)): sha(p) for p in sorted(out.rglob("*")) if p.is_file()
+        wheels.append({"file": source.name, "sha256": digest(source), **wheel_identity(source)})
+    manifest = {
+        "contract": CONTRACT, "published": False, "compatibility_profile": profile,
+        "wheels": wheels, "source_inventory_sha256": digest(source_inventory),
+        "status": "source-ready", "installed_artifact_qualification": "pending",
+        "publication": {"status": "waiting-for-published-refs", "released_profile_changed": False,
+                        "candidate_commits": "pending", "immutable_remote_refs": "pending"},
+        "runtime": {"python": ">=3.12", "uv": "preinstalled; no interpreter downloads",
+                    "platform": "wheel tags must match the selected interpreter and host",
+                    "models": "not installed", "services": "not started"},
     }
-    (out / "checksums.json").write_text(json.dumps(checks, indent=2) + "\n")
-    with zipfile.ZipFile(
-        out.with_suffix(".zip"), "w", zipfile.ZIP_DEFLATED, compresslevel=6
-    ) as z:
-        for path in sorted(out.rglob("*")):
-            if path.is_file():
-                info = zipfile.ZipInfo(
-                    str(Path(out.name) / path.relative_to(out)),
-                    date_time=(1980, 1, 1, 0, 0, 0),
-                )
-                info.compress_type = zipfile.ZIP_DEFLATED
-                info.external_attr = 0o100644 << 16
-                z.writestr(info, path.read_bytes())
-    print(
-        json.dumps(
-            dict(
-                archive=str(out.with_suffix(".zip")),
-                sha256=sha(out.with_suffix(".zip")),
-                wheels=len(wheels),
-            ),
-            indent=2,
-        )
-    )
+    verify_value(manifest, wheel_dir)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=".candidate-wheels-", dir=output.parent))
+    try:
+        for source, item in zip(sources, wheels):
+            target = staging / source.name
+            shutil.copyfile(source, target)
+            if digest(target) != item["sha256"]:
+                raise ValueError("Wheel changed during assembly")
+        (staging / "source-inventory.json").write_bytes(inventory_bytes)
+        (staging / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+        verify(staging / "manifest.json")
+        output.mkdir(mode=0o700)
+        for path in staging.iterdir():
+            path.rename(output / path.name)
+    finally:
+        shutil.rmtree(staging)
+    return {"status": "source-ready", "published": False, "wheels": len(wheels),
+            "manifest_sha256": digest(output / "manifest.json")}
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--wheel-dir", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--profile", choices=PROFILES, required=True)
+    parser.add_argument("--source-inventory", type=Path, required=True)
+    args = parser.parse_args()
+    print(json.dumps(build(args.wheel_dir, args.output, args.profile, args.source_inventory)))

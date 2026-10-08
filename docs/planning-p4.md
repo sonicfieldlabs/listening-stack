@@ -2,7 +2,7 @@
 
 The Station reuses Oída's existing provider interface. The optional gateway is hosted by the existing Oída environment; inference runs in a separate MLX environment. No saved provider selection is rewritten.
 
-On this workstation, the isolated bundle is `~/.local/share/listening-stack-local/reasoner/`, with exact checkpoint revisions, runtime lock, component notices, evaluation receipt and file hashes. Qwen3.5-4B passed 11/12 bounded task checks and is admitted under host guards; SmolLM3-3B passed 1/12 and remains withheld. See the [implementation and limitations](../../listeningstackweb/docs/model-ecology-p4.md).
+On this workstation, the isolated bundle is `~/.local/share/listening-stack-local/reasoner/`, with exact checkpoint revisions, runtime lock, component notices, evaluation receipt and file hashes. Qwen3.5-4B passed 11/12 bounded task checks and is admitted under host guards; SmolLM3-3B passed 1/12 and remains withheld. The default installer does not provision this research runtime.
 
 Recreate the deployment manifest only after reviewing the pinned files and local evaluation:
 
