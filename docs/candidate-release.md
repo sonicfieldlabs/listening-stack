@@ -6,7 +6,7 @@ revision. A local wheel candidate has a separate manifest and does not change
 those pins or configure a managed installation.
 
 The unpublished core profile selects Oída 0.12.0, Akousma 0.8.4, Akousmata 0.8.3,
-AKOUO contract 0.10.1 and installer 0.5.0. The full profile adds GERM 0.7.0.
+AKOUO contract 0.10.1 and installer 0.5.1. The full profile adds GERM 0.7.0.
 MASA and Cosmoaudition remain independent applications. The AKOUO contract
 package version does not change the AKOUO protocol version.
 

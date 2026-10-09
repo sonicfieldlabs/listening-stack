@@ -1205,7 +1205,7 @@ wheels = [
 
 [[package]]
 name = "sonicfield-listening-stack"
-version = "0.5.0"
+version = "0.5.1"
 source = { editable = "." }
 
 [package.optional-dependencies]
@@ -1252,7 +1252,7 @@ dependencies = [
     { name = "uvicorn", extra = ["standard"] },
 ]
 wheels = [
-    { filename = "sonicfield_oida-0.12.0-py3-none-any.whl", hash = "sha256:c4c3048c65654db413f676eea2762fd21b2acdf5f0a894affee6904d9bc906d2" },
+    { filename = "sonicfield_oida-0.12.0-py3-none-any.whl", hash = "sha256:3892b557110b0e1d1470187d4058740741830922665e28aec9f33d3037090984" },
 ]
 
 [package.metadata]
