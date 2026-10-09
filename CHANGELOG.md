@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1 — 2026-10-09
+
+- Give reusable CI a distinct concurrency group so tag-triggered release checks
+  can run without deadlocking their calling workflow.
+- Preserve the reviewed runtime dependencies and explicit publication gates.
+- Align the lockfile checksum with the reviewed, unchanged Oída 0.12.0
+  fixture recorded in `vendor/SHA256SUMS`.
+
 ## 0.5.0 — 2026-10-08
 
 - Assemble the repaired owner cohort with source-bound wheel identities. Preserve immutable public installer pins until their actual merge commits are available.

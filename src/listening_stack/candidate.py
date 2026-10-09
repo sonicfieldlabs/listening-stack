@@ -14,7 +14,7 @@ import zipfile
 CONTRACT = "listening-stack/candidate-set/v1"
 CORE = {
     "sonicfield-oida": "0.12.0", "akousma": "0.8.4", "akousmata": "0.8.3",
-    "akouo-contract": "0.10.1", "sonicfield-listening-stack": "0.5.0",
+    "akouo-contract": "0.10.1", "sonicfield-listening-stack": "0.5.1",
 }
 FULL = {**CORE, "germ": "0.7.0"}
 PROFILES = {"listening-stack-core/v1": CORE, "listening-stack-full/v1": FULL}

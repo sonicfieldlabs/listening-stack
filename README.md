@@ -19,7 +19,7 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer candidate: `0.5.0` (unpublished).
+Current installer candidate: `0.5.1` (unpublished).
 
 ## Quick Start
 
