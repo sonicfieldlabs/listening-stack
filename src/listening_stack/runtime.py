@@ -65,7 +65,7 @@ def start(
                 else "stub"
             )
             runner.run(
-                [uv, "run", "oida", "start", "--profile", profile, "--json"],
+                [uv, "run", "--no-sync", "oida", "start", "--profile", profile, "--json"],
                 cwd=root / "src" / "oida",
                 env=environment,
             )
@@ -88,6 +88,9 @@ def start(
                     [
                         uv,
                         "run",
+                        "--no-sync",
+                        "--python",
+                        "3.12",
                         "uvicorn",
                         "server.main:app",
                         "--host",
@@ -145,7 +148,7 @@ def stop(
     stopped: Dict[str, object] = {}
     if target in {"all", "oida"} and profile_includes(component, "oida"):
         runner.run(
-            [uv, "run", "oida", "stop", "--json"],
+            [uv, "run", "--no-sync", "oida", "stop", "--json"],
             cwd=root / "src" / "oida",
             env=environment,
             check=False,
@@ -186,6 +189,7 @@ def _environment(state: Mapping[str, object]) -> Dict[str, str]:
     if not isinstance(raw, dict):
         raise ValueError("Installation state contains no valid environment")
     environment = {str(key): str(value) for key, value in raw.items()}
+    environment.setdefault("LISTENINGSTACK_RESOURCE_DIR", str(Path.home() / ".local/share/listening-stack/resources"))
     environment.setdefault("OIDA_HOST", "127.0.0.1")
     environment.setdefault("OIDA_PORT", "8765")
     environment.setdefault("GERM_HOST", "127.0.0.1")

@@ -1,0 +1,1 @@
+These reviewed wheels are used only by the owner integration test extra on Python 3.12 or newer. They are unpublished candidates identified by exact hashes and source-input digests in owner-test-wheels.json. Each wheel carries its upstream license. Public installer source pins and historical compatibility fixtures remain separate from this local owner-test set.

@@ -50,7 +50,7 @@ class InstallerTests(unittest.TestCase):
                 state["components"], ["earworm", "akouo", "akousmata", "oida"]
             )
             self.assertEqual(state["optional_components"], [])
-            self.assertEqual(state["installer_version"], "0.4.1")
+            self.assertEqual(state["installer_version"], __import__("listening_stack").__version__)
             self.assertEqual(state["germ_interoperability"], {})
             self.assertEqual(state["contracts"]["gateway"], "oida/gateway/v0.6")
             self.assertEqual(
@@ -396,6 +396,43 @@ class InstallerTests(unittest.TestCase):
             self.assertEqual(
                 installer._install_repository(repository, destination), revision
             )
+
+
+    def test_hf_managed_symlink_is_reused_but_foreign_target_is_refused(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve() / "stack"
+            runner = Runner(quiet=True)
+            installer = Installer(self.selection(root), runner)
+            binary = Path(installer.hf)
+            target = root / ".listening-stack/tools/huggingface-hub/bin/hf"
+            binary.parent.mkdir(parents=True)
+            target.parent.mkdir(parents=True)
+            target.write_text("#!/bin/sh\n")
+            target.chmod(0o755)
+            binary.symlink_to(target)
+            with patch.object(runner, "capture", return_value="hf " + HF_CLI_VERSION), patch.object(runner, "run") as run:
+                installer._ensure_hf()
+                run.assert_not_called()
+            binary.unlink()
+            foreign = Path(temporary) / "foreign-hf"
+            foreign.write_text("#!/bin/sh\n")
+            binary.symlink_to(foreign)
+            with self.assertRaisesRegex(RuntimeError, "unselected"):
+                installer._ensure_hf()
+
+    def test_hf_managed_path_cannot_redirect_through_symlinked_parent(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve() / "stack"
+            installer = Installer(self.selection(root), Runner(quiet=True))
+            binary = Path(installer.hf)
+            binary.parent.mkdir(parents=True)
+            foreign = Path(temporary).resolve() / "elsewhere"
+            (foreign / "huggingface-hub/bin").mkdir(parents=True)
+            (foreign / "huggingface-hub/bin/hf").write_text("fixture")
+            (root / ".listening-stack/tools").symlink_to(foreign, target_is_directory=True)
+            binary.symlink_to(root / ".listening-stack/tools/huggingface-hub/bin/hf")
+            with self.assertRaisesRegex(RuntimeError, "unselected"):
+                installer._ensure_hf()
 
 
 if __name__ == "__main__":

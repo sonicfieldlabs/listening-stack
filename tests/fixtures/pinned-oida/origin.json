@@ -1,0 +1,15 @@
+{
+  "repository": "https://github.com/sonicfieldlabs/oida",
+  "revision": "4f934c7854bceda044f5be22f2567315d4af7ba2",
+  "purpose": "Exact pinned CLI parser/dispatch regression; host side effects are mocked",
+  "files": {
+    "cli.py": {
+      "source_path": "oida/cli.py",
+      "sha256": "b39d5b9527f49c8a3b924cdfa622e113225265fd8cd6d66a89d8659f3627bc0c"
+    },
+    "LICENSE": {
+      "source_path": "LICENSE",
+      "sha256": "e067945bf5d1d56dfd45d3978fcd2b6461389d2e221797ae55186f15a355aae7"
+    }
+  }
+}

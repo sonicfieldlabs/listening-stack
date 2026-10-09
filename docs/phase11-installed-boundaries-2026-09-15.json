@@ -1,0 +1,486 @@
+{
+  "date": "2026-09-15",
+  "scope": "Disposable Python 3.12 installed candidate contract tests; not an active deployment or live model qualification. Dependency versions below are observed, not a hash-complete dependency lock.",
+  "dependencies": [
+    {
+      "name": "Cython",
+      "version": "3.3.0"
+    },
+    {
+      "name": "PyJWT",
+      "version": "2.14.0"
+    },
+    {
+      "name": "PyYAML",
+      "version": "6.0.3"
+    },
+    {
+      "name": "Pygments",
+      "version": "2.21.0"
+    },
+    {
+      "name": "akouo-contract",
+      "version": "0.10.0"
+    },
+    {
+      "name": "akousma",
+      "version": "0.8.1"
+    },
+    {
+      "name": "akousmata",
+      "version": "0.8.1"
+    },
+    {
+      "name": "annotated-doc",
+      "version": "0.0.5"
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.8.0"
+    },
+    {
+      "name": "anyio",
+      "version": "4.15.1"
+    },
+    {
+      "name": "attrs",
+      "version": "26.1.0"
+    },
+    {
+      "name": "certifi",
+      "version": "2026.7.22"
+    },
+    {
+      "name": "cffi",
+      "version": "2.1.1"
+    },
+    {
+      "name": "click",
+      "version": "8.5.0"
+    },
+    {
+      "name": "cryptography",
+      "version": "50.0.1"
+    },
+    {
+      "name": "fastapi",
+      "version": "0.141.1"
+    },
+    {
+      "name": "germ",
+      "version": "0.6.1"
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0"
+    },
+    {
+      "name": "httpcore",
+      "version": "1.0.9"
+    },
+    {
+      "name": "httpcore2",
+      "version": "2.13.0"
+    },
+    {
+      "name": "httptools",
+      "version": "0.8.0"
+    },
+    {
+      "name": "httpx",
+      "version": "0.28.1"
+    },
+    {
+      "name": "httpx-sse",
+      "version": "0.4.3"
+    },
+    {
+      "name": "httpx2",
+      "version": "2.13.0"
+    },
+    {
+      "name": "idna",
+      "version": "3.19"
+    },
+    {
+      "name": "iniconfig",
+      "version": "2.3.0"
+    },
+    {
+      "name": "jsonschema",
+      "version": "4.26.0"
+    },
+    {
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1"
+    },
+    {
+      "name": "listeningstackweb",
+      "version": "0.4.0"
+    },
+    {
+      "name": "mcp",
+      "version": "1.30.0"
+    },
+    {
+      "name": "numpy",
+      "version": "2.5.3"
+    },
+    {
+      "name": "packaging",
+      "version": "26.3"
+    },
+    {
+      "name": "pluggy",
+      "version": "1.6.0"
+    },
+    {
+      "name": "pybind11",
+      "version": "3.1.0"
+    },
+    {
+      "name": "pycparser",
+      "version": "3.0"
+    },
+    {
+      "name": "pydantic",
+      "version": "2.13.5"
+    },
+    {
+      "name": "pydantic-settings",
+      "version": "2.15.0"
+    },
+    {
+      "name": "pydantic_core",
+      "version": "2.46.5"
+    },
+    {
+      "name": "pyroomacoustics",
+      "version": "0.10.0"
+    },
+    {
+      "name": "pytest",
+      "version": "9.1.1"
+    },
+    {
+      "name": "python-dotenv",
+      "version": "1.2.3"
+    },
+    {
+      "name": "python-multipart",
+      "version": "0.0.32"
+    },
+    {
+      "name": "referencing",
+      "version": "0.37.0"
+    },
+    {
+      "name": "rpds-py",
+      "version": "2026.6.3"
+    },
+    {
+      "name": "scipy",
+      "version": "1.18.1"
+    },
+    {
+      "name": "sonicfield-listening-stack",
+      "version": "0.4.3"
+    },
+    {
+      "name": "sonicfield-oida",
+      "version": "0.11.1"
+    },
+    {
+      "name": "soundfile",
+      "version": "0.14.0"
+    },
+    {
+      "name": "sse-starlette",
+      "version": "3.4.11"
+    },
+    {
+      "name": "starlette",
+      "version": "1.6.0"
+    },
+    {
+      "name": "truststore",
+      "version": "0.10.4"
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.5.0"
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.16.0"
+    },
+    {
+      "name": "uvicorn",
+      "version": "0.53.0"
+    },
+    {
+      "name": "uvloop",
+      "version": "0.22.1"
+    },
+    {
+      "name": "watchfiles",
+      "version": "1.2.0"
+    },
+    {
+      "name": "websockets",
+      "version": "17.1"
+    }
+  ],
+  "profiles": {
+    "core": {
+      "profile": "core",
+      "observed_at": "2026-09-16T01:42:42.094799+00:00",
+      "python": "3.12.13",
+      "status": "passed",
+      "scope": "Installed contract boundary, not live model qualification",
+      "installed": {
+        "listening_stack": {
+          "distribution": "sonicfield-listening-stack",
+          "version": "0.4.3",
+          "origin_within_environment": "lib/python3.12/site-packages/listening_stack/__init__.py",
+          "module_sha256": "784e78e65929e1171fc6a3399dd110ac102107bbdcea526ee2b7cc9d8cd80580",
+          "python_source_tree_sha256": "5311661eb2cf55f1dd16deef35ec3fbfd7c63d25622199459cd9ff377b21ef2c",
+          "wheel_sha256": null
+        },
+        "akousma": {
+          "distribution": "akousma",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousma/__init__.py",
+          "module_sha256": "fabb38c755a556002b345aaa3cb8dff1b92d7ae0eb08de7fda0299c0dd15f674",
+          "python_source_tree_sha256": "9f4995997ca37ee8b99dcab69ef5e74a13857fd4e7ebbc371eeeb7ae0b646f5f",
+          "wheel_sha256": null
+        },
+        "akousmata_app": {
+          "distribution": "akousmata",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousmata_app/__init__.py",
+          "module_sha256": "24e16b5dad1d1aef597786a254daab866e10fee9f299d1328d011c04017ab911",
+          "python_source_tree_sha256": "60d4948e34be14a421fde4b44a363847d4ec7ed6b85b479b43a59ef8533f58f8",
+          "wheel_sha256": null
+        }
+      },
+      "passed": 102,
+      "skipped": 0,
+      "failed": 0
+    },
+    "records": {
+      "profile": "records",
+      "observed_at": "2026-09-16T01:42:46.874763+00:00",
+      "python": "3.12.13",
+      "status": "passed",
+      "scope": "Installed contract boundary, not live model qualification",
+      "installed": {
+        "akouo_contract": {
+          "distribution": "akouo-contract",
+          "version": "0.10.0",
+          "origin_within_environment": "lib/python3.12/site-packages/akouo_contract/__init__.py",
+          "module_sha256": "880d7ba5150c6ffe5b87bb6a00b13a35b6bba8cf94c3b268480523dcc09e957c",
+          "python_source_tree_sha256": "3b85d0a66147555afe4a853a5fffd11bee0b34e9a693223a0a2d2bf6b3a87b15",
+          "wheel_sha256": null
+        },
+        "akousma": {
+          "distribution": "akousma",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousma/__init__.py",
+          "module_sha256": "fabb38c755a556002b345aaa3cb8dff1b92d7ae0eb08de7fda0299c0dd15f674",
+          "python_source_tree_sha256": "9f4995997ca37ee8b99dcab69ef5e74a13857fd4e7ebbc371eeeb7ae0b646f5f",
+          "wheel_sha256": null
+        }
+      },
+      "passed": 55,
+      "skipped": 0,
+      "failed": 0
+    },
+    "central-owner": {
+      "profile": "central-owner",
+      "observed_at": "2026-09-16T01:42:47.355915+00:00",
+      "python": "3.12.13",
+      "status": "passed",
+      "scope": "Installed contract boundary, not live model qualification",
+      "installed": {
+        "listeningstackweb": {
+          "distribution": "listeningstackweb",
+          "version": "0.4.0",
+          "origin_within_environment": "lib/python3.12/site-packages/listeningstackweb/__init__.py",
+          "module_sha256": "504e71805572d0ce9fd624acff2db3bdab8a2fcd7673d2db2a93aa28868c7330",
+          "python_source_tree_sha256": "b1afcbb4123c46879adbb78e6e722758c99dc76762b36ad8f906f40121c6a77f",
+          "wheel_sha256": null
+        },
+        "oida.source_capture": {
+          "distribution": "sonicfield-oida",
+          "version": "0.11.1",
+          "origin_within_environment": "lib/python3.12/site-packages/oida/source_capture.py",
+          "module_sha256": "e69768736c4092dff48ed660331048e82b7c4fcdb1ba0e02ff4dfe0ad60cc46e",
+          "python_source_tree_sha256": "be113533eb9451374166f81f0222bebf1ecdbe2e3304e4ef10ab8e09f25ff7d6",
+          "wheel_sha256": null
+        },
+        "akousma": {
+          "distribution": "akousma",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousma/__init__.py",
+          "module_sha256": "fabb38c755a556002b345aaa3cb8dff1b92d7ae0eb08de7fda0299c0dd15f674",
+          "python_source_tree_sha256": "9f4995997ca37ee8b99dcab69ef5e74a13857fd4e7ebbc371eeeb7ae0b646f5f",
+          "wheel_sha256": null
+        }
+      },
+      "passed": 17,
+      "skipped": 0,
+      "failed": 0
+    },
+    "derivatives": {
+      "profile": "derivatives",
+      "observed_at": "2026-09-16T01:42:49.467603+00:00",
+      "python": "3.12.13",
+      "status": "passed",
+      "scope": "Installed contract boundary, not live model qualification",
+      "installed": {
+        "server": {
+          "distribution": "germ",
+          "version": "0.6.1",
+          "origin_within_environment": "lib/python3.12/site-packages/server/__init__.py",
+          "module_sha256": "e89b31b9a59ac3f6a7574dd20475f304bd32bddf346e2e155d5909a45f158f76",
+          "python_source_tree_sha256": "3e5fd7c5627c52b54686dff6e97573640e778207ae08166a07138bfe3f7b9fc1",
+          "wheel_sha256": null
+        },
+        "akousmata_app.derivatives": {
+          "distribution": "akousmata",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousmata_app/derivatives.py",
+          "module_sha256": "d1ba6f389b11f437b3b02edafda443a6cbd557c88273cc28ad0243a88257a162",
+          "python_source_tree_sha256": "60d4948e34be14a421fde4b44a363847d4ec7ed6b85b479b43a59ef8533f58f8",
+          "wheel_sha256": null
+        },
+        "akousma": {
+          "distribution": "akousma",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousma/__init__.py",
+          "module_sha256": "fabb38c755a556002b345aaa3cb8dff1b92d7ae0eb08de7fda0299c0dd15f674",
+          "python_source_tree_sha256": "9f4995997ca37ee8b99dcab69ef5e74a13857fd4e7ebbc371eeeb7ae0b646f5f",
+          "wheel_sha256": null
+        }
+      },
+      "masa_validator_entry_sha256": "376131e060f8ac9f96d7ff401d6d5b2a80aaf016f7ae29e39e3d30c7e456e01a",
+      "passed": 17,
+      "skipped": 0,
+      "failed": 0
+    },
+    "room": {
+      "profile": "room",
+      "observed_at": "2026-09-16T01:43:07.697837+00:00",
+      "python": "3.12.13",
+      "status": "passed",
+      "scope": "Installed contract boundary, not live model qualification",
+      "installed": {
+        "server": {
+          "distribution": "germ",
+          "version": "0.6.1",
+          "origin_within_environment": "lib/python3.12/site-packages/server/__init__.py",
+          "module_sha256": "e89b31b9a59ac3f6a7574dd20475f304bd32bddf346e2e155d5909a45f158f76",
+          "python_source_tree_sha256": "3e5fd7c5627c52b54686dff6e97573640e778207ae08166a07138bfe3f7b9fc1",
+          "wheel_sha256": null
+        },
+        "pyroomacoustics": {
+          "distribution": "pyroomacoustics",
+          "version": "0.10.0",
+          "origin_within_environment": "lib/python3.12/site-packages/pyroomacoustics/__init__.py",
+          "module_sha256": "0ed7d227ed39cb5a5a6c7994877dfee8855d14e5400f53bd9b3a3c0e3efc5baa",
+          "python_source_tree_sha256": "0ffac4f298dcef26ee095b3d04d8884c2861f71ae7111554a8a451ed1d12742d",
+          "wheel_sha256": null
+        },
+        "akousma": {
+          "distribution": "akousma",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousma/__init__.py",
+          "module_sha256": "fabb38c755a556002b345aaa3cb8dff1b92d7ae0eb08de7fda0299c0dd15f674",
+          "python_source_tree_sha256": "9f4995997ca37ee8b99dcab69ef5e74a13857fd4e7ebbc371eeeb7ae0b646f5f",
+          "wheel_sha256": null
+        }
+      },
+      "masa_validator_entry_sha256": "376131e060f8ac9f96d7ff401d6d5b2a80aaf016f7ae29e39e3d30c7e456e01a",
+      "passed": 8,
+      "skipped": 0,
+      "failed": 0
+    },
+    "germ-full": {
+      "profile": "germ-full",
+      "observed_at": "2026-09-16T01:43:18.119036+00:00",
+      "python": "3.12.13",
+      "status": "passed",
+      "scope": "Installed contract boundary, not live model qualification",
+      "installed": {
+        "server": {
+          "distribution": "germ",
+          "version": "0.6.1",
+          "origin_within_environment": "lib/python3.12/site-packages/server/__init__.py",
+          "module_sha256": "e89b31b9a59ac3f6a7574dd20475f304bd32bddf346e2e155d5909a45f158f76",
+          "python_source_tree_sha256": "3e5fd7c5627c52b54686dff6e97573640e778207ae08166a07138bfe3f7b9fc1",
+          "wheel_sha256": null
+        },
+        "pyroomacoustics": {
+          "distribution": "pyroomacoustics",
+          "version": "0.10.0",
+          "origin_within_environment": "lib/python3.12/site-packages/pyroomacoustics/__init__.py",
+          "module_sha256": "0ed7d227ed39cb5a5a6c7994877dfee8855d14e5400f53bd9b3a3c0e3efc5baa",
+          "python_source_tree_sha256": "0ffac4f298dcef26ee095b3d04d8884c2861f71ae7111554a8a451ed1d12742d",
+          "wheel_sha256": null
+        },
+        "akousmata_app.derivatives": {
+          "distribution": "akousmata",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousmata_app/derivatives.py",
+          "module_sha256": "d1ba6f389b11f437b3b02edafda443a6cbd557c88273cc28ad0243a88257a162",
+          "python_source_tree_sha256": "60d4948e34be14a421fde4b44a363847d4ec7ed6b85b479b43a59ef8533f58f8",
+          "wheel_sha256": null
+        },
+        "akousma": {
+          "distribution": "akousma",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousma/__init__.py",
+          "module_sha256": "fabb38c755a556002b345aaa3cb8dff1b92d7ae0eb08de7fda0299c0dd15f674",
+          "python_source_tree_sha256": "9f4995997ca37ee8b99dcab69ef5e74a13857fd4e7ebbc371eeeb7ae0b646f5f",
+          "wheel_sha256": null
+        }
+      },
+      "masa_validator_entry_sha256": "376131e060f8ac9f96d7ff401d6d5b2a80aaf016f7ae29e39e3d30c7e456e01a",
+      "passed": 413,
+      "skipped": 0,
+      "failed": 0
+    },
+    "negative-missing-validator": {
+      "profile": "derivatives",
+      "observed_at": "2026-09-16T01:39:42.513611+00:00",
+      "python": "3.12.13",
+      "status": "failed",
+      "scope": "Installed contract boundary, not live model qualification",
+      "installed": {
+        "server": {
+          "distribution": "germ",
+          "version": "0.6.1",
+          "origin_within_environment": "lib/python3.12/site-packages/server/__init__.py",
+          "module_sha256": "e89b31b9a59ac3f6a7574dd20475f304bd32bddf346e2e155d5909a45f158f76",
+          "wheel_sha256": null
+        },
+        "akousmata_app.derivatives": {
+          "distribution": "akousmata",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousmata_app/derivatives.py",
+          "module_sha256": "d1ba6f389b11f437b3b02edafda443a6cbd557c88273cc28ad0243a88257a162",
+          "wheel_sha256": null
+        },
+        "akousma": {
+          "distribution": "akousma",
+          "version": "0.8.1",
+          "origin_within_environment": "lib/python3.12/site-packages/akousma/__init__.py",
+          "module_sha256": "fabb38c755a556002b345aaa3cb8dff1b92d7ae0eb08de7fda0299c0dd15f674",
+          "wheel_sha256": null
+        }
+      },
+      "error_type": "ValueError"
+    }
+  }
+}

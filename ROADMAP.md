@@ -32,3 +32,8 @@ The roadmap describes public-alpha direction and does not promise dates.
 - Opening local gateways to external networks automatically.
 - Treating a successful install as a judgment about output quality, consent,
   rights, or appropriate use.
+
+D7 provides a separate unpublished, checksum-pinned offline core/app candidate and
+native Pi adapter compatibility. See [candidate release and handoff](docs/candidate-release.md).
+Published Git tag/SHA promotion awaits actual release commits; L2 broader host/profile
+qualification remains open. No local candidate implies a pushed release.

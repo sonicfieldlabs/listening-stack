@@ -21,7 +21,8 @@ testable without downloading model weights.
 ## Development
 
 ```bash
-python3 -m unittest discover -s tests -v
+python3 -m pip install '.[test]'
+python3 -I scripts/check_tests.py unit --junitxml /tmp/installer-unit.xml
 python3 scripts/build_release.py
 first="$(shasum -a 256 dist/listening-stack.pyz | cut -d' ' -f1)"
 python3 scripts/build_release.py
@@ -29,6 +30,8 @@ test "$first" = "$(shasum -a 256 dist/listening-stack.pyz | cut -d' ' -f1)"
 ./dist/listening-stack.pyz models --json
 bash -n install.sh listening-stack
 ```
+
+Run the separate owner integration environment documented in [README.md](README.md#development) as well. CI and releases execute both partitions; no tests are intentionally omitted.
 
 All unit and dry-run tests must avoid real package installation, host config
 changes, model downloads, and service startup.
