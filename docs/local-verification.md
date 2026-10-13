@@ -64,45 +64,19 @@ and the selected GERM output, shared store and model-cache paths. The probe impo
 configuration without starting the application or creating store records. Normal
 installation additionally checks that the application imports successfully.
 
-## Evidence and remaining checks
+## Recording verification
 
-The local installation matrix currently has the following evidence. Each live
-check uses released repository pins, a separately installed CLI wheel, disposable
-roots outside development checkouts and temporary loopback ports. The lifecycle
-checks compare environment metadata before/after and confirm that their ports close.
+Keep installation receipts, dependency inventories, process metadata and local
+paths in a private directory outside the source checkout. Bind each result to
+the selected source revisions, CLI archive, runtime and profile. Verify live
+process ownership and retained data separately from import and schema checks.
 
-| Environment | Profile | Runtime | Doctor result |
-| --- | --- | --- | --- |
-| macOS arm64 | core | stub | 28 passed (earlier verification) |
-| macOS arm64 | germ | mock | 19 passed; no warnings/failures |
-| macOS arm64 | full | stub + mock | 32 passed; no warnings/failures |
-| Linux arm64 container | full | stub + mock | 31 passed; one memory warning; no failures |
-
-The container ran an actual fresh installation and both gateways, without mounting
-development source trees or exposing ports to the host. Its VM reported 7.7 GB,
-below the existing 8 GB recommendation. This is Linux container runtime evidence;
-it does not establish native Linux audio devices, GPU providers or x86 host support.
-
-The first optional-profile run exposed GERM verification replacing Python 3.12
-with 3.10. The corrected installer and lifecycle preserve 3.12 and packaged dependency
-metadata. Regression checks cover dependency/version drift, redirected output paths,
-missing interpreters and read-only verification. Synthetic unit fixtures exercise
-probe failures; the installation matrix above supplies separate real runtime evidence.
-
-Earlier core verification also covered version 1-to-2 configuration migration and
-restoration at unchanged pins. Dependency inventories record distribution metadata
-and retained licence-file hashes; absence is not inferred licence approval.
-
-The full supported-host/profile gate remains open for Intel macOS, native Linux
-hardware and other architecture checks, real selected model/provider installations,
-accelerators, physical devices and agent-host integration. Pi's new adapter belongs
-to the later integration work. Previously measured full-model execution in a
-separate application environment does not establish installer-profile compatibility.
-
-These checks use released component pins with local installer fixes. The recent
-unpublished repository implementations are not silently substituted into the pinned
-set. Testing a new combined candidate set and updating release pins remain separate
-compatibility/release preparation. The installer version and pins are unchanged.
+A successful model-free doctor does not establish decoder compatibility, model
+quality, accelerator support, physical audio behavior or agent-host integration.
+Test each selected provider in its managed environment with fallback disabled.
+Supported-host checks must use the actual target architecture and audio devices.
+See [candidate verification](verification.md) for unpublished offline artifacts;
+the released profile continues to select its existing immutable repository pins.
 
 ## Model-install retries and agent runtime binding
 
@@ -123,19 +97,7 @@ Hermes uses its recorded interpreter before PATH. This runtime-binding improveme
 is part of the local Oída candidate, not a silent change to released installer pins.
 Existing host registrations need explicit reinstallation to receive it.
 
-Isolated integration verification exercised real Hermes and OpenCode installation
-and tool discovery, Claude manifest validation, and MCP initialization/capability
-calls for Codex, Claude and OpenClaw bundles. These checks do not claim that every
-host's full interactive agent workflow or the new Pi adapter is complete.
-
-
-A macOS arm64 released-pin core installation with MOSS 4B Instruct completed a
-real synthetic listening call, retained its Akousma, and passed all 30 doctor
-checks with fallback disabled. The checkpoint was copied locally and its three
-weight shards checked against cached revision metadata. An initial decoder failure
-exposed an FFmpeg 9/TorchCodec 0.10 mismatch. This released-pin run required
-`DYLD_LIBRARY_PATH=/opt/homebrew/opt/ffmpeg@8/lib` in the invoking process; doctor
-alone had not detected the decoder failure. Do not infer model readiness from an
-import-only doctor pass. The local Oída candidate discovers an existing FFmpeg 8
-keg automatically; published pins remain unchanged. This is execution/storage
-proof with synthetic input, not a model-quality benchmark or microphone test.
+Host registration and tool discovery need a separate check in each target host.
+The adapter configuration and a valid manifest alone do not establish a complete
+interactive workflow. Check model decoding in the selected environment; FFmpeg
+and TorchCodec compatibility cannot be inferred from an import-only doctor pass.

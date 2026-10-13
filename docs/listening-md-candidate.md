@@ -1,6 +1,6 @@
 # LISTENING.md inscription candidate
 
-Installer 0.6.0 adds `listening-md-core/v1` for a separately selected, unpublished wheel bundle. Its exact application versions are Oída 0.13.1, Akousma 0.10.0, Akousmata 0.9.0, AKOÚŌ 0.12.0 and Listening Stack 0.6.0. Khipu is a separate private consumer. This profile contains no GERM or model weights.
+Installer 0.6.1 adds `listening-md-core/v1` for a separately selected, unpublished wheel bundle. Its exact application versions are Oída 0.13.2, Akousma 0.10.1, Akousmata 0.9.1, AKOÚŌ 0.12.1 and Listening Stack 0.6.1. Khipu is a separate private consumer. This profile contains no GERM or model weights.
 
 The existing managed installer and the historical candidate profiles keep their published/source selections. Choosing a newer candidate does not rewrite those selections. Every wheel in a bundle is named by version and SHA-256, including its runtime dependencies. The candidate verifier preflights the complete bundle before creating an environment. Installation requires a fresh directory outside source checkouts and uses explicit offline wheel paths.
 

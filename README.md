@@ -19,7 +19,7 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer candidate: `0.6.0` (unpublished).
+Current installer candidate: `0.6.1` (unpublished). The latest published installer is `0.5.1`.
 
 The opt-in [LISTENING.md candidate](docs/listening-md-candidate.md) adds primary
 text/data inputs and completed textual works through a separately verified
@@ -198,7 +198,7 @@ runtime paths, and attribution guidance.
 - A Hugging Face account only for gated Stable Audio 3 weights.
 
 When `uv` is absent, the assistant downloads the checksum-pinned official
-installer for tested `uv` 0.11.29 without modifying shell startup files. A
+installer for tested `uv` 0.12.09 without modifying shell startup files. A
 pinned Hugging Face CLI is installed inside the selected Listening Stack root,
 not into the host's global tool directory.
 
@@ -372,7 +372,7 @@ Use a dry run to inspect installation commands without changing the machine:
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md),
-[ROADMAP.md](ROADMAP.md), and [CITATION.cff](CITATION.cff).
+[CITATION.cff](CITATION.cff).
 
 ## License
 

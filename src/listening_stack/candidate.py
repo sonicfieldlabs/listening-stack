@@ -13,13 +13,13 @@ import zipfile
 
 CONTRACT = "listening-stack/candidate-set/v1"
 CORE = {
-    "sonicfield-oida": "0.11.2", "akousma": "0.8.4", "akousmata": "0.8.3",
-    "akouo-contract": "0.10.1", "sonicfield-listening-stack": "0.4.4",
+    "sonicfield-oida": "0.12.0", "akousma": "0.8.4", "akousmata": "0.8.3",
+    "akouo-contract": "0.10.1", "sonicfield-listening-stack": "0.6.1",
 }
-FULL = {**CORE, "germ": "0.6.2"}
+FULL = {**CORE, "germ": "0.7.0"}
 LISTENING_MD_CORE = {
-    "sonicfield-oida": "0.13.1", "akousma": "0.10.0", "akousmata": "0.9.0",
-    "akouo-contract": "0.12.0", "sonicfield-listening-stack": "0.6.0",
+    "sonicfield-oida": "0.13.2", "akousma": "0.10.1", "akousmata": "0.9.1",
+    "akouo-contract": "0.12.1", "sonicfield-listening-stack": "0.6.1",
 }
 PROFILES = {"listening-stack-core/v1": CORE, "listening-stack-full/v1": FULL,
             "listening-md-core/v1": LISTENING_MD_CORE}

@@ -28,7 +28,7 @@ def test_metadata_inventory_distinguishes_aliases_from_candidate_copies(tmp_path
 
 
 def test_boundary_gate_counts_collection_skips_and_setup_failures():
-    results = tool("verify_installed_boundaries.py")["Results"]()
+    results = tool("installed_boundary_results.py")["Results"]()
     results.pytest_collectreport(SimpleNamespace(skipped=True, failed=False))
     results.pytest_runtest_logreport(SimpleNamespace(skipped=False, failed=True, when="setup", passed=False))
     assert results.skipped == 1 and results.failed == 1 and results.passed == 0
