@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Prepare installer 0.4.4 with separate unpublished core/full wheel profiles.
+  Verify every wheel before creating an environment and compare installed owner
+  bytes directly with pinned archives in an isolated store configuration.
+- Preflight every selected source owner before snapshotting. Assemble candidates
+  without editorial workspaces or private application dependencies.
+- Allow the refreshed owner-test wheel filenames in Git. Keep the published
+  repository revisions, contract matrix and managed adapter selection unchanged.
 - Install the pinned core as built packages so AKOÚŌ's bundled schemas are
   available to Oída. Lifecycle and integration commands preserve the verified
   environment with `uv run --no-sync`.

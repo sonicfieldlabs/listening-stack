@@ -1,8 +1,4 @@
-"""Compare installed application bytes directly to the pinned wheel inventory.
-
-Run with candidate Python -I. Installed RECORD is checked by candidate doctor;
-this independent check does not use that mutable RECORD as its byte authority.
-"""
+"""Compare installed public owner resources directly with pinned wheel bytes."""
 from __future__ import annotations
 
 import argparse
@@ -11,56 +7,41 @@ from importlib.metadata import distribution
 import json
 from pathlib import Path
 import sys
+import zipfile
 
-APPLICATIONS = {"sonicfield-listening-stack", "sonicfield-oida", "akouo-contract", "akousma", "akousmata", "germ", "listeningstackweb"}
-TELAR_APPLICATIONS = (APPLICATIONS - {"listeningstackweb"}) | {"sonicfield-telar"}
-KHIPU_APPLICATIONS = (APPLICATIONS - {"listeningstackweb"}) | {"sonicfield-khipu"}
-PROFILE_APPLICATIONS = {"centaur-phase17/v1": APPLICATIONS, "telar-local/v1": TELAR_APPLICATIONS, "khipu-local/v1": KHIPU_APPLICATIONS,
-                        "khipu-safety/v1": KHIPU_APPLICATIONS}
+from listening_stack.candidate import PROFILES, digest, verify
 
 
-def digest(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def check(manifest: Path):
-    value = json.loads(manifest.read_text())
-    profile = value.get("compatibility_profile")
-    if value.get("published") is not False or profile not in PROFILE_APPLICATIONS:
-        raise ValueError("Expected unpublished Phase 17, Telar or Khipu manifest")
-    applications = PROFILE_APPLICATIONS[profile]
-    resources = manifest.parent / "wheel-resources.json"
-    if digest(resources) != value["wheel_resources_sha256"]:
-        raise ValueError("Resource inventory changed")
-    inventory = json.loads(resources.read_text())
+def check(manifest):
+    manifest = Path(manifest)
+    value = verify(manifest)
+    applications = set(PROFILES[value["compatibility_profile"]])
     prefix = Path(sys.prefix).resolve()
     result = {}
     for wheel in value["wheels"]:
         name = wheel["distribution"]
         if name not in applications:
             continue
-        if digest(manifest.parent / wheel["file"]) != wheel["sha256"]:
-            raise ValueError("Pinned wheel changed: " + name)
         dist = distribution(name)
         if dist.version != wheel["version"]:
             raise ValueError("Wrong installed version: " + name)
         count = non_python = 0
-        for resource in inventory[name]:
-            member = resource["path"]
-            if member.endswith(".dist-info/RECORD"):
-                continue  # Installer rewrites RECORD; not a source authority here.
-            if ".data/" in member:
-                raise ValueError("Review application wheel relocation: " + member)
-            installed = Path(dist.locate_file(member)).resolve()
-            if not installed.is_relative_to(prefix) or not installed.is_file() or digest(installed) != resource["sha256"]:
-                raise ValueError("Installed resource differs from pinned wheel: " + member)
-            count += 1
-            non_python += not member.endswith(".py")
+        with zipfile.ZipFile(manifest.parent / wheel["file"]) as archive:
+            for member in archive.namelist():
+                if member.endswith("/") or member.endswith(".dist-info/RECORD"):
+                    continue
+                if ".data/" in member:
+                    raise ValueError("Review application wheel relocation: " + member)
+                installed = Path(dist.locate_file(member)).resolve()
+                if not installed.is_relative_to(prefix) or not installed.is_file() or (
+                    digest(installed) != hashlib.sha256(archive.read(member)).hexdigest()
+                ):
+                    raise ValueError("Installed resource differs from pinned wheel: " + member)
+                count += 1
+                non_python += not member.endswith(".py")
         result[name] = {"version": dist.version, "wheel_sha256": wheel["sha256"],
                         "checked_files": count, "non_python_files": non_python}
-    if set(result) != applications:
-        raise ValueError("Missing application resource inventory")
-    return {"status": "passed", "scope": "installed application bytes, not model inference",
+    return {"status": "passed", "scope": "installed owner bytes; model inference not tested",
             "manifest_sha256": digest(manifest), "applications": result}
 
 

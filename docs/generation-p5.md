@@ -19,4 +19,4 @@ Set `GERM_ACE_CONFIG` to the resulting `ace/deployment.json` in the existing loc
 
 Rollback: remove `GERM_ACE_CONFIG` from the supervisor and restart the idle services. ACE becomes unavailable, while Stable Audio and CPU synthesis remain. Presets explicitly selecting ACE fail with an unavailable-model message; they are not silently rerouted. Keep the model files and generated artifacts unless deliberately uninstalling them.
 
-See the [P5 implementation report](../../listeningstackweb/docs/model-ecology-p5.md) for measured performance, memory caveats, text limits and editing-preservation results.
+These historical measurements do not qualify a fresh local candidate.

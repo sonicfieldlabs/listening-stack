@@ -8,4 +8,4 @@ The new optional Run fields are `share_analysis`, `acoustic_retrieval` and `revi
 
 Rollback: finish or stop active work, then disable the new recipe options. Existing manual workflows remain available. To install older code, retain the current database backup first and remove new fields from a copy of a new draft; never rewrite old Auditums to force older application compatibility. New P6 drafts are not promised readable by pre-P6 binaries.
 
-See `listeningstackweb/docs/model-ecology-p6.md` for boundaries and acceptance evidence. The local supervisor, ports and private Tailscale ingress remain unchanged. No push or public deployment is part of this phase.
+The default installer does not provision this research runtime. The local supervisor, ports and private Tailscale ingress remain unchanged. No push or public deployment is part of this phase.

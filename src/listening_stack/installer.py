@@ -716,7 +716,7 @@ class Installer:
                 "python": "stable_audio_python",
                 "mock": "mock",
             }.get(provider, "mock")
-            environment["GERM_DEFAULT_MODEL"] = _preferred_stable_model(stable)
+            environment["GERM_DEFAULT_MODEL"] = _preferred_stable_model(stable, provider=provider)
         return environment
 
     def _write_environment(self, environment: Mapping[str, str]) -> None:
@@ -835,13 +835,14 @@ def _preferred_moss(models: Sequence[Model], kind: str) -> Model:
     return sorted(candidates, key=lambda model: (model.size_bytes, model.key))[0]
 
 
-def _preferred_stable_model(models: Sequence[Model]) -> str:
+def _preferred_stable_model(models: Sequence[Model], *, provider=None) -> str:
     if not models:
         return "mock-sine"
     preference = ("stable-small-sfx", "stable-small-music", "stable-medium")
     by_key = {model.key: model for model in models}
     selected = next((by_key[key] for key in preference if key in by_key), models[0])
-    return selected.model_id.rsplit("stable-audio-3-", 1)[-1]
+    model = selected.model_id.rsplit("stable-audio-3-", 1)[-1]
+    return {"small-sfx": "sm-sfx", "small-music": "sm-music"}.get(model, model) if provider == "mlx" else model
 
 
 def _normalise_git_url(value: str) -> str:

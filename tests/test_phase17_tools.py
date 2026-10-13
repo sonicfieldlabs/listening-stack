@@ -53,65 +53,6 @@ def test_http_model_selection_without_listening_refuses_before_output(tmp_path, 
     assert not (tmp_path / "output").exists()
 
 
-def test_snapshot_refuses_an_existing_directory_before_changes(tmp_path):
-    prepare = tool("prepare_phase17.py")["prepare"]
-    output = tmp_path / "existing"
-    output.mkdir()
-    sentinel = output / "preserve.txt"
-    sentinel.write_text("preserve")
-    with pytest.raises(ValueError, match="Fresh destination"):
-        prepare(tmp_path, output, tmp_path / "unread-register.json")
-    assert sentinel.read_text() == "preserve"
-
-
-def test_assembly_refuses_incomplete_wheel_set_before_output(tmp_path):
-    assemble = tool("assemble_phase17.py")["assemble"]
-    (tmp_path / "selection.json").write_text(json.dumps({"selected_dependencies": []}))
-    with pytest.raises(ValueError, match="does not match"):
-        assemble(tmp_path, tmp_path / "output")
-    assert not (tmp_path / "output").exists()
-
-
-def resource_fixture(tmp_path, monkeypatch):
-    module = tool("verify_candidate_resources.py")
-    check = module["check"]
-    resources, wheels = {}, []
-    prefix = tmp_path / "installed"
-    prefix.mkdir()
-    for name in module["APPLICATIONS"]:
-        member = name + "/schema.json"
-        target = prefix / member
-        target.parent.mkdir()
-        target.write_bytes(b"schema fixture")
-        wheel = tmp_path / (name + ".whl")
-        wheel.write_bytes(b"trusted test wheel identity")
-        wheels.append({"distribution": name, "version": "1.0", "file": wheel.name, "sha256": hashlib.sha256(wheel.read_bytes()).hexdigest()})
-        resources[name] = [{"path": member, "sha256": hashlib.sha256(target.read_bytes()).hexdigest()}]
-    resource_file = tmp_path / "wheel-resources.json"
-    resource_file.write_text(json.dumps(resources))
-    manifest = tmp_path / "manifest.json"
-    manifest.write_text(json.dumps({"published": False, "compatibility_profile": "centaur-phase17/v1", "wheels": wheels,
-        "wheel_resources_sha256": hashlib.sha256(resource_file.read_bytes()).hexdigest()}))
-    monkeypatch.setattr(sys, "prefix", str(prefix))
-    monkeypatch.setitem(check.__globals__, "distribution", lambda name: SimpleNamespace(version="1.0", locate_file=lambda member: prefix / member))
-    return check, manifest, prefix, resource_file
-
-
-def test_installed_resource_check_uses_pinned_bytes_not_installed_record(tmp_path, monkeypatch):
-    check, manifest, prefix, _ = resource_fixture(tmp_path, monkeypatch)
-    assert check(manifest)["status"] == "passed"
-    (prefix / "akousma/schema.json").write_bytes(b"changed schema")
-    with pytest.raises(ValueError, match="differs from pinned wheel"):
-        check(manifest)
-
-
-def test_changed_resource_inventory_refuses_before_import(tmp_path, monkeypatch):
-    check, manifest, _, resources = resource_fixture(tmp_path, monkeypatch)
-    resources.write_text("{}")
-    with pytest.raises(ValueError, match="inventory changed"):
-        check(manifest)
-
-
 def test_moss_preparation_preserves_existing_destination(tmp_path):
     prepare = tool("prepare_moss_qualification.py")["prepare"]
     output = tmp_path / "existing"

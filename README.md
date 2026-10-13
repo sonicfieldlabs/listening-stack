@@ -19,7 +19,7 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer release: `0.4.3`.
+Current installer candidate: `0.4.4` (unpublished).
 
 ## Quick Start
 
@@ -339,7 +339,8 @@ python scripts/build_release.py
 bash -n install.sh listening-stack
 ```
 
-In a separate fresh owner-test virtual environment:
+In a separate fresh owner-test virtual environment using Python 3.12 or newer
+(the bundled Oída owner package requires 3.12):
 
 ```bash
 shasum -a 256 -c vendor/SHA256SUMS
@@ -371,7 +372,7 @@ models, datasets, inputs, and outputs retain their own licenses and terms.
 
 D5 local integration: [memory-restore](docs/memory-restore.md). Unreleased; no automatic publication.
 
-D7 local development handoff: [checksum-pinned offline candidate, component ownership and rollback](docs/candidate-release.md).
+Local development setup: [checksum-pinned offline candidate, component ownership and rollback](docs/candidate-release.md).
 Published release pins remain unchanged; uncommitted builds use a separate candidate manifest.
 
 ### Optional native spectral workers
@@ -393,7 +394,5 @@ an already downloaded and evaluated IIL guitar RAVE export and Basic Pitch ONNX.
 It requires `--root`, `--germ` and `--evaluation` paths, verifies the exact worker,
 checkpoint, runtime and evaluation evidence, and writes `deployments.json`.
 The existing generation/listening settings are not migrated or replaced.
-See `../listeningstackweb/docs/model-ecology-p7.md` for the local environment,
-profile gates, artifact contract, evaluation limits and upstream sources.
-
-For the current Khipu application, use the `khipu-local/v1` profile in the [candidate handback](docs/candidate-release.md); its wheel carries Khipu's Station page. The local `centaur-phase9/v1` candidate pins Station 0.2.1, GERM 0.6.1 and installer 0.4.3. It includes Earworm 1.8 bundle restore with current forgetting-ledger preservation. See [candidate handback](docs/candidate-release.md); this candidate has not been published.
+The helper requires independently reviewed evaluation and license evidence.
+It does not enable a research instrument in the default installation.
