@@ -19,7 +19,16 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer candidate: `0.4.4` (unpublished).
+Current installer candidate: `0.6.0` (unpublished).
+
+The opt-in [LISTENING.md candidate](docs/listening-md-candidate.md) adds primary
+text/data inputs and completed textual works through a separately verified
+wheel cohort. Its diagnostic reports installed representation and file
+lifecycle support. Select and qualify a provider explicitly before execution.
+
+The revised local package selection, including the repaired readers, is recorded
+in [the Phase 17 cohort record](docs/listening-md-phase17.md). Published installer
+selections have their own release history.
 
 ## Quick Start
 

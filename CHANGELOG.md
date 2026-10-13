@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Prepare candidate 0.6.0 with an explicit LISTENING.md inscription cohort.
+  Verify installed text/data conventions, completed text output and full-file
+  lifecycle support without probing a model or activating an owner.
+- Reconcile owner-test wheels and lock to Oída 0.13.1, Akousma 0.10.0,
+  Akousmata 0.9.0 and AKOÚŌ 0.12.0. Retain earlier artifacts and profiles.
+
 - Prepare installer 0.4.4 with separate unpublished core/full wheel profiles.
   Verify every wheel before creating an environment and compare installed owner
   bytes directly with pinned archives in an isolated store configuration.
