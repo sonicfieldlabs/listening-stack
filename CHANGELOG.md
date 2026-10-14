@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.1 — 2026-10-14
+
+- Add the opt-in `listening-md-core/v1` profile for the LISTENING.md inscription
+  cohort. Verify installed text/data conventions, completed text output and
+  full-file lifecycle support without probing a model or activating an owner.
+- Owner-test wheels and lock select the cohort reconciled with the 8 and 9
+  October releases: Oída 0.13.2, Akousma 0.10.1, Akousmata 0.9.1 and AKOÚŌ
+  0.12.1. The full profile names GERM 0.7.0. Superseded fixture wheels are
+  dropped, as in 0.5.1; they remain in Git history and the sealed archives.
+- Keep the managed source profile at the reviewed 0.4.1 compatibility set
+  (Oída 0.10.0, GERM 0.5.0, AKOÚŌ 0.9.2, Earworm 0.7.0, Akousmata 0.7.0).
+  Current owners install their siblings from vendored wheels and GERM 0.7.0
+  vendors Akousma 0.8.4, which the managed checks do not yet model; advancing
+  the set needs its own installer revision once the owner tags exist.
+
 ## 0.5.1 — 2026-10-09
 
 - Give reusable CI a distinct concurrency group so tag-triggered release checks

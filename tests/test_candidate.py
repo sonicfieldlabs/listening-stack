@@ -9,7 +9,7 @@ import zipfile
 
 import pytest
 
-from listening_stack.candidate import CONTRACT, CORE, FULL, install, selected_environment, verify
+from listening_stack.candidate import CONTRACT, CORE, FULL, LISTENING_MD_CORE, install, selected_environment, verify
 
 
 def wheel(root, name, version, extra=None):
@@ -60,6 +60,26 @@ def test_optional_germ_is_only_admitted_in_full_profile(tmp_path):
     value["compatibility_profile"] = "listening-stack-core/v1"
     manifest.write_text(json.dumps(value))
     with pytest.raises(ValueError, match="exact declared"): verify(manifest)
+
+
+def test_inscription_cohort_requires_its_own_exact_profile(tmp_path):
+    value = dict(contract=CONTRACT, published=False, compatibility_profile="listening-md-core/v1",
+                 wheels=[wheel(tmp_path, name, version) for name, version in LISTENING_MD_CORE.items()])
+    manifest = tmp_path / "manifest.json"; manifest.write_text(json.dumps(value))
+    assert verify(manifest)["compatibility_profile"] == "listening-md-core/v1"
+    value["compatibility_profile"] = "listening-stack-core/v1"
+    manifest.write_text(json.dumps(value))
+    with pytest.raises(ValueError, match="exact declared"): verify(manifest)
+
+
+def test_inscription_core_refuses_private_khipu_and_audio_generators(tmp_path):
+    for application, version in [("sonicfield-khipu", "0.7.0"), ("germ", "0.6.2")]:
+        folder = tmp_path / application; folder.mkdir()
+        value = dict(contract=CONTRACT, published=False, compatibility_profile="listening-md-core/v1",
+                     wheels=[wheel(folder, name, ver) for name, ver in LISTENING_MD_CORE.items()])
+        value["wheels"].append(wheel(folder, application, version))
+        manifest = folder / "manifest.json"; manifest.write_text(json.dumps(value))
+        with pytest.raises(ValueError): verify(manifest)
 
 
 def test_archive_member_traversal_is_rejected_before_install(tmp_path):

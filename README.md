@@ -19,7 +19,16 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer candidate: `0.5.1` (unpublished).
+Current installer candidate: `0.6.1` (unpublished). The latest published installer is `0.5.1`.
+
+The opt-in [LISTENING.md candidate](docs/listening-md-candidate.md) adds primary
+text/data inputs and completed textual works through a separately verified
+wheel cohort. Its diagnostic reports installed representation and file
+lifecycle support. Select and qualify a provider explicitly before execution.
+
+The revised local package selection, including the repaired readers, is recorded
+in [the Phase 17 cohort record](docs/listening-md-phase17.md). Published installer
+selections have their own release history.
 
 ## Quick Start
 
@@ -65,8 +74,9 @@ chmod +x listening-stack.pyz
 
 Sources are cloned into a dedicated installation directory. The installer
 verifies every existing origin and refuses to update a dirty or unexpected
-checkout. Release `0.4.1` installs one immutable compatibility set and records
-the exact commits it installed in local state:
+checkout. Releases `0.4.1` to `0.5.1` and the `0.6.1` candidate install one
+immutable compatibility set and record the exact commits they installed in
+local state:
 
 | Component | Tested release |
 | --- | --- |
@@ -75,6 +85,11 @@ the exact commits it installed in local state:
 | AKOÚŌ | 0.9.2 |
 | Earworm / Akousma schema | 0.7.0 / 1.6 |
 | Akousmata | 0.7.0 |
+
+Later owner releases resolve their sibling packages from reviewed wheels
+instead of sibling checkouts, so advancing this managed set is a separate
+installer revision with its own qualification. The newer owners are selected by
+the wheel candidates described below.
 
 The official MOSS-Audio source is pinned to the revision tested with Oída
 0.10.0. Stable Audio 3 source is pinned to the same revision locked by GERM

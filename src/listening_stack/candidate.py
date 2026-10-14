@@ -14,10 +14,15 @@ import zipfile
 CONTRACT = "listening-stack/candidate-set/v1"
 CORE = {
     "sonicfield-oida": "0.12.0", "akousma": "0.8.4", "akousmata": "0.8.3",
-    "akouo-contract": "0.10.1", "sonicfield-listening-stack": "0.5.1",
+    "akouo-contract": "0.10.1", "sonicfield-listening-stack": "0.6.1",
 }
 FULL = {**CORE, "germ": "0.7.0"}
-PROFILES = {"listening-stack-core/v1": CORE, "listening-stack-full/v1": FULL}
+LISTENING_MD_CORE = {
+    "sonicfield-oida": "0.13.2", "akousma": "0.10.1", "akousmata": "0.9.1",
+    "akouo-contract": "0.12.1", "sonicfield-listening-stack": "0.6.1",
+}
+PROFILES = {"listening-stack-core/v1": CORE, "listening-stack-full/v1": FULL,
+            "listening-md-core/v1": LISTENING_MD_CORE}
 APPLICATIONS = frozenset(FULL)
 
 
@@ -188,14 +193,17 @@ for name in modules:
  m=importlib.import_module(name); assert Path(m.__file__).resolve().is_relative_to(prefix), name
 print(json.dumps({'isolated_imports':True,'pinned_owner_bytes':True,'owner_payload_files':checked,
                   'distribution_count':len(expected),'python':sys.version.split()[0],
-                  'platform':sys.platform}))
+                  'platform':sys.platform,
+                  **({'inscriptions':importlib.import_module('listening_stack.representations').installed_capabilities()}
+                     if json.loads(sys.argv[4]) == 'listening-md-core/v1' else {})}))
 '''
     executable = root / (".venv/Scripts/python.exe" if os.name == "nt" else ".venv/bin/python")
     environment = selected_environment(root, include_germ="germ" in PROFILES[value["compatibility_profile"]])
     subprocess.run(["uv", "pip", "check", "--python", str(executable)], check=True, env=environment,
                    capture_output=True, text=True)
     result = subprocess.run([str(executable), "-I", "-c", script, json.dumps(value["wheels"]),
-                             str(manifest.parent), json.dumps(sorted(PROFILES[value["compatibility_profile"]]))],
+                             str(manifest.parent), json.dumps(sorted(PROFILES[value["compatibility_profile"]])),
+                             json.dumps(value["compatibility_profile"])],
                             capture_output=True, text=True, check=True, cwd=root, env=environment)
     return {**json.loads(result.stdout), "mode": "isolated-candidate", "managed_source_install": False,
             "status": "artifact-qualified", "publication": "waiting-for-published-refs",
