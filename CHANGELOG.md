@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.1 — unreleased
+## 0.6.1 — 2026-10-14
 
 - Add the opt-in `listening-md-core/v1` profile for the LISTENING.md inscription
   cohort. Verify installed text/data conventions, completed text output and
