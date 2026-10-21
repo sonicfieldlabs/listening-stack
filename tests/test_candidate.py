@@ -9,7 +9,7 @@ import zipfile
 
 import pytest
 
-from listening_stack.candidate import CONTRACT, CORE, FULL, LISTENING_MD_CORE, install, selected_environment, verify
+from listening_stack.candidate import CONTRACT, CORE, FULL, LISTENING_MD_CORE, RESEARCH_CORE, RESEARCH_FULL, install, selected_environment, verify
 
 
 def wheel(root, name, version, extra=None):
@@ -80,6 +80,25 @@ def test_inscription_core_refuses_private_khipu_and_audio_generators(tmp_path):
         value["wheels"].append(wheel(folder, application, version))
         manifest = folder / "manifest.json"; manifest.write_text(json.dumps(value))
         with pytest.raises(ValueError): verify(manifest)
+
+
+@pytest.mark.parametrize("profile,components", [
+    ("listening-research-core/v1", RESEARCH_CORE),
+    ("listening-research-full/v1", RESEARCH_FULL),
+])
+def test_research_selection_is_explicit_and_refuses_incomplete_or_private_sets(tmp_path, profile, components):
+    value = dict(contract=CONTRACT, published=False, compatibility_profile=profile,
+                 wheels=[wheel(tmp_path, name, version) for name, version in components.items()])
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps(value))
+    assert verify(manifest)["compatibility_profile"] == profile
+    original = list(value["wheels"])
+    value["wheels"] = original[:-1]
+    manifest.write_text(json.dumps(value))
+    with pytest.raises(ValueError, match="exact declared"): verify(manifest)
+    value["wheels"] = original + [wheel(tmp_path, "sonicfield-khipu", "0.7.1")]
+    manifest.write_text(json.dumps(value))
+    with pytest.raises(ValueError, match="Unreviewed application"): verify(manifest)
 
 
 def test_archive_member_traversal_is_rejected_before_install(tmp_path):
