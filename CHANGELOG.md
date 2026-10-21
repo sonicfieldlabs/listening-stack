@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.7.0 — 2026-10-21
+
+- Add the opt-in `listening-research-core/v1` and `listening-research-full/v1`
+  profiles for the research candidate: public Sonic Field context, explicitly
+  selected local passages and bounded return recipes (Oída 0.14.0). They require
+  exact wheel manifests and report installed research declarations without
+  reading a source or activating an owner.
+- Document the local planner's inquiry framing and its 21 October re-admission
+  for planning, routing and inquiry, including the known limit that it can label
+  a model-written summary as a fact.
+- Skip the cohort import test outside a research cohort; lock certifi 2026.10.19.
+- The managed source profile stays at the reviewed 0.4.1 compatibility set, and
+  the published executable stays 0.4.1.
+
 ## 0.6.1 — 2026-10-14
 
 - Add the opt-in `listening-md-core/v1` profile for the LISTENING.md inscription

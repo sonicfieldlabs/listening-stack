@@ -19,12 +19,18 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer candidate: `0.6.1` (unpublished). The latest published installer is `0.5.1`.
+Current installer candidate: `0.7.0` (unpublished). The latest published installer executable is `0.4.1`;
+`0.5.0` to `0.6.1` are tagged sources whose executables were not published.
 
 The opt-in [LISTENING.md candidate](docs/listening-md-candidate.md) adds primary
 text/data inputs and completed textual works through a separately verified
 wheel cohort. Its diagnostic reports installed representation and file
 lifecycle support. Select and qualify a provider explicitly before execution.
+
+The separate [research candidate](docs/research-candidate.md) packages public
+Sonic Field context, explicitly selected local passages and bounded return
+recipes. Its core/full profiles require exact unpublished wheel manifests and
+report installed declarations without reading sources or activating owners.
 
 The revised local package selection, including the repaired readers, is recorded
 in [the Phase 17 cohort record](docs/listening-md-phase17.md). Published installer
@@ -74,7 +80,7 @@ chmod +x listening-stack.pyz
 
 Sources are cloned into a dedicated installation directory. The installer
 verifies every existing origin and refuses to update a dirty or unexpected
-checkout. Releases `0.4.1` to `0.5.1` and the `0.6.1` candidate install one
+checkout. Releases `0.4.1` to `0.5.1` and the `0.6.1` and `0.7.0` candidates install one
 immutable compatibility set and record the exact commits they installed in
 local state:
 

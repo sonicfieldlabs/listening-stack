@@ -16,6 +16,7 @@ OWNER_TESTS = (
     "tests/test_phase17_tools.py",
     "tests/test_situated_qualification.py",
     "tests/test_representation_cohort.py",
+    "tests/test_research_cohort.py",
 )
 OWNERS = ("oida", "akousma", "akousmata_app", "akouo_contract")
 

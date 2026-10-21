@@ -19,6 +19,20 @@ Set `OIDA_LOCAL_REASONING_CONFIG` to the resulting `deployments.json` for Oída 
 
 To disable the provider, stop the supervisor, remove its planning service entry and `OIDA_LOCAL_REASONING_CONFIG`, then restart. Keep the listening/model/data directories. If a saved preset explicitly selected `local_ecology`, choose another existing provider; unavailable selections fail explicitly rather than silently substituting a model. All other provider configurations and listening records remain intact.
 
+## Inquiry framing and re-admission (21 October 2026)
+
+Oída `648c9ce` changed the worker and gateway after the 25 September admission, and the
+worker then imported Oída inside the model environment, so every call failed and the
+gateway refused the changed files. The repaired worker classifies planning, routing and
+inquiry without Oída. Real retained accounts give the 4B model about 5,000 prompt tokens. The
+worker now caps inquiry answers at 6 blocks, 3 hypotheses and 4 uncertainties, requires
+one to six offered references per item and accepts one leading Markdown fence. The caps
+are stated in the prompt and enforced when the answer is validated. The same 24 admission
+cases pass again. Six representative
+real-account inquiries from separate development clips pass 4/6; the two failures label a
+model-written summary as a fact. Recreate the manifest with the evaluation receipt that
+contains only the admission cases, and record the representative result beside it.
+
 ## Isolated candidate endpoints
 
 The optional deployment JSON can set `base_url`, for example

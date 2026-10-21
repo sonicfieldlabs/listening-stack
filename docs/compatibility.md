@@ -1,5 +1,9 @@
 # Optional host compatibility
 
+For the separately selected research owner cohort, exact artifact installation
+and recovery boundaries, see [research candidate](research-candidate.md). Historical
+managed and inscription selections retain their existing identities.
+
 Host applications can use Oída's situated listener and Akousmata's ancestry contracts without changing the published installer profile. Optional run fields include `share_analysis`, `acoustic_retrieval` and `review_generation`; planning can add a `role`. Oída rule options retain the corresponding fields. Consumers must negotiate supported capabilities and leave unavailable options disabled.
 
 Akousmata carries generated ancestry through parent links before serving acoustic candidates. Older run and preset payloads retain their original parameter meanings, with new optional fields defaulting off. Running work is never automatically replayed after a restart.
