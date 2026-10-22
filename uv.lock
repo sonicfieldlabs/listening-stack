@@ -1205,7 +1205,7 @@ wheels = [
 
 [[package]]
 name = "sonicfield-listening-stack"
-version = "0.7.0"
+version = "0.7.1"
 source = { editable = "." }
 
 [package.optional-dependencies]
@@ -1227,14 +1227,14 @@ requires-dist = [
     { name = "akousmata", marker = "extra == 'owner-test'", path = "vendor/akousmata-0.9.1-py3-none-any.whl" },
     { name = "pytest", marker = "extra == 'owner-test'", specifier = ">=8" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
-    { name = "sonicfield-oida", marker = "python_full_version >= '3.12' and extra == 'owner-test'", path = "vendor/sonicfield_oida-0.13.2-py3-none-any.whl" },
+    { name = "sonicfield-oida", marker = "python_full_version >= '3.12' and extra == 'owner-test'", path = "vendor/sonicfield_oida-0.14.1-py3-none-any.whl" },
 ]
 provides-extras = ["test", "owner-test"]
 
 [[package]]
 name = "sonicfield-oida"
-version = "0.13.2"
-source = { path = "vendor/sonicfield_oida-0.13.2-py3-none-any.whl" }
+version = "0.14.1"
+source = { path = "vendor/sonicfield_oida-0.14.1-py3-none-any.whl" }
 dependencies = [
     { name = "akouo-contract", marker = "python_full_version >= '3.12'" },
     { name = "akousma", marker = "python_full_version >= '3.12'" },
@@ -1252,7 +1252,7 @@ dependencies = [
     { name = "uvicorn", extra = ["standard"], marker = "python_full_version >= '3.12'" },
 ]
 wheels = [
-    { filename = "sonicfield_oida-0.13.2-py3-none-any.whl", hash = "sha256:2bde37349a1cb276c48b708f84d486092423c7ca0d0b4ce4f0e8956b08c661f2" },
+    { filename = "sonicfield_oida-0.14.1-py3-none-any.whl", hash = "sha256:248632b6c705840d5522fc1da639f1c8413da7cf323a9675ba6e5872a230a524" },
 ]
 
 [package.metadata]
@@ -1267,7 +1267,7 @@ requires-dist = [
     { name = "fsspec", marker = "extra == 'moss'", specifier = ">=2026.6.0" },
     { name = "httpx2", specifier = ">=2.12,<3" },
     { name = "jsonschema", specifier = ">=4.22" },
-    { name = "mcp", specifier = ">=1.27,<2" },
+    { name = "mcp", specifier = ">=1.30,<2" },
     { name = "multidict", marker = "extra == 'songid'", specifier = ">=6.9.1" },
     { name = "numpy", specifier = ">=1.26" },
     { name = "pydantic", specifier = ">=2.8" },

@@ -58,3 +58,17 @@ jobs:
         run: shasum -a 256 -c vendor/SHA256SUMS
       - run: python -m pip install --find-links vendor '.[owner-test]'
       - run: python -I scripts/check_tests.py owners --junitxml "$RUNNER_TEMP/installer-owners.xml"
+
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.13"
+      - run: shasum -a 256 -c vendor/SHA256SUMS
+      - run: python -m pip install --find-links vendor '.[owner-test]'
+      - run: python -I scripts/check_tests.py research --junitxml "$RUNNER_TEMP/installer-research.xml"

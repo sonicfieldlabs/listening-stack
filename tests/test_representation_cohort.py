@@ -12,7 +12,7 @@ def test_installed_diagnostic_names_software_support_without_activation(tmp_path
     monkeypatch.chdir(tmp_path)
     report = installed_capabilities()
     assert report["state"] == "installed_software"
-    assert report["owners"] == {"sonicfield-oida":"0.13.2", "akousma":"0.10.1", "akousmata":"0.9.1", "akouo-contract":"0.12.1"}
+    assert report["owners"] == {"sonicfield-oida":"0.14.1", "akousma":"0.10.1", "akousmata":"0.9.1", "akouo-contract":"0.12.1"}
     assert set(report["execution"]["conventions"]) == {"text", "data", "morse", "notation", "glyphs", "code", "midi"}
     assert report["execution"]["output_forms"] == ["text"]
     assert report["execution"]["output_kinds"] == ["account", "work"]
@@ -46,10 +46,15 @@ def test_owner_test_wheels_and_lock_name_the_same_bytes():
     root = Path(__file__).resolve().parents[1]
     manifest = json.loads((root / "vendor/owner-test-wheels.json").read_text())
     lock = tomllib.loads((root / "uv.lock").read_text())
-    assert manifest["compatibility_basis"] == "listening-md-core/v1"
+    checksums = {
+        path: digest
+        for digest, path in (line.split() for line in (root / "vendor/SHA256SUMS").read_text().splitlines() if line.strip())
+    }
+    assert manifest["compatibility_basis"] == "listening-research-core/v3"
     for row in manifest["wheels"]:
         digest = hashlib.sha256((root / "vendor" / row["file"]).read_bytes()).hexdigest()
         assert digest == row["sha256"]
+        assert checksums["vendor/" + row["file"]] == digest
         package = next(p for p in lock["package"] if p["name"] == row["distribution"])
         assert package["version"] == row["version"]
         assert package["source"] == {"path": "vendor/" + row["file"]}
