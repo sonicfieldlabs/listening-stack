@@ -1,5 +1,18 @@
 # Listening research candidate
 
+The versioned research selections are:
+
+| Profile suffix | Oída | Installer | Status |
+| --- | --- | --- | --- |
+| `/v1` | 0.13.2 | 0.6.1 | Historical unpublished P7/P8 candidate bytes |
+| `/v2` | 0.14.0 | 0.7.0 | October release identities; exact manifest still required |
+| `/v3` | 0.14.1 | 0.7.1 | Audit repair candidates; unpublished, selected for current owner CI |
+
+Both `listening-research-core` and `listening-research-full` use these suffixes.
+The repair profiles preserve the earlier selections and require new wheel hashes.
+Research CI installs the repaired owner wheel and requires zero skipped cohort tests.
+Preparing or verifying a candidate does not publish or activate it.
+
 `listening-research-core/v1` and `listening-research-full/v1` are explicit,
 unpublished selections for the P2–P6 research adapters. Core selects Oída
 0.13.2, Akousma 0.10.1, Akousmata 0.9.1, AKOÚŌ 0.12.1 and installer 0.6.1.

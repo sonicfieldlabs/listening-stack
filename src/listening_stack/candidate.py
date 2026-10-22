@@ -25,10 +25,19 @@ LISTENING_MD_CORE = {
 # not distinguish this selection from the earlier inscription candidate.
 RESEARCH_CORE = dict(LISTENING_MD_CORE)
 RESEARCH_FULL = {**RESEARCH_CORE, "germ": "0.7.0"}
+# Versioned selections preserve the same-version P7/P8 candidate history.
+RESEARCH_RELEASED_CORE = {**RESEARCH_CORE, "sonicfield-oida": "0.14.0", "sonicfield-listening-stack": "0.7.0"}
+RESEARCH_RELEASED_FULL = {**RESEARCH_RELEASED_CORE, "germ": "0.7.0"}
+RESEARCH_REPAIRED_CORE = {**RESEARCH_CORE, "sonicfield-oida": "0.14.1", "sonicfield-listening-stack": "0.7.1"}
+RESEARCH_REPAIRED_FULL = {**RESEARCH_REPAIRED_CORE, "germ": "0.7.0"}
 PROFILES = {"listening-stack-core/v1": CORE, "listening-stack-full/v1": FULL,
             "listening-md-core/v1": LISTENING_MD_CORE,
             "listening-research-core/v1": RESEARCH_CORE,
-            "listening-research-full/v1": RESEARCH_FULL}
+            "listening-research-full/v1": RESEARCH_FULL,
+            "listening-research-core/v2": RESEARCH_RELEASED_CORE,
+            "listening-research-full/v2": RESEARCH_RELEASED_FULL,
+            "listening-research-core/v3": RESEARCH_REPAIRED_CORE,
+            "listening-research-full/v3": RESEARCH_REPAIRED_FULL}
 APPLICATIONS = frozenset(FULL)
 
 
@@ -201,9 +210,9 @@ print(json.dumps({'isolated_imports':True,'pinned_owner_bytes':True,'owner_paylo
                   'distribution_count':len(expected),'python':sys.version.split()[0],
                   'platform':sys.platform,
                   **({'inscriptions':importlib.import_module('listening_stack.representations').installed_capabilities()}
-                     if json.loads(sys.argv[4]) in {'listening-md-core/v1', 'listening-research-core/v1', 'listening-research-full/v1'} else {}),
+                     if json.loads(sys.argv[4]) == 'listening-md-core/v1' or json.loads(sys.argv[4]).startswith('listening-research-') else {}),
                   **({'research':importlib.import_module('listening_stack.research_support').installed_capabilities()}
-                     if json.loads(sys.argv[4]) in {'listening-research-core/v1', 'listening-research-full/v1'} else {})}))
+                     if json.loads(sys.argv[4]).startswith('listening-research-') else {})}))
 '''
     executable = root / (".venv/Scripts/python.exe" if os.name == "nt" else ".venv/bin/python")
     environment = selected_environment(root, include_germ="germ" in PROFILES[value["compatibility_profile"]])

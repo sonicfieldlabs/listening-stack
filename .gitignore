@@ -19,6 +19,9 @@ output/
 logs/
 vendor/*
 !vendor/sonicfield_oida-0.13.2-py3-none-any.whl
+!vendor/sonicfield_oida-0.14.1-py3-none-any.whl
+!vendor/owner-test-wheels-0.13.2.json
+!vendor/oida-0.14.1-source-inputs.json
 !vendor/akousma-0.10.1-py3-none-any.whl
 !vendor/akousmata-0.9.1-py3-none-any.whl
 !vendor/akouo_contract-0.12.1-py3-none-any.whl
