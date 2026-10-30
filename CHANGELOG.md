@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.1 — Unreleased audit repair candidate
+
+- Preserve research v1 and add v2 for the October release identities, plus v3
+  for Oida 0.14.1 and installer 0.7.1 repair candidates.
+- Pin the repaired owner wheel, its source inventory and exact checksums; retain
+  the historical 0.13.2 fixture manifest and wheel separately.
+- Require an installed research CI lane with collected tests and zero skips.
+  Public bootstrap defaults, activation and publication remain separate.
+
 ## 0.7.0 — 2026-10-21
 
 - Add the opt-in `listening-research-core/v1` and `listening-research-full/v1`
