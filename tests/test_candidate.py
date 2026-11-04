@@ -1,15 +1,26 @@
 import hashlib
 import json
-from pathlib import Path
 import runpy
 import subprocess
+import zipfile
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
-import zipfile
 
 import pytest
 
-from listening_stack.candidate import CONTRACT, CORE, FULL, LISTENING_MD_CORE, RESEARCH_CORE, RESEARCH_FULL, install, selected_environment, verify
+from listening_stack.candidate import (
+    CONTRACT,
+    CORE,
+    FULL,
+    LISTENING_MD_CORE,
+    PROFILES,
+    RESEARCH_CORE,
+    RESEARCH_FULL,
+    install,
+    selected_environment,
+    verify,
+)
 
 
 def wheel(root, name, version, extra=None):
@@ -85,6 +96,7 @@ def test_inscription_core_refuses_private_khipu_and_audio_generators(tmp_path):
 @pytest.mark.parametrize("profile,components", [
     ("listening-research-core/v1", RESEARCH_CORE),
     ("listening-research-full/v1", RESEARCH_FULL),
+    *[(profile, components) for profile, components in PROFILES.items() if profile.endswith(("/v2", "/v3"))],
 ])
 def test_research_selection_is_explicit_and_refuses_incomplete_or_private_sets(tmp_path, profile, components):
     value = dict(contract=CONTRACT, published=False, compatibility_profile=profile,

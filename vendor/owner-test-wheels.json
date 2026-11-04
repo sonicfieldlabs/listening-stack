@@ -1,5 +1,5 @@
 {
-  "purpose": "Unpublished owner integration fixtures for listening-md-core/v1, reconciled with the 8 and 9 October releases; managed public Git pins remain separate.",
+  "purpose": "Owner integration fixtures for the listening-research-core/v3 audit repair candidate; historical selections and the public bootstrap remain separate.",
   "wheels": [
     {
       "distribution": "akouo-contract",
@@ -42,19 +42,19 @@
     },
     {
       "distribution": "sonicfield-oida",
-      "version": "0.13.2",
-      "sha256": "2bde37349a1cb276c48b708f84d486092423c7ca0d0b4ce4f0e8956b08c661f2",
+      "version": "0.14.1",
+      "sha256": "248632b6c705840d5522fc1da639f1c8413da7cf323a9675ba6e5872a230a524",
       "source_repository": "oida",
-      "base_commit": "397401c7e2514d837da879a6fc6b5111c92b4da6",
-      "build_state": "Built from the committed merge of the published release line with the LISTENING.md work; registry publication remains separate.",
-      "source_changes_sha256": "a5d902b08783d38cb7c62df39ed1fad6c5699ddfd3af2419a72d39cda4f82e96",
+      "base_commit": "c69bc28cfc30ba04c8f3bef8cfc72e2c27b31eeb",
+      "build_state": "Unpublished audit repair candidate including final re-listen selection enforcement; exact wheel and source digest select this revision.",
+      "source_changes_sha256": "8f4dfe01ee87cb124ab646ff403a173f1584e5a66fb872d41a637f703d403bf6",
       "source_changes_basis": "SHA256 of compact sorted JSON mapping explicit source-distribution input paths to file SHA256; excludes generated PKG-INFO.",
       "published": false,
-      "file": "sonicfield_oida-0.13.2-py3-none-any.whl",
+      "file": "sonicfield_oida-0.14.1-py3-none-any.whl",
       "builder": "hatchling==1.32.4"
     }
   ],
-  "compatibility_basis": "listening-md-core/v1",
-  "oida_metadata_review": "Oida 0.13.2 built from oida 397401c, which contains the published 0.12.1 line and the LISTENING.md inscription work.",
-  "metadata_review": "Reconciled 13 October 2026 (ship E1): built from committed owner merges; earlier Phase 17 wheels and receipts remain in the sealed operations archives."
+  "compatibility_basis": "listening-research-core/v3",
+  "oida_metadata_review": "Oida 0.14.1 audit repair candidate. Historical 0.13.2 fixture manifest is retained separately.",
+  "metadata_review": "Prepared 22 October 2026; exact wheel bytes and source inputs identify this unpublished candidate."
 }
