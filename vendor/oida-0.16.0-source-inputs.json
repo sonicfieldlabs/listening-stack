@@ -223,7 +223,7 @@
   "oida/textual_budget.py": "ba66e965ce30e8773a05284858ad195aabee143b45e9a3a4a04c85779d6caa5b",
   "oida/textual_sounding.py": "6a3fee06f1d1be6b5baa620e27edac0596a7305070dc262a7a32e96f2d95feee",
   "oida/transposition.py": "09934e55eddd1fc92dc06e717db17bf61e4b503f5e69f5ca7fb011a252b29335",
-  "oida/window_leases.py": "dee8c8203e2c81d42747e7d16bcd3ea02502b00ee520196f1de50e3b71c9deac",
+  "oida/window_leases.py": "9faeac2a6f384d8b77eb9a6ffa4cf777c1607faacaa9e883092cce07a877e33e",
   "pyproject.toml": "af86986989ac7a5e83682b56833212ae765720370d906aeaa71f031636bb6b5d",
   "tests/fixtures/sources/LICENSE": "e99aaf82224217516800f9d7ecedcc825113b1669f9ecb264ee178c90e5d3c50",
   "vendor/NOTICE.md": "51c69c1187e82d9695d1ce223d236f13a5c24b148ec7888531a565d35f590484",
