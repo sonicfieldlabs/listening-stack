@@ -22,8 +22,9 @@ code.
 Current installer release: `0.8.0` (GitHub, 14 November 2026, with its executable). The executable
 before it was `0.4.1`; `0.5.0` to `0.7.0` are tagged sources whose executables were not published.
 Its default profiles install the tested set listed under
-[What the Assistant Can Install](#what-the-assistant-can-install); the owners' current versions
-are reached through the opt-in candidates described below.
+[What the Assistant Can Install](#what-the-assistant-can-install). The owners' current versions
+are selected only by the opt-in candidates described below, which install from a reviewed offline
+bundle that is not published; the bootstrap command alone does not install them.
 
 The opt-in [LISTENING.md candidate](docs/listening-md-candidate.md) adds primary
 text/data inputs and completed textual works through a separately verified
