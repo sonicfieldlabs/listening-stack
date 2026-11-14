@@ -28,7 +28,11 @@ def test_diagnostic_does_not_read_sources_or_contact_an_owner(tmp_path, monkeypa
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(socket, "create_connection", forbidden)
     monkeypatch.setattr(socket.socket, "connect", forbidden)
-    monkeypatch.setattr(local_passages, "ROOTS", {"aleph": Path("unavailable-source")})
+    # Oída 0.16.0 reads its local corpora from the operator's file; this one names a folder
+    # that is not there, and the diagnostic must not look for it.
+    roots = tmp_path.parent / "roots.json"
+    roots.write_text('{"contract": "oida/local-passage-roots/v1", "corpora": {"aleph": "/unavailable-source"}}')
+    monkeypatch.setenv("OIDA_LOCAL_PASSAGES_ROOTS", str(roots))
     monkeypatch.setattr(sonicfield_discovery.httpx, "AsyncClient", forbidden)
     report = installed_capabilities()
     assert report["contracts"] == {

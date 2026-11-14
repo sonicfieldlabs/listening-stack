@@ -6,9 +6,13 @@ The versioned research selections are:
 | --- | --- | --- | --- |
 | `/v1` | 0.13.2 | 0.6.1 | Historical unpublished P7/P8 candidate bytes |
 | `/v2` | 0.14.0 | 0.7.0 | October release identities; exact manifest still required |
-| `/v3` | 0.14.1 | 0.7.1 | Audit repair candidates; unpublished, selected for current owner CI |
+| `/v3` | 0.14.1 | 0.7.1 | Audit repair candidates; unpublished, never released |
+| `/v4` | 0.16.0 | 0.8.0 | The circuit cohort; unpublished, selected for current owner CI |
 
 Both `listening-research-core` and `listening-research-full` use these suffixes.
+`/v4` selects Oída 0.16.0, Akousma 0.11.0, Akousmata 0.10.1, AKOÚŌ 0.13.1 and installer
+0.8.0; full adds GERM 0.8.1. It carries what a listening circuit needs: a held live
+window, the circuit and run-memory records, the router's rules and Akousmata's runs.
 The repair profiles preserve the earlier selections and require new wheel hashes.
 Research CI installs the repaired owner wheel and requires zero skipped cohort tests.
 Preparing or verifying a candidate does not publish or activate it.

@@ -30,6 +30,13 @@ RESEARCH_RELEASED_CORE = {**RESEARCH_CORE, "sonicfield-oida": "0.14.0", "sonicfi
 RESEARCH_RELEASED_FULL = {**RESEARCH_RELEASED_CORE, "germ": "0.7.0"}
 RESEARCH_REPAIRED_CORE = {**RESEARCH_CORE, "sonicfield-oida": "0.14.1", "sonicfield-listening-stack": "0.7.1"}
 RESEARCH_REPAIRED_FULL = {**RESEARCH_REPAIRED_CORE, "germ": "0.7.0"}
+# The circuit cohort: Oída's window lease and pass limits, the circuit and run-memory records,
+# the router's 0.13.1 rules, Akousmata's runs. Unpublished; exact wheel bytes select it.
+RESEARCH_CIRCUIT_CORE = {
+    "sonicfield-oida": "0.16.0", "akousma": "0.11.0", "akousmata": "0.10.1",
+    "akouo-contract": "0.13.1", "sonicfield-listening-stack": "0.8.0",
+}
+RESEARCH_CIRCUIT_FULL = {**RESEARCH_CIRCUIT_CORE, "germ": "0.8.1"}
 PROFILES = {"listening-stack-core/v1": CORE, "listening-stack-full/v1": FULL,
             "listening-md-core/v1": LISTENING_MD_CORE,
             "listening-research-core/v1": RESEARCH_CORE,
@@ -37,7 +44,9 @@ PROFILES = {"listening-stack-core/v1": CORE, "listening-stack-full/v1": FULL,
             "listening-research-core/v2": RESEARCH_RELEASED_CORE,
             "listening-research-full/v2": RESEARCH_RELEASED_FULL,
             "listening-research-core/v3": RESEARCH_REPAIRED_CORE,
-            "listening-research-full/v3": RESEARCH_REPAIRED_FULL}
+            "listening-research-full/v3": RESEARCH_REPAIRED_FULL,
+            "listening-research-core/v4": RESEARCH_CIRCUIT_CORE,
+            "listening-research-full/v4": RESEARCH_CIRCUIT_FULL}
 APPLICATIONS = frozenset(FULL)
 
 

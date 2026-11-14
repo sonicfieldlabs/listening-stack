@@ -1,6 +1,20 @@
 # Changelog
 
-## 0.7.1 — Unreleased audit repair candidate
+## 0.8.0 — Unreleased
+
+- Research v4, the circuit cohort: Oída 0.16.0 (a window lease that lets the
+  same live window be heard again, pass limits, local corpora named by the
+  operator), Akousma 0.11.0 (listening-circuit and run-memory records),
+  Akousmata 0.10.1 (runs, opened from the page's address), AKOÚŌ contract
+  0.13.1 (the router as rules) and installer 0.8.0; full adds GERM 0.8.1.
+  Earlier selections are preserved.
+- Pin the four owner wheels with their source identities and exact checksums;
+  the 0.14.1 and 0.13.2 fixture manifests and wheels are retained separately.
+- The research diagnostic's test names an unavailable corpus through Oída's
+  roots file, since Oída 0.16.0 names no folder in source.
+  Public bootstrap defaults, activation and publication remain separate.
+
+## 0.7.1 — not released; a repair candidate for an Oída 0.14.1 that was never released
 
 - Preserve research v1 and add v2 for the October release identities, plus v3
   for Oida 0.14.1 and installer 0.7.1 repair candidates.
