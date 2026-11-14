@@ -19,8 +19,11 @@ Earworm, and Akousmata remain independent repositories with their own histories,
 licenses, and releases. The assistant does not duplicate their application
 code.
 
-Current installer candidate: `0.8.0` (unpublished). The latest published installer executable is `0.4.1`;
-`0.5.0` to `0.6.1` are tagged sources whose executables were not published.
+Current installer release: `0.8.0` (GitHub, 14 November 2026, with its executable). The executable
+before it was `0.4.1`; `0.5.0` to `0.7.0` are tagged sources whose executables were not published.
+Its default profiles install the tested set listed under
+[What the Assistant Can Install](#what-the-assistant-can-install); the owners' current versions
+are reached through the opt-in candidates described below.
 
 The opt-in [LISTENING.md candidate](docs/listening-md-candidate.md) adds primary
 text/data inputs and completed textual works through a separately verified

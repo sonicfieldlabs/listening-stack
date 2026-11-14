@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.0 — Unreleased
+## 0.8.0 — 2026-11-14
 
 - Research v4, the circuit cohort: Oída 0.16.0 (a window lease that lets the
   same live window be heard again, pass limits, local corpora named by the
