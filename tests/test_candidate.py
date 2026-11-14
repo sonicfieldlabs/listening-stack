@@ -96,7 +96,7 @@ def test_inscription_core_refuses_private_khipu_and_audio_generators(tmp_path):
 @pytest.mark.parametrize("profile,components", [
     ("listening-research-core/v1", RESEARCH_CORE),
     ("listening-research-full/v1", RESEARCH_FULL),
-    *[(profile, components) for profile, components in PROFILES.items() if profile.endswith(("/v2", "/v3"))],
+    *[(profile, components) for profile, components in PROFILES.items() if profile.endswith(("/v2", "/v3", "/v4"))],
 ])
 def test_research_selection_is_explicit_and_refuses_incomplete_or_private_sets(tmp_path, profile, components):
     value = dict(contract=CONTRACT, published=False, compatibility_profile=profile,

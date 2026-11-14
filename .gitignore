@@ -21,6 +21,12 @@ vendor/*
 !vendor/sonicfield_oida-0.13.2-py3-none-any.whl
 !vendor/sonicfield_oida-0.14.1-py3-none-any.whl
 !vendor/owner-test-wheels-0.13.2.json
+!vendor/owner-test-wheels-0.14.1.json
+!vendor/sonicfield_oida-0.16.0-py3-none-any.whl
+!vendor/oida-0.16.0-source-inputs.json
+!vendor/akousma-0.11.0-py3-none-any.whl
+!vendor/akousmata-0.10.1-py3-none-any.whl
+!vendor/akouo_contract-0.13.1-py3-none-any.whl
 !vendor/oida-0.14.1-source-inputs.json
 !vendor/akousma-0.10.1-py3-none-any.whl
 !vendor/akousmata-0.9.1-py3-none-any.whl

@@ -1,8 +1,17 @@
+# Publishing is deliberate; creating a tag alone does not start hosted work.
 name: Release executable
 
 on:
-  push:
-    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: Existing v-prefixed release tag to qualify and publish
+        type: string
+        required: true
+      expected_sha:
+        description: Exact 40-character commit already selected for this release tag
+        type: string
+        required: true
 
 permissions:
   contents: read
@@ -12,36 +21,69 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  authorize:
+    name: Bind the release tag to the reviewed commit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.expected_sha }}
+          fetch-depth: 0
+      - name: Verify the tag before starting full qualification
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          RELEASE_REF: ${{ inputs.release_ref }}
+        run: |
+          test "${#EXPECTED_SHA}" -eq 40
+          case "$EXPECTED_SHA" in *[!0-9a-f]*) exit 1 ;; esac
+          case "$RELEASE_REF" in v*) ;; *) exit 1 ;; esac
+          git check-ref-format "refs/tags/$RELEASE_REF"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$(git rev-parse "refs/tags/$RELEASE_REF^{commit}")" = "$EXPECTED_SHA"
+
   checks:
+    needs: authorize
     uses: ./.github/workflows/ci.yml
+    with:
+      full: true
+      release_ref: ${{ inputs.expected_sha }}
   release:
     if: ${{ vars.LISTENING_STACK_PUBLISH_ENABLED == 'true' }}
     permissions:
       contents: write
     environment: github-release
     needs: checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          ref: ${{ inputs.expected_sha }}
+          fetch-depth: 0
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
       - name: Verify release tag
+        env:
+          RELEASE_REF: ${{ inputs.release_ref }}
         run: |
           project_version="$(python -c 'from pathlib import Path; import re; print(re.search(r"^version = \"([^\"]+)\"", Path("pyproject.toml").read_text(), re.MULTILINE).group(1))')"
           package_version="$(PYTHONPATH=src python -c 'import listening_stack; print(listening_stack.__version__)')"
-          test "$GITHUB_REF_NAME" = "v$project_version"
+          case "$RELEASE_REF" in v*) ;; *) exit 1 ;; esac
+          test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_REF"
+          test "$RELEASE_REF" = "v$project_version"
           test "$project_version" = "$package_version"
       - run: python scripts/build_release.py
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_REF: ${{ inputs.release_ref }}
         run: >-
-          gh release create "$GITHUB_REF_NAME"
+          gh release create "$RELEASE_REF"
           dist/listening-stack.pyz
           dist/listening-stack.pyz.sha256
-          --title "Listening Stack $GITHUB_REF_NAME"
+          --title "Listening Stack $RELEASE_REF"
           --generate-notes

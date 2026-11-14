@@ -1,10 +1,29 @@
+# Portable PR checks run once; full platform qualification is deliberate.
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
+    branches:
+    - main
+  workflow_dispatch:
+    inputs:
+      full:
+        description: Run complete platform and release qualification (prefer local execution)
+        type: boolean
+        required: false
+        default: false
   workflow_call:
+    inputs:
+      full:
+        description: Run complete platform and release qualification (prefer local execution)
+        type: boolean
+        required: false
+        default: true
+      release_ref:
+        description: Immutable release tag selected by the publishing workflow
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -21,6 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.release_ref || github.ref }}
           persist-credentials: false
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
@@ -33,17 +53,15 @@ jobs:
 
   unit:
     strategy:
+      max-parallel: 1
       matrix:
-        include:
-          - {os: ubuntu-latest, python: "3.11.18"}
-          - {os: ubuntu-latest, python: "3.12.16"}
-          - {os: ubuntu-latest, python: "3.13.18"}
-          - {os: macos-latest, python: "3.14.10"}
+        include: ${{ inputs.full && fromJSON('[{"os":"ubuntu-24.04","python":"3.11.18"},{"os":"ubuntu-24.04","python":"3.12.16"},{"os":"ubuntu-24.04","python":"3.13.18"},{"os":"macos-latest","python":"3.14.10"}]') || fromJSON('[{"os":"ubuntu-24.04","python":"3.12.16"}]') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.release_ref || github.ref }}
           persist-credentials: false
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
@@ -61,11 +79,12 @@ jobs:
       - run: bash -n install.sh listening-stack
 
   owners:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.release_ref || github.ref }}
           persist-credentials: false
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
@@ -76,11 +95,12 @@ jobs:
       - run: python -I scripts/check_tests.py owners --junitxml "$RUNNER_TEMP/installer-owners.xml"
 
   research:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.release_ref || github.ref }}
           persist-credentials: false
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
